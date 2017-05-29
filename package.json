@@ -1,0 +1,11 @@
+{
+  "name": "node-7dtd-discord",
+  "version": "1.0.0",
+  "description": "Discord integration for 7 Days to Die.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LakeYS",
+  "license": "ISC"
+}
