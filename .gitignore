@@ -46,5 +46,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Node modules
+# Node modules and security
 node_modules
+run.sh
