@@ -63,7 +63,7 @@ connection.on('data', function(data) {
       // Convert it to Discord-friendly text.
       msg = msg.replace("'","").replace("'","");
 
-      channel.sendMessage(msg);
+      channel.send(msg);
       console.log(msg);
     }
   }
@@ -90,7 +90,7 @@ client.on('ready', () => {
 
 client.on('message', function(msg) {
   if(msg.channel == channel && msg.author != client.user)
-    channel.sendMessage("WIP: Messages are not sent to the server yet.");
+    channel.send("WIP: Messages are not sent to the server yet.");
 });
 
 ////// # Input
@@ -109,4 +109,8 @@ process.on('exit',  () => {
 
 process.on('uncaughtException', (err) => {
   console.log(err);
+
+  console.log("An error occurred. Reconnecting...");
+  //client.destroy();
+  setTimeout(function(){ client.login(token); }, 2000);
 });
