@@ -86,9 +86,6 @@ client.on('ready', () => {
   console.log('Connected to ' + client.guilds.size + ' servers.');
 
   channel = client.channels.find("id","319257907579453440");
-
-  console.log(channel);
-  console.log(channelid);
 });
 
 client.on('message', function(msg) {
@@ -98,12 +95,18 @@ client.on('message', function(msg) {
 
 ////// # Input
 process.stdin.on('data', function (text) {
-  if(text == "stop\r\n")
+  if(text.toString() == "stop\n" || text.toString() == "exit\n")
     process.exit();
+  else if(text.toString() == "help\n")
+    console.log("This is the console for the Discord bot. It currently only accepts JavaScript commands for advanced users. Type 'exit' to shut it down.");
   else
     eval(text.toString());
 });
 
 process.on('exit',  () => {
   client.destroy();
+});
+
+process.on('uncaughtException', (err) => {
+  console.log(err);
 });
