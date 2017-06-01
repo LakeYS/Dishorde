@@ -23,7 +23,7 @@ var params = {
   shellPrompt: /\r\n$/,
 
   debug: false,
-}
+};
 
 //var cmd = 'say "--telnet connected--"';
 var cmd = 'version';
@@ -31,46 +31,57 @@ var cmd = 'version';
 connection.on('ready', function(prompt) {
   connection.exec(cmd, function(err, response) {
     console.log(response);
-  })
-})
+  });
+});
 
 connection.on('failedlogin', function(prompt) {
-    console.log("login failed!");
-})
+    console.log("Login to game failed!");
+});
 
 connection.on('timeout', function() {
-  console.log('socket timeout!');
-  connection.end();
-})
+  //console.log('Connection to game timed out.');
+  //connection.end();
+});
 
 connection.on('close', function() {
-  console.log('connection closed');
-})
+  console.log('Connection to game closed.');
+});
 
 connection.on('data', function(data) {
-  var data = data.toString();
-  var split = data.split(" ");
-  var type = split[3];
+  data = data.toString();
+  var lines = data.split("\n");
 
-  if(type == "Chat:")
+  for(var i = 0; i <= lines.length-1; i++)
   {
-    // Make sure the channel exists.
-    if(channel !== null)
+    //console.log("*LINE" + " " + i + " " + lines[i]);
+    var line = lines[i];
+
+    var split = line.split(" ");
+    var type = split[3];
+
+    if(type == "Chat:" || type == "GMSG:")
     {
-      // Cut off the timestamp and other info
-      var msg = data.substring(40,data.length);
+      // Make sure the channel exists.
+      if(channel !== null)
+      {
+        // Cut off the timestamp and other info
+        // NOTE: This needs to be refined as the number of leading characters can vary.
+        var msg = line.substring(40,line.length);
 
-      // Convert it to Discord-friendly text.
-      msg = msg.replace("'","").replace("'","");
+        // Convert it to Discord-friendly text.
+        // Note: Users can circumvent this if they have an apostrophe in their screen name.
+        msg = msg.replace("'","").replace("'","");
 
-      channel.send(msg);
-      console.log(msg);
+        channel.send(msg);
+        console.log(msg);
+      }
     }
   }
 });
 
 connection.on('error', function(data) {
   console.log(data);
+  console.log("Connection FAILED with error: " + data.code);
 });
 
 connection.connect(params);
@@ -95,9 +106,9 @@ client.on('message', function(msg) {
 
 ////// # Input
 process.stdin.on('data', function (text) {
-  if(text.toString() == "stop\n" || text.toString() == "exit\n")
+  if(text.toString() == "stop\r\n" || text.toString() == "exit\r\n" || text.toString() == "stop\n" || text.toString() == "exit\n")
     process.exit();
-  else if(text.toString() == "help\n")
+  else if(text.toString() == "help\r\n" || text.toString() == "help\n")
     console.log("This is the console for the Discord bot. It currently only accepts JavaScript commands for advanced users. Type 'exit' to shut it down.");
   else
     eval(text.toString());
