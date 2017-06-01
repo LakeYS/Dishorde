@@ -5,6 +5,8 @@ const client = new Discord.Client();
 var telnet = require('telnet-client');
 connection = new telnet();
 
+doReconnect = 1;
+
 ////// Arguments
 // TODO: Replace with proper checks
 pass = process.argv[3];
@@ -12,10 +14,12 @@ token = process.argv[5];
 channelid = process.argv[7].toString();
 
 ////// Telnet
-var params = {
+params = {
   host: '149.56.109.127',
   port: 8081,
-  timeout: 32000,
+  // Timeout is set to 10 minutes, just in case.
+  // Note: The game's timeout appears to be 15.
+  timeout: 600000,
   username: '',
   password: pass,
 
@@ -39,12 +43,16 @@ connection.on('failedlogin', function(prompt) {
 });
 
 connection.on('timeout', function() {
-  //console.log('Connection to game timed out.');
-  //connection.end();
+  console.log('Connection to game timed out. This is normal if the server is empty. Reconnecting...');
+  connection.end();
+  connection.connect(params);
 });
 
 connection.on('close', function() {
   console.log('Connection to game closed.');
+
+  if(doReconnect)
+    setTimeout(function(){ connection.connect(params); }, 5000);
 });
 
 connection.on('data', function(data) {
@@ -115,6 +123,7 @@ process.stdin.on('data', function (text) {
 });
 
 process.on('exit',  () => {
+  doReconnect = 0;
   client.destroy();
 });
 
