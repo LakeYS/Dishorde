@@ -7,13 +7,13 @@ connection = new telnet();
 
 doReconnect = 1;
 
-////// Arguments
+////// # Arguments
 // TODO: Replace with proper checks
 pass = process.argv[3];
 token = process.argv[5];
 channelid = process.argv[7].toString();
 
-////// Telnet
+////// # Telnet
 params = {
   host: '149.56.109.127',
   port: 8081,
@@ -33,26 +33,27 @@ params = {
 var cmd = 'version';
 
 connection.on('ready', function(prompt) {
-  connection.exec(cmd, function(err, response) {
-    console.log(response);
-  });
+  console.log("[" + Date() + "] Connection ready");
 });
 
 connection.on('failedlogin', function(prompt) {
-    console.log("Login to game failed!");
+    console.log("[" + Date() + "] Login to game failed!");
 });
 
 connection.on('timeout', function() {
   console.log('Connection to game timed out. This is normal if the server is empty. Reconnecting...');
   connection.end();
-  connection.connect(params);
+  setTimeout(function(){ connection.connect(params); }, 5000);
 });
 
 connection.on('close', function() {
   console.log('Connection to game closed.');
 
   if(doReconnect)
+  {
+    connection.end(); // Just in case
     setTimeout(function(){ connection.connect(params); }, 5000);
+  }
 });
 
 connection.on('data', function(data) {
@@ -64,42 +65,19 @@ connection.on('data', function(data) {
     //console.log("*LINE" + " " + i + " " + lines[i]);
     var line = lines[i];
 
-    var split = line.split(" ");
-    var type = split[3];
-
-    if(type == "Chat:" || type == "GMSG:")
-    {
-      // Make sure the channel exists.
-      if(channel !== null)
-      {
-        // Cut off the timestamp and other info
-        // NOTE: This needs to be refined as the number of leading characters can vary.
-        var msg = line.substring(40,line.length);
-
-        // Convert it to Discord-friendly text.
-        // Note: Users can circumvent this if they have an apostrophe in their screen name.
-        msg = msg.replace("'","").replace("'","");
-
-        channel.send(msg);
-        console.log(msg);
-      }
-    }
+    handleMsgFromGame(line);
   }
 });
 
 connection.on('error', function(data) {
   console.log(data);
-  console.log("Connection FAILED with error: " + data.code);
+  console.log("[" + Date() + "] Connection FAILED with error: " + data.code);
 });
 
 connection.connect(params);
 
 ////// # Discord
 client.login(token);
-
-client.on("message", msg => {
-
-});
 
 client.on('ready', () => {
   console.log('Connected to ' + client.guilds.size + ' servers.');
@@ -109,8 +87,46 @@ client.on('ready', () => {
 
 client.on('message', function(msg) {
   if(msg.channel == channel && msg.author != client.user)
-    channel.send("WIP: Messages are not sent to the server yet.");
+  {
+    var msg = "[" + msg.author.username + "] " + msg.cleanContent;
+    // connection.exec(msg)
+    console.log(msg);
+    handleMsgToGame(msg);
+  }
 });
+
+////// # Functions
+function handleMsgFromGame(line)
+{
+  var split = line.split(" ");
+  var type = split[3];
+
+  if(type == "Chat:" || type == "GMSG:")
+  {
+    // Make sure the channel exists.
+    if(channel !== null)
+    {
+      // Cut off the timestamp and other info
+      // NOTE: This needs to be refined as the number of leading characters can vary.
+      var msg = line.substring(40,line.length);
+
+      // Convert it to Discord-friendly text.
+      // TODO: Fix bug where users can circumvent this by having
+      // an apostrophe in their screen name.
+      msg = msg.replace("'","").replace("'","");
+
+      channel.send(msg);
+    }
+  }
+}
+
+function handleMsgToGame(line)
+{
+  connection.exec("say \"" + line + "\"", function(err, response)
+  {
+    handleMsgFromGame(response);
+  });
+}
 
 ////// # Input
 process.stdin.on('data', function (text) {
@@ -131,6 +147,6 @@ process.on('uncaughtException', (err) => {
   console.log(err);
 
   console.log("An error occurred. Reconnecting...");
-  //client.destroy();
+  client.destroy();
   setTimeout(function(){ client.login(token); }, 2000);
 });
