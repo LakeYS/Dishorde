@@ -107,8 +107,9 @@ function handleMsgFromGame(line)
     if(channel !== null)
     {
       // Cut off the timestamp and other info
-      // NOTE: This needs to be refined as the number of leading characters can vary.
-      var msg = line.substring(40,line.length);
+      var msg = split[4];
+      for(var i = 5; i <= split.length-1; i++)
+        msg = msg + " " + split[i];
 
       // Convert it to Discord-friendly text.
       // TODO: Fix bug where users can circumvent this by having
@@ -116,6 +117,7 @@ function handleMsgFromGame(line)
       msg = msg.replace("'","").replace("'","");
 
       channel.send(msg);
+      //console.log(msg);
     }
   }
 }
