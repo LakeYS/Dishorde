@@ -1,21 +1,55 @@
-////// # Requirements and Initialization
+////// # Requirements and Initialization # //////
 const Discord = require("discord.js");
 const client = new Discord.Client();
+const minimist = require('minimist');
 
 var telnet = require('telnet-client');
 connection = new telnet();
 
 doReconnect = 1;
 
-////// # Arguments
-// TODO: Replace with proper checks
-pass = process.argv[3];
-token = process.argv[5];
-channelid = process.argv[7].toString();
+////// # Arguments # //////
 
-////// # Telnet
+argv = require('minimist')(process.argv.slice(2));
+
+// IP
+// This argument allows you to run the bot on a remote network.
+// For debugging purposes only.
+if(typeof argv.ip === 'undefined')
+  ip = "localhost";
+else
+  ip = argv.ip;
+
+// Port
+if(typeof argv.port === 'undefined')
+  port = 8081; // If no port, default to 8081
+else
+  port = argv.port;
+
+// Telnet Password
+if(typeof argv.password === 'undefined') {
+  console.log("ERROR: No telnet password specified!");
+  process.exit();
+}
+pass = argv["password"];
+
+// Discord token
+if(typeof argv.token === 'undefined') {
+  console.log("ERROR: No Discord token specified!");
+  process.exit();
+}
+token = argv.token;
+
+// Discord channel
+if(typeof argv.channel === 'undefined') {
+  console.log("ERROR: No Discord channel specified!");
+  process.exit();
+}
+channelid = argv.channel.toString();
+
+////// # Telnet # //////
 params = {
-  host: '149.56.109.127',
+  host: ip,
   port: 8081,
   // Timeout is set to 10 minutes, just in case.
   // Note: The game's timeout appears to be 15.
@@ -76,7 +110,7 @@ connection.on('error', function(data) {
 
 connection.connect(params);
 
-////// # Discord
+////// # Discord # //////
 client.login(token);
 
 client.on('ready', () => {
@@ -95,17 +129,14 @@ client.on('message', function(msg) {
   }
 });
 
-////// # Functions
-function handleMsgFromGame(line)
-{
+////// # Functions # //////
+function handleMsgFromGame(line) {
   var split = line.split(" ");
   var type = split[3];
 
-  if(type == "Chat:" || type == "GMSG:")
-  {
+  if(type == "Chat:" || type == "GMSG:") {
     // Make sure the channel exists.
-    if(channel !== null)
-    {
+    if(channel !== null) {
       // Cut off the timestamp and other info
       var msg = split[4];
       for(var i = 5; i <= split.length-1; i++)
@@ -122,15 +153,13 @@ function handleMsgFromGame(line)
   }
 }
 
-function handleMsgToGame(line)
-{
-  connection.exec("say \"" + line + "\"", function(err, response)
-  {
+function handleMsgToGame(line) {
+  connection.exec("say \"" + line + "\"", function(err, response) {
     handleMsgFromGame(response);
   });
 }
 
-////// # Input
+////// # Console Input # //////
 process.stdin.on('data', function (text) {
   if(text.toString() == "stop\r\n" || text.toString() == "exit\r\n" || text.toString() == "stop\n" || text.toString() == "exit\n")
     process.exit();
