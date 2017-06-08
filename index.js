@@ -115,6 +115,7 @@ client.login(token);
 
 client.on('ready', () => {
   console.log('Connected to ' + client.guilds.size + ' Discord servers.');
+  client.user.setGame("7DTD||Type 7dtd!info");
 
   channel = client.channels.find("id", channelid);
 });
@@ -122,10 +123,14 @@ client.on('ready', () => {
 client.on('message', function(msg) {
   if(msg.channel == channel && msg.author != client.user)
   {
-    var msg = "[" + msg.author.username + "] " + msg.cleanContent;
-    // connection.exec(msg)
-    console.log(msg);
-    handleMsgToGame(msg);
+    if(msg.toString().startsWith("7dtd!info"))
+      msg.author.send("This bot relays chat messages to and from a 7 Days to Die server.\nSource code: https://github.com/LakeYS/7DTD-Discord-Integration\nBot by Lake_YS. http://lakeys.net");
+    else {
+      var msg = "[" + msg.author.username + "] " + msg.cleanContent;
+      // connection.exec(msg)
+      console.log(msg);
+      handleMsgToGame(msg);
+    }
   }
 });
 
