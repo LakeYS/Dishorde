@@ -33,11 +33,11 @@ params = {
 var cmd = 'version';
 
 connection.on('ready', function(prompt) {
-  console.log("[" + Date() + "] Connection ready");
+  console.log("Connected to game. (" +  Date() + ")");
 });
 
 connection.on('failedlogin', function(prompt) {
-    console.log("[" + Date() + "] Login to game failed!");
+    console.log("Login to game failed! (" +  Date() + ")");
 });
 
 connection.on('timeout', function() {
@@ -70,8 +70,8 @@ connection.on('data', function(data) {
 });
 
 connection.on('error', function(data) {
-  console.log(data);
-  console.log("[" + Date() + "] Connection FAILED with error: " + data.code);
+  //console.log(data);
+  console.log("Connection to game FAILED with error: " + data.code + " (" +  Date() + ")");
 });
 
 connection.connect(params);
@@ -80,9 +80,9 @@ connection.connect(params);
 client.login(token);
 
 client.on('ready', () => {
-  console.log('Connected to ' + client.guilds.size + ' servers.');
+  console.log('Connected to ' + client.guilds.size + ' Discord servers.');
 
-  channel = client.channels.find("id","319257907579453440");
+  channel = client.channels.find("id", channelid);
 });
 
 client.on('message', function(msg) {
