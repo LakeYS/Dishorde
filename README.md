@@ -1,5 +1,5 @@
 # 7 Days to Die Discord Integration
-This project is currently a work-in-progress. More information will be available here soon.
+This project is currently a work-in-progress.
 
 # How to Install
 A proper installation guide will be available here soon. For now, a simple set of instructions can be found in run.sh/run.bat.
