@@ -4,7 +4,7 @@
 # Token: Your Discord bot token.
 # Channel: The channel you want the bot to operate in. (Will be optional in the future)
 
-# Note: Node.js and NPM are required to run this.
+# Note: Node.js and NPM are required to run this. Telnet must be enabled on your server.
 # If any problems occur, ensure that both are installed and that your system is up-to-date.
 
 node ./index.js --password="changeme" --token="your_token_here" --channel="319257907579453440"
