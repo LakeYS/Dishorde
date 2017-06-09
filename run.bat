@@ -1,4 +1,6 @@
 @echo off
+rem Be sure to keep this file secure as it contains sensitive information.
+
 rem Note: Node.js and NPM are required to run this. Telnet must be enabled on your server.
 rem If any problems occur, ensure that both are installed and that your system is up-to-date.
 

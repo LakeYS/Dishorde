@@ -31,7 +31,7 @@ if(typeof argv.password === 'undefined') {
   console.log("ERROR: No telnet password specified!");
   process.exit();
 }
-pass = argv["password"];
+pass = argv.password;
 
 // Discord token
 if(typeof argv.token === 'undefined') {
@@ -121,18 +121,23 @@ client.on('ready', () => {
 });
 
 client.on('message', function(msg) {
-  if(msg.channel == channel && msg.author != client.user)
-  {
-    if(msg.toString().startsWith("7dtd!info"))
-      msg.author.send("This bot relays chat messages to and from a 7 Days to Die server.\nSource code: https://github.com/LakeYS/7DTD-Discord-Integration\nBot by Lake_YS. http://lakeys.net");
-    else {
-      var msg = "[" + msg.author.username + "] " + msg.cleanContent;
-      // connection.exec(msg)
+  if((msg.channel == channel || msg.channel.type == "dm") && msg.author != client.user) {
+    if(msg.toString().toUpperCase().startsWith("7DTD!"))
+      parseDiscordCommand(msg);
+    else if(msg.channel.type == "text") {
+      msg = "[" + msg.author.username + "] " + msg.cleanContent;
       console.log(msg);
       handleMsgToGame(msg);
     }
   }
 });
+
+function parseDiscordCommand(msg)
+{
+  var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
+  if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
+    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord-Integration\n**Commands:** 7dtd!info, 7dtd!time (coming soon)");
+}
 
 ////// # Functions # //////
 function handleMsgFromGame(line) {

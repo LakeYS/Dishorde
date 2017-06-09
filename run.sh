@@ -1,3 +1,5 @@
+# Be sure to keep this file secure as it contains sensitive information.
+
 # Note: Node.js and NPM are required to run this. Telnet must be enabled on your server.
 # If any problems occur, ensure that both are installed and that your system is up-to-date.
 
