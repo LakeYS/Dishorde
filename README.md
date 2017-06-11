@@ -1,5 +1,5 @@
 # 7 Days to Die Discord Integration
-This project is currently a work-in-progress.
+A Discord bot for 7 Days to Die. This integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
 
 # Commands
 `7dtd!info`
