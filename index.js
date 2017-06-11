@@ -126,7 +126,6 @@ client.on('message', function(msg) {
       parseDiscordCommand(msg);
     else if(msg.channel.type == "text") {
       msg = "[" + msg.author.username + "] " + msg.cleanContent;
-      console.log(msg);
       handleMsgToGame(msg);
     }
   }
@@ -158,7 +157,6 @@ function handleMsgFromGame(line) {
       msg = msg.replace("'","").replace("'","");
 
       channel.send(msg);
-      //console.log(msg);
     }
   }
 }
