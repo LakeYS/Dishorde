@@ -5,7 +5,6 @@ This project is currently a work-in-progress.
 `7dtd!info`
 
 # How to Install
-Access to a 7 Days to Die server is required to run this bot.
 ## Windows
 ### Creating the bot account
 1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) and click "New App".
