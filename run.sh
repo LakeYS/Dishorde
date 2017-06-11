@@ -8,5 +8,7 @@
 # Password: Your server's telnet password.
 # Token: Your Discord bot token.
 # Channel: The channel you want the bot to operate in. (Will be optional in the future)
-node ./index.js --password="changeme" --token="your_token_here" --channel="319257907579453440"
+
+node ./index.js --password="changeme" --token="your_token_here" --channel="channelid"
+
 read -p "Press enter to continue" nothing

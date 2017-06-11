@@ -9,5 +9,10 @@ rem Port: (Optional) Your server's telnet port. This defaults to 8081 if none is
 rem Password: Your server's telnet password.
 rem Token: Your Discord bot token.
 rem Channel: The channel you want the bot to operate in. (Will be optional in the future)
-node ./index.js --password="changeme" --token="your_token_here" --channel="319257907579453440"
+
+rem See the official installation guide for more information:
+rem https://github.com/LakeYS/7DTD-Discord-Integration
+
+node ./index.js --password="changeme" --token="your_token_here" --channel="channelid"
+
 pause
