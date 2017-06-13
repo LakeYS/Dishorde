@@ -133,9 +133,42 @@ client.on('message', function(msg) {
 
 function parseDiscordCommand(msg)
 {
+  // TODO: Ensure connection is valid before executing commands
+
   var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
+
+  // 7dtd!info
   if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
-    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord-Integration\n**Commands:** 7dtd!info, 7dtd!time (coming soon)");
+    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord-Integration\n**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
+
+  // 7dtd!time
+  if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
+    connection.exec("gettime", function(err, response) {
+      // Sometimes the "response" has more than what we're looking for.
+      // We have to double-check and make sure the correct line is returned.
+      var lines = response.split("\n");
+      for(var i = 0; i <= lines.length-1; i++) {
+        var line = lines[i];
+        if(line.startsWith("Day"))
+          msg.reply(line);
+      }
+    });
+  }
+
+  // 7dtd!version
+  if(cmd == "VERSION" || cmd == "V") {
+    connection.exec("version", function(err, response) {
+      // Sometimes the "response" has more than what we're looking for.
+      // We have to double-check and make sure the correct line is returned.
+      var lines = response.split("\n");
+      for(var i = 0; i <= lines.length-1; i++) {
+        var line = lines[i];
+        if(line.startsWith("Game version:"))
+          msg.reply(line);
+      }
+    });
+  }
+
 }
 
 ////// # Functions # //////
@@ -162,6 +195,7 @@ function handleMsgFromGame(line) {
 }
 
 function handleMsgToGame(line) {
+  // TODO: Ensure connection is valid before executing commands
   connection.exec("say \"" + line + "\"", function(err, response) {
     handleMsgFromGame(response);
   });
