@@ -3,6 +3,8 @@ A Discord bot for 7 Days to Die. This integrates a dedicated game server's chat 
 
 # Commands
 `7dtd!info`
+`7dtd!time`
+`7dtd!version`
 
 # How to Install
 ## Windows
