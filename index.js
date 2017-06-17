@@ -47,6 +47,9 @@ if(typeof argv.channel === 'undefined') {
 }
 channelid = argv.channel.toString();
 
+// Client status: 0 = Error, 1 = Online
+clientStatus = 1;
+
 ////// # Telnet # //////
 params = {
   host: ip,
@@ -68,6 +71,12 @@ var cmd = 'version';
 
 connection.on('ready', function(prompt) {
   console.log("Connected to game. (" +  Date() + ")");
+
+  if(clientStatus == 0) {
+    client.user.setStatus('online');
+    client.user.setGame("7DTD||Type 7dtd!info");
+    clientStatus = 1;
+  }
 });
 
 connection.on('failedlogin', function(prompt) {
@@ -106,6 +115,12 @@ connection.on('data', function(data) {
 connection.on('error', function(data) {
   //console.log(data);
   console.log("Connection to game FAILED with error: " + data.code + " (" +  Date() + ")");
+
+  if(clientStatus == 1) {
+    client.user.setGame("Error||Type 7dtd!info");
+    client.user.setStatus('dnd');
+    clientStatus = 0;
+  }
 });
 
 connection.connect(params);
