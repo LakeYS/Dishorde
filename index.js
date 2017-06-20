@@ -9,8 +9,8 @@ connection = new telnet();
 doReconnect = 1;
 
 ////// # Arguments # //////
-
-argv = require('minimist')(process.argv.slice(2));
+// We have to treat the channel ID as a string or the number will parse incorrectly.
+argv = minimist(process.argv.slice(2), {string: 'channel'});
 
 // IP
 // This argument allows you to run the bot on a remote network.
