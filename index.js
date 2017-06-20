@@ -164,8 +164,12 @@ function parseDiscordCommand(msg)
       var lines = response.split("\n");
       for(var i = 0; i <= lines.length-1; i++) {
         var line = lines[i];
-        if(line.startsWith("Day"))
-          msg.reply(line);
+        if(line.startsWith("Day")) {
+          var day = line.substring(4,6);
+          var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+
+          msg.reply(line + "\n" + dayHorde + " days to next horde.");
+        }
       }
     });
   }
