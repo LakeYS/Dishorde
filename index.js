@@ -212,7 +212,7 @@ function handleMsgFromGame(line) {
 function handleMsgToGame(line) {
   // TODO: Ensure connection is valid before executing commands
   connection.exec("say \"" + line + "\"", function(err, response) {
-    handleMsgFromGame(response);
+    // Empty
   });
 }
 
