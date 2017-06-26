@@ -50,6 +50,90 @@ if(typeof argv.channel === 'undefined') {
 }
 channelid = argv.channel.toString();
 
+////// # Discord # //////
+client.login(token);
+
+client.on('ready', () => {
+  clientStatus = 0;
+
+  console.log('Connected to ' + client.guilds.size + ' Discord servers.');
+  client.user.setGame("7DTD||Type 7dtd!info");
+
+  channel = client.channels.find("id", channelid);
+
+  if(channel == 'null')
+  {
+    console.log("Failed to identify channel with ID '" + channelid + "'");
+    process.exit();
+  }
+
+  // Wait until the Discord client is ready before connecting to the game.
+  connection.connect(params);
+});
+
+client.on('disconnect', function(event) {
+  if(event.code != 1000)
+  {
+    console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
+    setTimeout(function(){ client.login(token); }, 6000);
+  }
+});
+
+client.on('message', function(msg) {
+  if((msg.channel == channel || msg.channel.type == "dm") && msg.author != client.user) {
+    if(msg.toString().toUpperCase().startsWith("7DTD!"))
+      parseDiscordCommand(msg);
+    else if(msg.channel.type == "text") {
+      msg = "[" + msg.author.username + "] " + msg.cleanContent;
+      handleMsgToGame(msg);
+    }
+  }
+});
+
+function parseDiscordCommand(msg)
+{
+  // TODO: Ensure connection is valid before executing commands
+
+  var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
+
+  // 7dtd!info
+  if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
+    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord-Integration\n**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
+
+  // 7dtd!time
+  if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
+    connection.exec("gettime", function(err, response) {
+      // Sometimes the "response" has more than what we're looking for.
+      // We have to double-check and make sure the correct line is returned.
+      var lines = response.split("\n");
+      for(var i = 0; i <= lines.length-1; i++) {
+        var line = lines[i];
+        if(line.startsWith("Day")) {
+          var day = line.substring(4,6);
+          var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+
+          msg.reply(line + "\n" + dayHorde + " days to next horde.");
+        }
+      }
+    });
+  }
+
+  // 7dtd!version
+  if(cmd == "VERSION" || cmd == "V") {
+    connection.exec("version", function(err, response) {
+      // Sometimes the "response" has more than what we're looking for.
+      // We have to double-check and make sure the correct line is returned.
+      var lines = response.split("\n");
+      for(var i = 0; i <= lines.length-1; i++) {
+        var line = lines[i];
+        if(line.startsWith("Game version:"))
+          msg.reply(line);
+      }
+    });
+  }
+
+}
+
 ////// # Telnet # //////
 params = {
   host: ip,
@@ -123,89 +207,6 @@ connection.on('error', function(data) {
   }
 });
 
-connection.connect(params);
-
-////// # Discord # //////
-client.login(token);
-
-client.on('ready', () => {
-  clientStatus = 0;
-
-  console.log('Connected to ' + client.guilds.size + ' Discord servers.');
-  client.user.setGame("7DTD||Type 7dtd!info");
-
-  channel = client.channels.find("id", channelid);
-
-  if(channel == 'null')
-  {
-    console.log("Failed to identify channel with ID '" + channelid + "'");
-    process.exit();
-  }
-});
-
-client.on('disconnect', function(event) {
-  if(event.code != 1000)
-  {
-    console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
-    setTimeout(function(){ client.login(token); }, 6000);
-  }
-});
-
-client.on('message', function(msg) {
-  if((msg.channel == channel || msg.channel.type == "dm") && msg.author != client.user) {
-    if(msg.toString().toUpperCase().startsWith("7DTD!"))
-      parseDiscordCommand(msg);
-    else if(msg.channel.type == "text") {
-      msg = "[" + msg.author.username + "] " + msg.cleanContent;
-      handleMsgToGame(msg);
-    }
-  }
-});
-
-function parseDiscordCommand(msg)
-{
-  // TODO: Ensure connection is valid before executing commands
-
-  var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
-
-  // 7dtd!info
-  if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
-    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord-Integration\n**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
-
-  // 7dtd!time
-  if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
-    connection.exec("gettime", function(err, response) {
-      // Sometimes the "response" has more than what we're looking for.
-      // We have to double-check and make sure the correct line is returned.
-      var lines = response.split("\n");
-      for(var i = 0; i <= lines.length-1; i++) {
-        var line = lines[i];
-        if(line.startsWith("Day")) {
-          var day = line.substring(4,6);
-          var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
-
-          msg.reply(line + "\n" + dayHorde + " days to next horde.");
-        }
-      }
-    });
-  }
-
-  // 7dtd!version
-  if(cmd == "VERSION" || cmd == "V") {
-    connection.exec("version", function(err, response) {
-      // Sometimes the "response" has more than what we're looking for.
-      // We have to double-check and make sure the correct line is returned.
-      var lines = response.split("\n");
-      for(var i = 0; i <= lines.length-1; i++) {
-        var line = lines[i];
-        if(line.startsWith("Game version:"))
-          msg.reply(line);
-      }
-    });
-  }
-
-}
-
 ////// # Functions # //////
 function handleMsgFromGame(line) {
   var split = line.split(" ");
@@ -251,13 +252,9 @@ process.on('exit',  () => {
   client.destroy();
 });
 
-//process.on('uncaughtException', (err) => {
-//  console.log(err);
-//
-//  console.log("An error occurred. Reconnecting...");
-//  client.destroy();
-//  setTimeout(function(){ client.login(token); }, 2000);
-//});
+process.on('uncaughtException', (err) => {
+  console.log(err);
+});
 
 process.on('unhandledRejection', (err) => {
   console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
