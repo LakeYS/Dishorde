@@ -8,6 +8,9 @@ connection = new telnet();
 
 doReconnect = 1;
 
+// Client status: 0 = Error/Offline, 1 = Online
+clientStatus = 0;
+
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
 argv = minimist(process.argv.slice(2), {string: 'channel'});
@@ -46,9 +49,6 @@ if(typeof argv.channel === 'undefined') {
   process.exit();
 }
 channelid = argv.channel.toString();
-
-// Client status: 0 = Error, 1 = Online
-clientStatus = 1;
 
 ////// # Telnet # //////
 params = {
@@ -114,7 +114,7 @@ connection.on('data', function(data) {
 
 connection.on('error', function(data) {
   //console.log(data);
-  console.log("Connection to game FAILED with error: " + data.code + " (" +  Date() + ")");
+  console.log("Connection to game FAILED with error: " + data.code);
 
   if(clientStatus == 1) {
     client.user.setGame("Error||Type 7dtd!info");
@@ -129,10 +129,26 @@ connection.connect(params);
 client.login(token);
 
 client.on('ready', () => {
+  clientStatus = 0;
+
   console.log('Connected to ' + client.guilds.size + ' Discord servers.');
   client.user.setGame("7DTD||Type 7dtd!info");
 
   channel = client.channels.find("id", channelid);
+
+  if(channel == 'null')
+  {
+    console.log("Failed to identify channel with ID '" + channelid + "'");
+    process.exit();
+  }
+});
+
+client.on('disconnect', function(event) {
+  if(event.code != 1000)
+  {
+    console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
+    setTimeout(function(){ client.login(token); }, 6000);
+  }
 });
 
 client.on('message', function(msg) {
@@ -235,10 +251,16 @@ process.on('exit',  () => {
   client.destroy();
 });
 
-process.on('uncaughtException', (err) => {
-  console.log(err);
+//process.on('uncaughtException', (err) => {
+//  console.log(err);
+//
+//  console.log("An error occurred. Reconnecting...");
+//  client.destroy();
+//  setTimeout(function(){ client.login(token); }, 2000);
+//});
 
-  console.log("An error occurred. Reconnecting...");
+process.on('unhandledRejection', (err) => {
+  console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
   client.destroy();
-  setTimeout(function(){ client.login(token); }, 2000);
+  setTimeout(function(){ client.login(token); }, 6000);
 });
