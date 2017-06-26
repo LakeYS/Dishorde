@@ -21,7 +21,10 @@ argv = minimist(process.argv.slice(2), {string: 'channel'});
 if(typeof argv.ip === 'undefined')
   ip = "localhost";
 else
+{
+  console.log("WARNING: You have specified an external IP. This is known to cause connection issues for the bot and should be used for development purposes only.");
   ip = argv.ip;
+}
 
 // Port
 if(typeof argv.port === 'undefined')
@@ -105,14 +108,16 @@ function parseDiscordCommand(msg)
     connection.exec("gettime", function(err, response) {
       // Sometimes the "response" has more than what we're looking for.
       // We have to double-check and make sure the correct line is returned.
+
       var lines = response.split("\n");
       for(var i = 0; i <= lines.length-1; i++) {
         var line = lines[i];
         if(line.startsWith("Day")) {
-          var day = line.substring(4,6);
-          var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+          //var day = line.substring(4,6);
+          //var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
 
-          msg.reply(line + "\n" + dayHorde + " days to next horde.");
+          //msg.reply(line + "\n" + dayHorde + " days to next horde.");
+          msg.reply(line);
         }
       }
     });

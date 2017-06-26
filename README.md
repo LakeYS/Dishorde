@@ -27,9 +27,10 @@ Commands can be sent via DM or in the specified chat channel.
 1. [Download](https://github.com/LakeYS/7DTD-Discord-Integration/archive/master.zip) this repository and extract it somewhere on your server's system.
 2. Install Node.js LTS from [this website](https://nodejs.org/en/download/).
 3. Once Node.js is finished installing, run install.bat in the bot's folder. This will automatically install the required modules for the bot.
-4. Now you'll need to edit your server's config xml file. Find "TelnetEnabled" and set it to true. Make sure TelnetPort is 8081 (or use the --port argument in run.bat). If you haven't already, set a telnet password.
-5. Right click the bot's run.bat and click "Edit".
-6. Find "changeme" and replace it with your server's Telnet password. Replace "your_token_here" with the Discord token from earlier.
+4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
+5. Open serverconfig.xml in a text editor (Right click and select 'Edit' to open it in Nodepad) and find "TelnetEnabled". Set it to true. Make sure TelnetPort is 8081 (or use the --port argument in run.bat). Set a telnet password.
+6. Right click the bot's run.bat and click "Edit".
+7. Find "changeme" and replace it with your server's Telnet password. Replace "your_token_here" with the Discord token from earlier.
 
 ## Setting up the channel
 1. Open Discord.

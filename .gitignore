@@ -49,4 +49,5 @@ Temporary Items
 # Node modules and security
 node_modules
 run_private.sh
+run_private2.sh
 run_private.bat
