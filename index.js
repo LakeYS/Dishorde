@@ -78,7 +78,7 @@ client.on('ready', () => {
   }
 
   // Wait until the Discord client is ready before connecting to the game.
-  if(connectionInitialized !== 0)
+  if(connectionInitialized !== 1)
   {
     connectionInitialized = 1; // Make sure we only do this once
     connection.connect(params);
