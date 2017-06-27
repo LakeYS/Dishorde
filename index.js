@@ -20,7 +20,7 @@ connectionInitialized = 0;
 
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
-argv = minimist(process.argv.slice(2), {string: 'channel'});
+argv = minimist(process.argv.slice(2), {string: ['channel','port']});
 
 // IP
 // This argument allows you to run the bot on a remote network.
@@ -37,7 +37,7 @@ else
 if(typeof argv.port === 'undefined')
   port = 8081; // If no port, default to 8081
 else
-  port = argv.port;
+  port = parseInt(argv.port);
 
 // Telnet Password
 if(typeof argv.password === 'undefined') {
@@ -152,7 +152,7 @@ function parseDiscordCommand(msg) {
 ////// # Telnet # //////
 params = {
   host: ip,
-  port: 8081,
+  port: port,
   // Timeout is set to 10 minutes, just in case.
   // Note: The game's timeout appears to be 15.
   timeout: 600000,
@@ -270,6 +270,7 @@ process.on('uncaughtException', (err) => {
 });
 
 process.on('unhandledRejection', (err) => {
+  console.log(err);
   console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
   client.destroy();
   setTimeout(function(){ client.login(token); }, 6000);
