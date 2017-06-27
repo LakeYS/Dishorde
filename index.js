@@ -1,4 +1,8 @@
 ////// # Requirements and Initialization # //////
+const pjson = require("./package.json");
+
+console.log("7DTD Discord Integration v" + pjson.version);
+
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const minimist = require('minimist');
@@ -10,6 +14,9 @@ doReconnect = 1;
 
 // Client status: 0 = Error/Offline, 1 = Online
 clientStatus = 0;
+
+// Connection initialized?
+connectionInitialized = 0;
 
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
@@ -71,7 +78,11 @@ client.on('ready', () => {
   }
 
   // Wait until the Discord client is ready before connecting to the game.
-  connection.connect(params);
+  if(connectionInitialized !== 0)
+  {
+    connectionInitialized = 1; // Make sure we only do this once
+    connection.connect(params);
+  }
 });
 
 client.on('disconnect', function(event) {
@@ -93,15 +104,14 @@ client.on('message', function(msg) {
   }
 });
 
-function parseDiscordCommand(msg)
-{
+function parseDiscordCommand(msg) {
   // TODO: Ensure connection is valid before executing commands
 
   var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
 
   // 7dtd!info
   if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
-    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord-Integration\n**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
+    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord\n**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
 
   // 7dtd!time
   if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
@@ -181,8 +191,7 @@ connection.on('timeout', function() {
 connection.on('close', function() {
   console.log('Connection to game closed.');
 
-  if(doReconnect)
-  {
+  if(doReconnect) {
     connection.end(); // Just in case
     setTimeout(function(){ connection.connect(params); }, 5000);
   }
@@ -192,8 +201,7 @@ connection.on('data', function(data) {
   data = data.toString();
   var lines = data.split("\n");
 
-  for(var i = 0; i <= lines.length-1; i++)
-  {
+  for(var i = 0; i <= lines.length-1; i++) {
     //console.log("*LINE" + " " + i + " " + lines[i]);
     var line = lines[i];
 
