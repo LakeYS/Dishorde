@@ -6,6 +6,7 @@ rem https://github.com/LakeYS/7DTD-Discord-Integration
 
 rem Note: Node.js and NPM are required to run this. Telnet must be enabled on your server.
 rem If any problems occur, ensure that both are installed and that your system is up-to-date.
+rem Support e-mail: contact@lakeys.net
 
 rem Port: (Optional) Your server's telnet port. This defaults to 8081 if none is specified.
 rem Password: Your server's telnet password.

@@ -1,3 +1,6 @@
+/*jshint esversion: 6 */
+/*jshint evil:true */
+
 ////// # Requirements and Initialization # //////
 const pjson = require("./package.json");
 
@@ -153,9 +156,7 @@ function parseDiscordCommand(msg) {
 params = {
   host: ip,
   port: port,
-  // Timeout is set to 10 minutes, just in case.
-  // Note: The game's timeout appears to be 15.
-  timeout: 600000,
+  timeout: 15000,
   username: '',
   password: pass,
 
@@ -171,7 +172,7 @@ var cmd = 'version';
 connection.on('ready', function(prompt) {
   console.log("Connected to game. (" +  Date() + ")");
 
-  if(clientStatus == 0) {
+  if(clientStatus === 0) {
     client.user.setStatus('online');
     client.user.setGame("7DTD||Type 7dtd!info");
     clientStatus = 1;
@@ -183,9 +184,9 @@ connection.on('failedlogin', function(prompt) {
 });
 
 connection.on('timeout', function() {
-  console.log('Connection to game timed out. This is normal if the server is empty. Reconnecting...');
-  connection.end();
-  setTimeout(function(){ connection.connect(params); }, 5000);
+  //console.log('Connection to game timed out. This is normal if the server is empty. Ignoring...');
+  //connection.end();
+  //setTimeout(function(){ connection.connect(params); }, 5000);
 });
 
 connection.on('close', function() {
@@ -200,6 +201,14 @@ connection.on('close', function() {
 connection.on('data', function(data) {
   data = data.toString();
   var lines = data.split("\n");
+
+  // Error catcher for password re-prompt
+  if(data == "Please enter password:\r\n\u0000\u0000") {
+    console.log("ERROR: Received password prompt!");
+    process.exit();
+    //connection.exec(pass);
+  }
+
 
   for(var i = 0; i <= lines.length-1; i++) {
     //console.log("*LINE" + " " + i + " " + lines[i]);

@@ -5,6 +5,7 @@
 
 # Note: Node.js and NPM are required to run this. Telnet must be enabled on your server.
 # If any problems occur, ensure that both are installed and that your system is up-to-date.
+# Support e-mail: contact@lakeys.net
 
 # Port: (Optional) Your server's telnet port. This defaults to 8081 if none is specified.
 # Password: Your server's telnet password.
