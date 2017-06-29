@@ -114,42 +114,48 @@ function parseDiscordCommand(msg) {
 
   // 7dtd!info
   if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
-    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord\n**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
+  {
+    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
-  // 7dtd!time
-  if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
-    connection.exec("gettime", function(err, response) {
-      // Sometimes the "response" has more than what we're looking for.
-      // We have to double-check and make sure the correct line is returned.
+    if(argv["disable-commands"] !== 'true')
+      msg.author.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
+  }
 
-      var lines = response.split("\n");
-      for(var i = 0; i <= lines.length-1; i++) {
-        var line = lines[i];
-        if(line.startsWith("Day")) {
-          //var day = line.substring(4,6);
-          //var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+  if(argv["disable-commands"] !== 'true') {
+    // 7dtd!time
+    if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
+      connection.exec("gettime", function(err, response) {
+        // Sometimes the "response" has more than what we're looking for.
+        // We have to double-check and make sure the correct line is returned.
 
-          //msg.reply(line + "\n" + dayHorde + " days to next horde.");
-          msg.reply(line);
+        var lines = response.split("\n");
+        for(var i = 0; i <= lines.length-1; i++) {
+          var line = lines[i];
+          if(line.startsWith("Day")) {
+            //var day = line.substring(4,6);
+            //var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+
+            //msg.reply(line + "\n" + dayHorde + " days to next horde.");
+            msg.reply(line);
+          }
         }
-      }
-    });
-  }
+      });
+    }
 
-  // 7dtd!version
-  if(cmd == "VERSION" || cmd == "V") {
-    connection.exec("version", function(err, response) {
-      // Sometimes the "response" has more than what we're looking for.
-      // We have to double-check and make sure the correct line is returned.
-      var lines = response.split("\n");
-      for(var i = 0; i <= lines.length-1; i++) {
-        var line = lines[i];
-        if(line.startsWith("Game version:"))
-          msg.reply(line);
-      }
-    });
+    // 7dtd!version
+    if(cmd == "VERSION" || cmd == "V") {
+      connection.exec("version", function(err, response) {
+        // Sometimes the "response" has more than what we're looking for.
+        // We have to double-check and make sure the correct line is returned.
+        var lines = response.split("\n");
+        for(var i = 0; i <= lines.length-1; i++) {
+          var line = lines[i];
+          if(line.startsWith("Game version:"))
+            msg.reply(line);
+        }
+      });
+    }
   }
-
 }
 
 ////// # Telnet # //////
@@ -165,9 +171,6 @@ params = {
 
   debug: false,
 };
-
-//var cmd = 'say "--telnet connected--"';
-var cmd = 'version';
 
 connection.on('ready', function(prompt) {
   console.log("Connected to game. (" +  Date() + ")");
