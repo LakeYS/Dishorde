@@ -14,6 +14,6 @@
 
 # Replace the following arguments with your Discord and game information.
 
-node ./index.js --password="changeme" --token="your_token_here" --channel="channelid" --disable-commands=false
+node ./index.js --password="changeme" --token="your_token_here" --channel="channelid" --disable-commands=false --disable-chatmsgs=false --disable-gmsgs=false
 
 read -p "Press enter to continue" nothing

@@ -13,6 +13,12 @@ Commands can be sent via DM or in the specified chat channel.
 # Terminal Commands
 `exit`
 
+# Configuration
+You can configure the bot with a number of arguments.
+- `--disable-commands` - Disable Discord commands such as 7dtd!time. Does not disable 7dtd!info.
+- `--disable-chatmsgs` - Disable chat messages. Does not disable other messages such as join/leave and deaths.
+- `--disable-gmsgs` - Disable other messages. Includes deaths, leaves/joins, etc.
+
 # How to Install - Windows
 ## Creating the bot account
 1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) and click "New App".
