@@ -246,9 +246,14 @@ function handleMsgFromGame(line) {
         msg = msg + " " + split[i];
 
       // Convert it to Discord-friendly text.
-      // TODO: Fix bug where users can circumvent this by having
-      // an apostrophe in their screen name.
       msg = msg.replace("'","").replace("'","");
+
+      if(argv["hide-prefix"] == 'true')
+      {
+        // Do nothing if the prefix '/' is in the message.
+        if(msg.includes(": /"))
+          return;
+      }
 
       channel.send(msg);
     }
