@@ -241,6 +241,14 @@ function handleMsgFromGame(line) {
       for(var i = 5; i <= split.length-1; i++)
         msg = msg + " " + split[i];
 
+      if(argv["log-messages"] == 'true')
+        console.log(msg);
+
+      // When using a local connection, messages go through as new data rather than a response.
+      // This string check is a workaround for that.
+      if(msg.startsWith("'Server': ["))
+        return;
+
       // Convert it to Discord-friendly text.
       msg = msg.replace("'","").replace("'","");
 
