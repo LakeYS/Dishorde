@@ -31,10 +31,7 @@ argv = minimist(process.argv.slice(2), {string: ['channel','port']});
 if(typeof argv.ip === 'undefined')
   ip = "localhost";
 else
-{
-  console.log("WARNING: You have specified an external IP. This is known to cause connection issues for the bot and should be used for development purposes only.");
   ip = argv.ip;
-}
 
 // Port
 if(typeof argv.port === 'undefined')

@@ -37,7 +37,7 @@ You can configure the bot with a number of arguments.
 4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
 5. Open serverconfig.xml in a text editor (Right click and select 'Edit' to open it in Nodepad) and find "TelnetEnabled". Set it to true. Make sure TelnetPort is 8081 (or use the --port argument in run.bat). Set a telnet password.
 6. Right click the bot's run.bat and click "Edit".
-7. Find "changeme" and replace it with your server's Telnet password. Replace "your_token_here" with the Discord token from earlier.
+7. Find "changeme" and replace it with your server's Telnet password. Replace "your_token_here" with the Discord token from earlier. If running the bot on a different network from the server, add `--ip=[your server's external ip]`
 
 ## Setting up the channel
 1. Open Discord.
@@ -79,7 +79,8 @@ You may want to create a shortcut to run.bat in your Startup folder.
 2. Find "TelnetEnabled" and make sure it is set to "true". Set a telnet password and save the file.
 3. Now navigate back to the bot's folder. Edit run.sh.
 4. Find the line starting with `node ./index.js` and replace "changeme" with your server's telnet password.
-5. Replace "your_token_here" with the Discord bot token from earlier. Keep the file open for the next section.
+5. If running the bot on a different network from the server, add `--ip=[your server's external ip]`
+6. Replace "your_token_here" with the Discord bot token from earlier.  Keep the file open for the next section.
 
 ## Setting up the channel
 1. Open Discord in a browser.
