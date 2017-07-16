@@ -51,3 +51,5 @@ node_modules
 run_private.sh
 run_private2.sh
 run_private.bat
+run_private2.bat
+config_private.json

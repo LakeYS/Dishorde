@@ -1,0 +1,15 @@
+{
+  "_comment": "Keep this file secure as it contains sensitive information.",
+  "_comment": "If arguments are used in run.bat/run.sh, this config file will be ignored.",
+
+  "password": "changeme",
+  "token": "your_token_here",
+  "channel": "channelid",
+  "port": "8081",
+
+  "disable-commands": false,
+  "disable-chatmsgs": false,
+  "disable-gmsgs": false,
+  "hide-prefix": false,
+  "log-messages": true
+}

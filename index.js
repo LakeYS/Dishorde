@@ -25,40 +25,47 @@ connectionInitialized = 0;
 // We have to treat the channel ID as a string or the number will parse incorrectly.
 argv = minimist(process.argv.slice(2), {string: ['channel','port']});
 
+// This is a simple check to see if we're using arguments or the config file.
+// If the user is using arguments, config.json is ignored.
+if(Object.keys(argv).length > 1)
+  config = argv;
+else
+  config = require("./config.json");
+
 // IP
 // This argument allows you to run the bot on a remote network.
 // For debugging purposes only.
-if(typeof argv.ip === 'undefined')
+if(typeof config.ip === 'undefined')
   ip = "localhost";
 else
-  ip = argv.ip;
+  ip = config.ip;
 
 // Port
-if(typeof argv.port === 'undefined')
+if(typeof config.port === 'undefined')
   port = 8081; // If no port, default to 8081
 else
-  port = parseInt(argv.port);
+  port = parseInt(config.port);
 
 // Telnet Password
-if(typeof argv.password === 'undefined') {
+if(typeof config.password === 'undefined') {
   console.log("ERROR: No telnet password specified!");
   process.exit();
 }
-pass = argv.password;
+pass = config.password;
 
 // Discord token
-if(typeof argv.token === 'undefined') {
+if(typeof config.token === 'undefined') {
   console.log("ERROR: No Discord token specified!");
   process.exit();
 }
-token = argv.token;
+token = config.token;
 
 // Discord channel
-if(typeof argv.channel === 'undefined') {
+if(typeof config.channel === 'undefined') {
   console.log("ERROR: No Discord channel specified!");
   process.exit();
 }
-channelid = argv.channel.toString();
+channelid = config.channel.toString();
 
 ////// # Discord # //////
 client.login(token);
@@ -114,11 +121,11 @@ function parseDiscordCommand(msg) {
   {
     msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
-    if(argv["disable-commands"] !== 'true')
+    if(config["disable-commands"] !== 'true')
       msg.author.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
   }
 
-  if(argv["disable-commands"] !== 'true') {
+  if(config["disable-commands"] !== 'true') {
     // 7dtd!time
     if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
       connection.exec("gettime", function(err, response) {
@@ -233,7 +240,7 @@ function handleMsgFromGame(line) {
   var split = line.split(" ");
   var type = split[3];
 
-  if((argv["disable-chatmsgs"] !== 'true' && type == "Chat:") || (argv["disable-gmsgs"] !== 'true' && type == "GMSG:")) {
+  if((config["disable-chatmsgs"] !== 'true' && type == "Chat:") || (config["disable-gmsgs"] !== 'true' && type == "GMSG:")) {
     // Make sure the channel exists.
     if(channel !== null) {
       // Cut off the timestamp and other info
@@ -241,7 +248,7 @@ function handleMsgFromGame(line) {
       for(var i = 5; i <= split.length-1; i++)
         msg = msg + " " + split[i];
 
-      if(argv["log-messages"] == 'true')
+      if(config["log-messages"] == 'true')
         console.log(msg);
 
       // When using a local connection, messages go through as new data rather than a response.
@@ -252,7 +259,7 @@ function handleMsgFromGame(line) {
       // Convert it to Discord-friendly text.
       msg = msg.replace("'","").replace("'","");
 
-      if(argv["hide-prefix"] == 'true')
+      if(config["hide-prefix"] == 'true')
       {
         // Do nothing if the prefix '/' is in the message.
         if(msg.includes(": /"))

@@ -15,6 +15,6 @@ rem Channel: The channel you want the bot to operate in. (Will be optional in th
 
 rem Replace the following arguments with your Discord and game information.
 
-node ./index.js --password="changeme" --token="your_token_here" --channel="channelid" --disable-commands=false --disable-chatmsgs=false --disable-gmsgs=false
+node ./index.js
 
 pause
