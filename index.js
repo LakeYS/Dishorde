@@ -285,16 +285,19 @@ process.stdin.on('data', function (text) {
   else if(text.toString() == "help\r\n" || text.toString() == "help\n")
     console.log("This is the console for the Discord bot. It currently only accepts JavaScript commands for advanced users. Type 'exit' to shut it down.");
   else
-    eval(text.toString());
+  {
+    try {
+      eval(text.toString());
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
 });
 
 process.on('exit',  () => {
   doReconnect = 0;
   client.destroy();
-});
-
-process.on('uncaughtException', (err) => {
-  console.log(err);
 });
 
 process.on('unhandledRejection', (err) => {
