@@ -74,7 +74,8 @@ client.on('ready', () => {
   clientStatus = 0;
 
   console.log('Connected to ' + client.guilds.size + ' Discord servers.');
-  client.user.setGame("7DTD||Type 7dtd!info");
+  client.user.setGame("No connection");
+  client.user.setStatus('dnd');
 
   channel = client.channels.find("id", channelid);
 
