@@ -79,7 +79,7 @@ client.on('ready', () => {
 
   channel = client.channels.find("id", channelid);
 
-  if(channel == 'null')
+  if(!channel)
   {
     console.log("Failed to identify channel with ID '" + channelid + "'");
     process.exit();
