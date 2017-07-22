@@ -27,10 +27,18 @@ argv = minimist(process.argv.slice(2), {string: ['channel','port']});
 
 // This is a simple check to see if we're using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
-if(Object.keys(argv).length > 1)
+if(Object.keys(argv).length > 2)
   config = argv;
 else
-  config = require("./config.json");
+{
+  configFile = "./config.json";
+
+  if(argv.configfile !== undefined) {
+    var configFile = argv.configfile;
+  }
+
+  config = require(configFile);
+}
 
 // IP
 // This argument allows you to run the bot on a remote network.
@@ -120,7 +128,7 @@ function parseDiscordCommand(msg) {
   // 7dtd!info
   if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
   {
-    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
+    msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
     if(config["disable-commands"] !== 'true')
       msg.author.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
