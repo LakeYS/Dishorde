@@ -6,6 +6,7 @@
   "token": "your_token_here",
   "channel": "channelid",
   "port": "8081",
+  "ip": "localhost",
 
   "disable-commands": false,
   "disable-chatmsgs": false,
