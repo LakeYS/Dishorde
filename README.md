@@ -3,6 +3,9 @@ A Discord bot for 7 Days to Die. This integrates a dedicated game server's chat 
 
 **NOTE: This bot only works with dedicated servers.**
 
+# How it Works
+This script works by connecting to your server's admin console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
+
 # Commands
 Commands can be sent via DM or in the specified chat channel.
 
@@ -18,7 +21,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 - `disable-commands` - Disable Discord commands such as 7dtd!time. Does not disable 7dtd!info.
 - `disable-chatmsgs` - Disable chat messages. Does not disable other messages such as join/leave and deaths.
 - `disable-gmsgs` - Disable other messages. Includes deaths, leaves/joins, etc.
-- `hide-prefix` - Hides all chat messages that start with a forward slash.
+- `hide-prefix` - Hides all chat messages that start with a forward slash. This may be useful if your server uses commands.
 - `log-messages` - Chat messages will show up in the terminal.
 
 # How to Install - Windows
