@@ -15,6 +15,9 @@ connection = new telnet();
 
 doReconnect = 1;
 
+waitingForTime = 0;
+waitingForVersion = 0;
+
 // Client status: 0 = Error/Offline, 1 = Online
 clientStatus = 0;
 
@@ -148,14 +151,20 @@ function parseDiscordCommand(msg) {
         // We have to double-check and make sure the correct line is returned.
 
         var lines = response.split("\n");
+        receivedData = 0;
         for(var i = 0; i <= lines.length-1; i++) {
           var line = lines[i];
           if(line.startsWith("Day")) {
-            var day = line.split(",")[0].replace("Day ","");
-            var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+            receivedData = 1;
 
-            msg.reply(line + "\n" + dayHorde + " days to next horde.");
+            handleTime(line, msg);
           }
+        }
+
+        // Sometimes, the response doesn't have the data we're looking for...
+        if(!receivedData) {
+          waitingForTime = 1;
+          waitingForTimeMsg = msg;
         }
       });
     }
@@ -166,10 +175,18 @@ function parseDiscordCommand(msg) {
         // Sometimes the "response" has more than what we're looking for.
         // We have to double-check and make sure the correct line is returned.
         var lines = response.split("\n");
+        receivedData = 0;
         for(var i = 0; i <= lines.length-1; i++) {
           var line = lines[i];
-          if(line.startsWith("Game version:"))
+          if(line.startsWith("Game version:")) {
             msg.reply(line);
+            receivedData = 1;
+          }
+        }
+
+        if(!receivedData) {
+          waitingForVersion = 1;
+          waitingForVersionMsg = msg;
         }
       });
     }
@@ -235,7 +252,15 @@ connection.on('data', function(data) {
     //console.log("*LINE" + " " + i + " " + lines[i]);
     var line = lines[i];
 
-    handleMsgFromGame(line);
+    // This is a workaround for responses not working properly, particularly on local connections.
+    if(waitingForTime && line.startsWith("Day")) {
+      handleTime(line, waitingForTimeMsg);
+    }
+    else if(waitingForVersion && line.startsWith("Game version:")) {
+      waitingForVersionMsg.reply(line);
+    }
+    else
+      handleMsgFromGame(line);
   }
 });
 
@@ -291,6 +316,13 @@ function handleMsgToGame(line) {
   connection.exec("say \"" + line + "\"", function(err, response) {
     // Empty
   });
+}
+
+function handleTime(line, msg) {
+  var day = line.split(",")[0].replace("Day ","");
+  var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+
+  msg.reply(line + "\n" + dayHorde + " days to next horde.");
 }
 
 ////// # Console Input # //////
