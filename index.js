@@ -52,17 +52,22 @@ var request = https.request(options, (res) => {
   res.on('end', function() {
     if(input !== undefined) {
       json = JSON.parse(input.toString());
-      release = json.tag_name.replace("v",""); // Mark the release
+      if(json.tag_name !== undefined) {
+        release = json.tag_name.replace("v",""); // Mark the release
 
-      // Compare this build's version to the latest release.
-      var releaseRelative = semver(pjson.version, release);
+        // Compare this build's version to the latest release.
+        var releaseRelative = semver(pjson.version, release);
 
-      if(releaseRelative == 1)
-        console.log("********\nNOTICE: You are currently running v" + pjson.version + ". This build is considered unstable.\nCheck here for the latest stable versions of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
+        if(releaseRelative == 1)
+          console.log("********\nNOTICE: You are currently running v" + pjson.version + ". This build is considered unstable.\nCheck here for the latest stable versions of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
 
-      if(releaseRelative == -1)
-        console.log("********\nNOTICE: You are currently running v" + pjson.version + ". A newer version is available.\nCheck here for the latest version of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
-    }
+        if(releaseRelative == -1)
+          console.log("********\nNOTICE: You are currently running v" + pjson.version + ". A newer version is available.\nCheck here for the latest version of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
+        } else {
+          console.log(json);
+          console.log("ERROR: Unable to parse version data.");
+        }
+      }
     else {
       console.log(input); // Log the input on error
       console.log("ERROR: Unable to parse version data.");
