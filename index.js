@@ -2,13 +2,15 @@
 /*jshint evil:true */
 
 ////// # Requirements and Initialization # //////
-const pjson = require("./package.json");
+const pjson = require('./package.json');
 
 console.log("7DTD Discord Integration v" + pjson.version);
 
-const Discord = require("discord.js");
+const Discord = require('discord.js');
 const client = new Discord.Client();
 const minimist = require('minimist');
+const semver = require('semver-compare');
+const https = require('https');
 
 var telnet = require('telnet-client');
 connection = new telnet();
@@ -24,6 +26,57 @@ clientStatus = 0;
 
 // Connection initialized?
 connectionInitialized = 0;
+
+////// # Version Check # //////
+var options = {
+  host: 'api.github.com',
+  path: '/repos/LakeYS/7DTD-Discord/releases/latest',
+  method: 'GET',
+  headers: {'user-agent':'7DTD-Discord-Integration'}
+};
+
+var input = "";
+json = "";
+var request = https.request(options, (res) => {
+  res.on('data', (data) => {
+    input = input + data; // Combine the data
+  });
+  res.on('error', (err) => {
+    console.log(err);
+  });
+  res.on('uncaughtException', (err) => {
+    console.log(err);
+  });
+
+  // Note that if there is an error while parsing the JSON data, the bot will crash.
+  res.on('end', function() {
+    if(input !== undefined) {
+      json = JSON.parse(input.toString());
+      release = json.tag_name.replace("v",""); // Mark the release
+
+      // Compare this build's version to the latest release.
+      var releaseRelative = semver(pjson.version, release);
+
+      if(releaseRelative == 1)
+        console.log("********\nNOTICE: You are currently running v" + pjson.version + ". This build is considered unstable.\nCheck here for the latest stable versions of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
+
+      if(releaseRelative == -1)
+        console.log("********\nNOTICE: You are currently running v" + pjson.version + ". A newer version is available.\nCheck here for the latest version of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
+    }
+    else {
+      console.log(input); // Log the input on error
+      console.log("ERROR: Unable to parse version data.");
+    }
+  });
+});
+
+request.end();
+process.nextTick(() => {
+  request.on('error', (err) => {
+    console.log(err);
+    console.log("ERROR: Unable to query version data.");
+  });
+});
 
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
@@ -131,8 +184,6 @@ client.on('message', function(msg) {
 });
 
 function parseDiscordCommand(msg) {
-  // TODO: Ensure connection is valid before executing commands
-
   var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
 
   // 7dtd!info
