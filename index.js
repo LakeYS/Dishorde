@@ -244,7 +244,6 @@ connection.on('data', function(data) {
   if(data == "Please enter password:\r\n\u0000\u0000") {
     console.log("ERROR: Received password prompt!");
     process.exit();
-    //connection.exec(pass);
   }
 
 

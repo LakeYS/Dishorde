@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^11.1.0",
+    "minimist": "^1.2.0",
     "telnet-client": "^0.15.0"
   }
 }
