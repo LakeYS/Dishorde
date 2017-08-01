@@ -17,6 +17,7 @@ doReconnect = 1;
 
 waitingForTime = 0;
 waitingForVersion = 0;
+receivedData = 0;
 
 // Client status: 0 = Error/Offline, 1 = Online
 clientStatus = 0;
@@ -150,14 +151,16 @@ function parseDiscordCommand(msg) {
         // Sometimes the "response" has more than what we're looking for.
         // We have to double-check and make sure the correct line is returned.
 
-        var lines = response.split("\n");
-        receivedData = 0;
-        for(var i = 0; i <= lines.length-1; i++) {
-          var line = lines[i];
-          if(line.startsWith("Day")) {
-            receivedData = 1;
+        if(response !== undefined) {
+          var lines = response.split("\n");
+          receivedData = 0;
+          for(var i = 0; i <= lines.length-1; i++) {
+            var line = lines[i];
+            if(line.startsWith("Day")) {
+              receivedData = 1;
 
-            handleTime(line, msg);
+              handleTime(line, msg);
+            }
           }
         }
 
@@ -174,13 +177,15 @@ function parseDiscordCommand(msg) {
       connection.exec("version", function(err, response) {
         // Sometimes the "response" has more than what we're looking for.
         // We have to double-check and make sure the correct line is returned.
-        var lines = response.split("\n");
-        receivedData = 0;
-        for(var i = 0; i <= lines.length-1; i++) {
-          var line = lines[i];
-          if(line.startsWith("Game version:")) {
-            msg.reply(line);
-            receivedData = 1;
+        if(response !== undefined) {
+          var lines = response.split("\n");
+          receivedData = 0;
+          for(var i = 0; i <= lines.length-1; i++) {
+            var line = lines[i];
+            if(line.startsWith("Game version:")) {
+              msg.reply(line);
+              receivedData = 1;
+            }
           }
         }
 
