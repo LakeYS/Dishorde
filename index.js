@@ -19,6 +19,7 @@ doReconnect = 1;
 
 waitingForTime = 0;
 waitingForVersion = 0;
+waitingForPlayers = 0;
 receivedData = 0;
 
 // Client status: 0 = Error/Offline, 1 = Online
@@ -251,6 +252,34 @@ function parseDiscordCommand(msg) {
         }
       });
     }
+
+    // 7dtd!players
+    if(cmd == "PLAYERS" || cmd == "P" || cmd == "PL" || cmd == "LP") {
+      connection.exec("lp", function(err, response) {
+        // Sometimes the "response" has more than what we're looking for.
+        // We have to double-check and make sure the correct line is returned.
+
+        if(response !== undefined) {
+          var lines = response.split("\n");
+          receivedData = 0;
+          for(var i = 0; i <= lines.length-1; i++) {
+            var line = lines[i];
+            if(line.startsWith("Total of ")) {
+              receivedData = 1;
+
+              handlePlayerCount(line, msg);
+            }
+            // TODO: Add code to detect player listing
+          }
+        }
+
+        // Sometimes, the response doesn't have the data we're looking for...
+        if(!receivedData) {
+          waitingForPlayers = 1;
+          waitingForPlayersMsg = msg;
+        }
+      });
+    }
   }
 }
 
@@ -319,6 +348,9 @@ connection.on('data', function(data) {
     else if(waitingForVersion && line.startsWith("Game version:")) {
       waitingForVersionMsg.reply(line);
     }
+    else if(waitingForPlayers && line.startsWith("Total of ")) {
+      waitingForPlayersMsg.reply(line);
+    }
     else
       handleMsgFromGame(line);
   }
@@ -383,6 +415,10 @@ function handleTime(line, msg) {
   var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
 
   msg.reply(line + "\n" + dayHorde + " days to next horde.");
+}
+
+function handlePlayerCount(line, msg) {
+  msg.reply(line);
 }
 
 ////// # Console Input # //////
