@@ -398,7 +398,23 @@ function handleMsgFromGame(line) {
           return;
       }
 
-      channel.send(msg);
+      var embed = 0;
+      var color = 3447003;
+
+      // Color coding based on the message
+      if(type == "GMSG:") {
+        embed = 1;
+
+        // TODO: Color coding
+      }
+
+      if(embed)
+        channel.send({embed: {
+          color: color,
+          description: msg
+        }});
+      else
+        channel.send(msg);
     }
   }
 }
