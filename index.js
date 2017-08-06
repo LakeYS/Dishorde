@@ -193,12 +193,11 @@ function parseDiscordCommand(msg) {
   var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
 
   // 7dtd!info
-  if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H")
-  {
+  if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H") {
     msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
     if(config["disable-commands"] !== 'true')
-      msg.author.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version");
+      msg.author.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version, 7dtd!players");
   }
 
   if(config["disable-commands"] !== 'true') {
