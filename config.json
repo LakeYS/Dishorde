@@ -12,5 +12,6 @@
   "disable-chatmsgs": false,
   "disable-gmsgs": false,
   "hide-prefix": false,
-  "log-messages": true
+  "log-messages": false,
+  "disable-version-check": false
 }

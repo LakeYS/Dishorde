@@ -28,62 +28,6 @@ clientStatus = 0;
 // Connection initialized?
 connectionInitialized = 0;
 
-////// # Version Check # //////
-var options = {
-  host: 'api.github.com',
-  path: '/repos/LakeYS/7DTD-Discord/releases/latest',
-  method: 'GET',
-  headers: {'user-agent':'7DTD-Discord-Integration'}
-};
-
-var input = "";
-json = "";
-var request = https.request(options, (res) => {
-  res.on('data', (data) => {
-    input = input + data; // Combine the data
-  });
-  res.on('error', (err) => {
-    console.log(err);
-  });
-  res.on('uncaughtException', (err) => {
-    console.log(err);
-  });
-
-  // Note that if there is an error while parsing the JSON data, the bot will crash.
-  res.on('end', function() {
-    if(input !== undefined) {
-      json = JSON.parse(input.toString());
-      if(json.tag_name !== undefined) {
-        release = json.tag_name.replace("v",""); // Mark the release
-
-        // Compare this build's version to the latest release.
-        var releaseRelative = semver(pjson.version, release);
-
-        if(releaseRelative == 1)
-          console.log("********\nNOTICE: You are currently running v" + pjson.version + ". This build is considered unstable.\nCheck here for the latest stable versions of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
-
-        if(releaseRelative == -1)
-          console.log("********\nNOTICE: You are currently running v" + pjson.version + ". A newer version is available.\nCheck here for the latest version of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
-        } else {
-          console.log(json);
-          console.log("ERROR: Unable to parse version data.");
-        }
-      }
-    else {
-      console.log(input); // Log the input on error
-      console.log("ERROR: Unable to parse version data.");
-    }
-  });
-});
-
-request.end();
-process.nextTick(() => {
-  request.on('error', (err) => {
-    console.log(err);
-    console.log("ERROR: Unable to query version data.");
-  });
-});
-
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
 argv = minimist(process.argv.slice(2), {string: ['channel','port']});
@@ -137,6 +81,64 @@ if(typeof config.channel === 'undefined') {
   process.exit();
 }
 channelid = config.channel.toString();
+
+////// # Version Check # //////
+if(!config['disable-version-check']) {
+  var options = {
+    host: 'api.github.com',
+    path: '/repos/LakeYS/7DTD-Discord/releases/latest',
+    method: 'GET',
+    headers: {'user-agent':'7DTD-Discord-Integration'}
+  };
+
+  var input = "";
+  json = "";
+  var request = https.request(options, (res) => {
+    res.on('data', (data) => {
+      input = input + data; // Combine the data
+    });
+    res.on('error', (err) => {
+      console.log(err);
+    });
+    res.on('uncaughtException', (err) => {
+      console.log(err);
+    });
+
+    // Note that if there is an error while parsing the JSON data, the bot will crash.
+    res.on('end', function() {
+      if(input !== undefined) {
+        json = JSON.parse(input.toString());
+        if(json.tag_name !== undefined) {
+          release = json.tag_name.replace("v",""); // Mark the release
+
+          // Compare this build's version to the latest release.
+          var releaseRelative = semver(pjson.version, release);
+
+          if(releaseRelative == 1)
+            console.log("********\nNOTICE: You are currently running v" + pjson.version + ". This build is considered unstable.\nCheck here for the latest stable versions of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
+
+          if(releaseRelative == -1)
+            console.log("********\nNOTICE: You are currently running v" + pjson.version + ". A newer version is available.\nCheck here for the latest version of this script:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
+          } else {
+            console.log(json);
+            console.log("ERROR: Unable to parse version data.");
+          }
+        }
+      else {
+        console.log(input); // Log the input on error
+        console.log("ERROR: Unable to parse version data.");
+      }
+    });
+  });
+
+  request.end();
+  process.nextTick(() => {
+    request.on('error', (err) => {
+      console.log(err);
+      console.log("ERROR: Unable to query version data.");
+    });
+  });
+}
 
 ////// # Discord # //////
 client.login(token);
@@ -379,7 +381,7 @@ function handleMsgFromGame(line) {
       for(var i = 5; i <= split.length-1; i++)
         msg = msg + " " + split[i];
 
-      if(config["log-messages"] == 'true')
+      if(config["log-messages"])
         console.log(msg);
 
       // When using a local connection, messages go through as new data rather than a response.
