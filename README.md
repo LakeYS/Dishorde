@@ -65,9 +65,12 @@ You may want to create a shortcut to run.bat or run_silent.vbs in your Startup f
 
 
 # How to Install - Linux
+## Android Devices
+The bot can be installed on Android devices using the [Termux](https://play.google.com/store/apps/details?id=com.termux&hl=en) app. Once installed, enter `apt update` and `apt install nodejs curl`. Then, proceed with the installation as a Linux system. Note that you will need access to a desktop computer in order to create the bot account and set up the channel.
+
 ## Setting up the bot
 1. Open a terminal on your system.
-2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/)
+2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android device.**
 3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.2.0/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh.
