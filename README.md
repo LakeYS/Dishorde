@@ -75,7 +75,7 @@ The bot can be installed on Android devices using the [Termux](https://play.goog
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android device.**
 3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.2.0/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
-5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh.
+5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
 6. Type `npm install discord.js telnet-client minimist` to install the required packages for the bot to run.
 
 ## Creating the bot account
