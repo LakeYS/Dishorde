@@ -11,6 +11,7 @@ const client = new Discord.Client();
 const minimist = require('minimist');
 const semver = require('semver-compare');
 const https = require('https');
+const fs = require('fs');
 
 var telnet = require('telnet-client');
 connection = new telnet();
@@ -76,9 +77,9 @@ if(typeof config.token === 'undefined') {
 token = config.token;
 
 // Discord channel
-if(typeof config.channel === 'undefined') {
-  console.log("ERROR: No Discord channel specified!");
-  process.exit();
+if(typeof config.channel === 'undefined' || config.channel == 'channelid') {
+  console.log("WARNING: No Discord channel specified! You will need to set one with '7dtd!setchannel #channelname'");
+  skipChannelCheck = 1;
 }
 channelid = config.channel.toString();
 
@@ -152,15 +153,13 @@ client.on('ready', () => {
 
   channel = client.channels.find("id", channelid);
 
-  if(!channel)
-  {
+  if(!channel && !skipChannelCheck) {
     console.log("Failed to identify channel with ID '" + channelid + "'");
     process.exit();
   }
 
   // Wait until the Discord client is ready before connecting to the game.
-  if(connectionInitialized !== 1)
-  {
+  if(connectionInitialized !== 1) {
     connectionInitialized = 1; // Make sure we only do this once
     connection.connect(params);
   }
@@ -181,10 +180,10 @@ client.on('error', function(err) {
 });
 
 client.on('message', function(msg) {
-  if((msg.channel == channel || msg.channel.type == "dm") && msg.author != client.user) {
+  if(msg.author != client.user) {
     if(msg.toString().toUpperCase().startsWith("7DTD!"))
       parseDiscordCommand(msg);
-    else if(msg.channel.type == "text") {
+    else if(msg.channel == channel && msg.channel.type == "text") {
       msg = "[" + msg.author.username + "] " + msg.cleanContent;
       handleMsgToGame(msg);
     }
@@ -194,6 +193,30 @@ client.on('message', function(msg) {
 function parseDiscordCommand(msg) {
   var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
 
+  // 7dtd!setchannel
+  if(cmd.startsWith("SETCHANNEL")) {
+    if(msg.member.permissions.has("MANAGE_GUILD")) {
+      var str = msg.toString().toUpperCase().replace("7DTD!SETCHANNEL ", "");
+      var id = str.replace("<#","").replace(">","");
+      var channelobj = client.channels.find("id", id);
+
+      if(channelobj !== null) {
+        msg.reply(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
+        channel = channelobj;
+        channelid = channel.id;
+
+        config.channel = channelid;
+
+        fs.writeFile(configFile, JSON.stringify(config, null, '\t'), "utf8");
+      }
+      else
+        msg.reply(":x: Failed to identify the channel you specified.");
+    }
+    else {
+      msg.author.send("You do not have permission to do this. (7dtd!setchannel)");
+    }
+  }
+
   // 7dtd!info
   if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H") {
     msg.author.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
@@ -202,84 +225,92 @@ function parseDiscordCommand(msg) {
       msg.author.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version, 7dtd!players");
   }
 
-  if(config["disable-commands"] !== 'true') {
-    // 7dtd!time
-    if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
-      connection.exec("gettime", function(err, response) {
-        // Sometimes the "response" has more than what we're looking for.
-        // We have to double-check and make sure the correct line is returned.
+  // The following commands only work in the specified channel if one is set.
+  if(msg.channel == channel || msg.channel.type == "dm") {
 
-        if(response !== undefined) {
-          var lines = response.split("\n");
-          receivedData = 0;
-          for(var i = 0; i <= lines.length-1; i++) {
-            var line = lines[i];
-            if(line.startsWith("Day")) {
-              receivedData = 1;
+    // [There are currently no commands that override disable-commands AND work in any channel]
 
-              handleTime(line, msg);
+    // The following commands only work if disable-commands is OFF. (includes above conditions)
+    if(config["disable-commands"] !== 'true') {
+
+      // 7dtd!time
+      if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
+        connection.exec("gettime", function(err, response) {
+          // Sometimes the "response" has more than what we're looking for.
+          // We have to double-check and make sure the correct line is returned.
+
+          if(response !== undefined) {
+            var lines = response.split("\n");
+            receivedData = 0;
+            for(var i = 0; i <= lines.length-1; i++) {
+              var line = lines[i];
+              if(line.startsWith("Day")) {
+                receivedData = 1;
+
+                handleTime(line, msg);
+              }
             }
           }
-        }
 
-        // Sometimes, the response doesn't have the data we're looking for...
-        if(!receivedData) {
-          waitingForTime = 1;
-          waitingForTimeMsg = msg;
-        }
-      });
-    }
+          // Sometimes, the response doesn't have the data we're looking for...
+          if(!receivedData) {
+            waitingForTime = 1;
+            waitingForTimeMsg = msg;
+          }
+        });
+      }
 
-    // 7dtd!version
-    if(cmd == "VERSION" || cmd == "V") {
-      connection.exec("version", function(err, response) {
-        // Sometimes the "response" has more than what we're looking for.
-        // We have to double-check and make sure the correct line is returned.
-        if(response !== undefined) {
-          var lines = response.split("\n");
-          receivedData = 0;
-          for(var i = 0; i <= lines.length-1; i++) {
-            var line = lines[i];
-            if(line.startsWith("Game version:")) {
-              msg.reply(line);
-              receivedData = 1;
+      // 7dtd!version
+      if(cmd == "VERSION" || cmd == "V") {
+        connection.exec("version", function(err, response) {
+          // Sometimes the "response" has more than what we're looking for.
+          // We have to double-check and make sure the correct line is returned.
+          if(response !== undefined) {
+            var lines = response.split("\n");
+            receivedData = 0;
+            for(var i = 0; i <= lines.length-1; i++) {
+              var line = lines[i];
+              if(line.startsWith("Game version:")) {
+                msg.reply(line);
+                receivedData = 1;
+              }
             }
           }
-        }
 
-        if(!receivedData) {
-          waitingForVersion = 1;
-          waitingForVersionMsg = msg;
-        }
-      });
-    }
-
-    // 7dtd!players
-    if(cmd == "PLAYERS" || cmd == "P" || cmd == "PL" || cmd == "LP") {
-      connection.exec("lp", function(err, response) {
-        // Sometimes the "response" has more than what we're looking for.
-        // We have to double-check and make sure the correct line is returned.
-
-        if(response !== undefined) {
-          var lines = response.split("\n");
-          receivedData = 0;
-          for(var i = 0; i <= lines.length-1; i++) {
-            var line = lines[i];
-            if(line.startsWith("Total of ")) {
-              receivedData = 1;
-
-              handlePlayerCount(line, msg);
-            }
-            // TODO: Add code to detect player listing
+          if(!receivedData) {
+            waitingForVersion = 1;
+            waitingForVersionMsg = msg;
           }
-        }
+        });
+      }
 
-        // Sometimes, the response doesn't have the data we're looking for...
-        if(!receivedData) {
-          waitingForPlayers = 1;
-          waitingForPlayersMsg = msg;
-        }
-      });
+      // 7dtd!players
+      if(cmd == "PLAYERS" || cmd == "P" || cmd == "PL" || cmd == "LP") {
+        connection.exec("lp", function(err, response) {
+          // Sometimes the "response" has more than what we're looking for.
+          // We have to double-check and make sure the correct line is returned.
+
+          if(response !== undefined) {
+            var lines = response.split("\n");
+            receivedData = 0;
+            for(var i = 0; i <= lines.length-1; i++) {
+              var line = lines[i];
+              if(line.startsWith("Total of ")) {
+                receivedData = 1;
+
+                handlePlayerCount(line, msg);
+              }
+              // TODO: Add code to detect player listing
+            }
+          }
+
+          // Sometimes, the response doesn't have the data we're looking for...
+          if(!receivedData) {
+            waitingForPlayers = 1;
+            waitingForPlayersMsg = msg;
+          }
+        });
+      }
     }
   }
 }
@@ -303,7 +334,7 @@ connection.on('ready', function(prompt) {
 
   if(clientStatus === 0) {
     client.user.setStatus('online');
-    client.user.setGame("7DTD||Type 7dtd!info");
+    client.user.setGame("[Type '7dtd!info']");
     clientStatus = 1;
   }
 });
@@ -358,8 +389,7 @@ connection.on('data', function(data) {
 });
 
 connection.on('error', function(data) {
-  //console.log(data);
-  console.log("Connection to game FAILED with error: " + data.code);
+  console.log(data);
 
   if(clientStatus == 1) {
     client.user.setGame("Error||Type 7dtd!info");
