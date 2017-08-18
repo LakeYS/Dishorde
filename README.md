@@ -45,17 +45,12 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 6. Right click the bot's config.json file and click "Edit".
 7. Find "changeme" and replace it with your server's Telnet password. Replace "your_token_here" with the Discord token from earlier. If running the bot on a different network from the server, add `--ip=[your server's external ip]` (May require port forwarding if using an external IP. Make sure your Telnet password is secure.)
 
-## Setting up the channel
-1. Open Discord.
-2. Open your user settings (gear in the bottom left) and go to "Appearance".
-3. Scroll down to "Advanced" and turn Developer Mode on.
-4. Now go to your Discord server. Create a text channel or choose an existing one for your server's chat.
-5. Right-click the text channel you want to use and click "Copy ID". This will copy the channel's number ID to your clipboard.
-6. Go back to your config.json file and paste the ID in place of "channelid".
-
 ## Run the bot!
 Once you complete all of this, you will be able to run the bot by opening run.bat. If you've done all of this correctly, you will see the following in the terminal:
 `Connected to game. Connected to 1 Discord Servers.`
+
+To set the channel for your server's chat, open Discord and type `7dtd!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
+
 
 Note that if you close this terminal the bot will be disconnected. The bot can be run in the background with no terminal by opening run_silent.vbs.
 
@@ -76,7 +71,7 @@ The bot can be installed on Android devices using the [Termux](https://play.goog
 3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.2.0/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
-6. Type `npm install discord.js telnet-client minimist` to install the required packages for the bot to run.
+6. Type `npm install` to install the required packages for the bot to run.
 
 ## Creating the bot account
 1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) in a browser and click "New App".
@@ -95,15 +90,8 @@ The bot can be installed on Android devices using the [Termux](https://play.goog
 5. If running the bot on a different network from the server, change "localhost" to your server's external IP. (If using an external IP to connect the bot, forwarding the telnet port may be required)
 6. Replace "your_token_here" with the Discord bot token from earlier.  Keep the file open for the next section.
 
-## Setting up the channel
-1. Open Discord in a browser.
-2. Open your user settings (gear in the bottom left) and go to "Appearance".
-3. Scroll down to "Advanced" and turn Developer Mode on.
-4. Now go to your Discord server. Create a text channel or choose an existing one for your server's chat.
-5. Right-click the text channel you want to use and click "Copy ID". This will copy the channel's number ID to your clipboard.
-6. Go back to your server's config.json file and enter the ID in place of "channelid".
-7. Save and close the file.
-
 ## Run the bot!
 Once you complete all of this, you will be able to run the bot by executing run.sh (Navigate to the bot's directory and enter `./run.sh`). If you've done all of this correctly, you will see the following:
 `Connected to game. Connected to 1 Discord Servers.`
+
+To set the channel for your server's chat, open Discord and type `7dtd!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!

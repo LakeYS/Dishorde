@@ -37,8 +37,7 @@ argv = minimist(process.argv.slice(2), {string: ['channel','port']});
 // If the user is using arguments, config.json is ignored.
 if(Object.keys(argv).length > 2)
   config = argv;
-else
-{
+else {
   configFile = "./config.json";
 
   if(argv.configfile !== undefined) {
