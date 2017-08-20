@@ -61,7 +61,7 @@ You may want to create a shortcut to run.bat or run_silent.vbs in your Startup f
 
 # How to Install - Linux
 ## Android Devices
-The bot can be installed on Android devices using the [Termux](https://play.google.com/store/apps/details?id=com.termux&hl=en) app. Once installed, enter `apt update` and `apt install nodejs curl`. Then, proceed with the installation as a Linux system. Note that you will need access to a desktop computer in order to create the bot account and set up the channel.
+The bot can be installed on Android devices using the [Termux](https://play.google.com/store/apps/details?id=com.termux&hl=en) app. Once installed, enter `apt update` and `apt install nodejs curl`. Then, proceed with the installation as a Linux system. Note that you may need access to a desktop computer in order to create the bot account.
 
 *Warning: For security purposes, please do not run this bot on an unsecured network (such as public wi-fi).*
 
