@@ -6,8 +6,6 @@ const pjson = require('./package.json');
 
 console.log("7DTD Discord Integration v" + pjson.version);
 
-const Discord = require('discord.js');
-const client = new Discord.Client();
 const minimist = require('minimist');
 const semver = require('semver-compare');
 const https = require('https');
@@ -82,6 +80,12 @@ if(typeof config.channel === 'undefined' || config.channel == 'channelid') {
 }
 channelid = config.channel.toString();
 
+// Load the Discord client
+if(config["skip-discord-auth"] !== true) {
+  Discord = require('discord.js');
+  client = new Discord.Client();
+}
+
 ////// # Version Check # //////
 if(!config['disable-version-check']) {
   var options = {
@@ -141,53 +145,55 @@ if(!config['disable-version-check']) {
 }
 
 ////// # Discord # //////
-client.login(token);
+if(config["skip-discord-auth"] !== true) {
+  client.login(token);
 
-client.on('ready', () => {
-  clientStatus = 0;
+  client.on('ready', () => {
+    clientStatus = 0;
 
-  console.log('Connected to ' + client.guilds.size + ' Discord servers.');
-  client.user.setGame("No connection");
-  client.user.setStatus('dnd');
+    console.log('Connected to ' + client.guilds.size + ' Discord servers.');
+    client.user.setGame("No connection");
+    client.user.setStatus('dnd');
 
-  channel = client.channels.find("id", channelid);
+    channel = client.channels.find("id", channelid);
 
-  if(!channel && !skipChannelCheck) {
-    console.log("Failed to identify channel with ID '" + channelid + "'");
-    process.exit();
-  }
-
-  // Wait until the Discord client is ready before connecting to the game.
-  if(connectionInitialized !== 1) {
-    connectionInitialized = 1; // Make sure we only do this once
-    connection.connect(params);
-  }
-});
-
-client.on('disconnect', function(event) {
-  if(event.code != 1000) {
-    console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
-    setTimeout(function(){ client.login(token); }, 6000);
-  }
-});
-
-client.on('error', function(err) {
-  console.log("Discord client error '" + err.code + "'. Attempting to reconnect in 6s...");
-
-  client.destroy();
-  setTimeout(function(){ client.login(config.token); }, 6000);
-});
-
-client.on('message', function(msg) {
-  if(msg.author != client.user) {
-    if(msg.toString().toUpperCase().startsWith("7DTD!"))
-      parseDiscordCommand(msg);
-    else if(msg.channel == channel && msg.channel.type == "text") {
-      msg = "[" + msg.author.username + "] " + msg.cleanContent;
-      handleMsgToGame(msg);
+    if(!channel && !skipChannelCheck) {
+      console.log("Failed to identify channel with ID '" + channelid + "'");
+      process.exit();
     }
-  }
-});
+
+    // Wait until the Discord client is ready before connecting to the game.
+    if(connectionInitialized !== 1) {
+      connectionInitialized = 1; // Make sure we only do this once
+      connection.connect(params);
+    }
+  });
+
+  client.on('disconnect', function(event) {
+    if(event.code != 1000) {
+      console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
+      setTimeout(function(){ client.login(token); }, 6000);
+    }
+  });
+
+  client.on('error', function(err) {
+    console.log("Discord client error '" + err.code + "'. Attempting to reconnect in 6s...");
+
+    client.destroy();
+    setTimeout(function(){ client.login(config.token); }, 6000);
+  });
+
+  client.on('message', function(msg) {
+    if(msg.author != client.user) {
+      if(msg.toString().toUpperCase().startsWith("7DTD!"))
+        parseDiscordCommand(msg);
+      else if(msg.channel == channel && msg.channel.type == "text") {
+        msg = "[" + msg.author.username + "] " + msg.cleanContent;
+        handleMsgToGame(msg);
+      }
+    }
+  });
+}
 
 function parseDiscordCommand(msg) {
   var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
@@ -328,10 +334,14 @@ params = {
   debug: false,
 };
 
+// If Discord auth is skipped, we have to connect now rather than waiting for the Discord client.
+if(config["skip-discord-auth"] == true)
+  connection.connect(params);
+
 connection.on('ready', function(prompt) {
   console.log("Connected to game. (" +  Date() + ")");
 
-  if(clientStatus === 0) {
+  if(clientStatus === 0 && config["skip-discord-auth"] !== true) {
     client.user.setStatus('online');
     client.user.setGame("[Type '7dtd!info']");
     clientStatus = 1;
@@ -367,7 +377,6 @@ connection.on('data', function(data) {
     process.exit();
   }
 
-
   for(var i = 0; i <= lines.length-1; i++) {
     //console.log("*LINE" + " " + i + " " + lines[i]);
     var line = lines[i];
@@ -390,7 +399,7 @@ connection.on('data', function(data) {
 connection.on('error', function(data) {
   console.log(data);
 
-  if(clientStatus == 1) {
+  if(clientStatus == 1 && config["skip-discord-auth"] !== true) {
     client.user.setGame("Error||Type 7dtd!info");
     client.user.setStatus('dnd');
     clientStatus = 0;
@@ -486,12 +495,16 @@ process.stdin.on('data', function (text) {
 
 process.on('exit',  () => {
   doReconnect = 0;
-  client.destroy();
+
+  if(config["skip-discord-auth"] !== true)
+    client.destroy();
 });
 
 process.on('unhandledRejection', (err) => {
   console.log(err);
-  console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
-  client.destroy();
-  setTimeout(function(){ client.login(token); }, 6000);
+  if(config["skip-discord-auth"] !== true) {
+    console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
+    client.destroy();
+    setTimeout(function(){ client.login(token); }, 6000);
+  }
 });
