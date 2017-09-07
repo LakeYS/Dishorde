@@ -237,18 +237,17 @@ function parseDiscordCommand(msg) {
     }
   }
 
-  // 7dtd!info
-  if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H") {
-    msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
-
-    if(config["disable-commands"] !== 'true')
-      msg.channel.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version, 7dtd!players");
-  }
-
   // The following commands only work in the specified channel if one is set.
   if(msg.channel == channel || msg.channel.type == "dm") {
 
-    // [There are currently no commands that override disable-commands AND work in any channel]
+    // 7dtd!info
+    if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H") {
+
+      msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
+
+      if(config["disable-commands"] !== 'true')
+        msg.channel.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version, 7dtd!players");
+    }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
     if(config["disable-commands"] !== 'true') {
