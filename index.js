@@ -192,6 +192,7 @@ if(config["skip-discord-auth"] !== true) {
   });
 
   client.on('error', function(err) {
+    console.log(err);
     console.log("Discord client error '" + err.code + "'. Attempting to reconnect in 6s...");
 
     client.destroy();
