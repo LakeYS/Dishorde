@@ -1,6 +1,8 @@
 # 7 Days to Die Discord Integration
 A Discord bot for 7 Days to Die. This integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
 
+The bot runs as a completely separate application, so no mods are required to run it.
+
 *Note: Dedicated servers only.*
 
 # How it Works
