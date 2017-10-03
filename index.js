@@ -400,12 +400,12 @@ connection.on('data', function(data) {
 
     var split = line.split(" ");
 
-    // If we don't destroy the connection, crashes will happen when someone types a message.
-    // This is a workaround until better measures can be put in place for sending data to the game.
-    console.log("The server has shut down. Closing connection...");
-    connection.destroy();
-
     if(split[2] == "INF" && split[3] == "[NET]" && split[4] == "ServerShutdown\r") {
+      // If we don't destroy the connection, crashes will happen when someone types a message.
+      // This is a workaround until better measures can be put in place for sending data to the game.
+      console.log("The server has shut down. Closing connection...");
+      connection.destroy();
+
       channel.send({embed: {
         color: 14164000,
         description: "The server has shut down."
