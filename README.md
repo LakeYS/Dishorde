@@ -9,9 +9,13 @@ The bot runs as a completely separate application, so no mods are required to ru
 This script works by connecting to your server's admin console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
 
 # Development and Support
-I will continue to keep this project up-to-date with new features and fixes whenever possible. If running v1.3.0 or higher, notifications for updates are displayed in the terminal. Planned features and known bugs are documented in the [Issues](https://github.com/LakeYS/7DTD-Discord/issues) section.
+I will continue to keep this project up-to-date with new features and fixes whenever possible. If running v1.3.0 or higher, notifications for updates are displayed in the terminal.
 
-For support, feel free to [open an issue](https://github.com/LakeYS/7DTD-Discord/issues) or contact me privately at contact@lakeys.net. Feel free to reach me via e-mail if you have any inquiries or feedback related to this project.
+Note: Development of this project will likely be slow through the month of October as I am be working hard on another project. Normal development will resume soon.
+
+For support, questions, and comments, you can join the Discord server or contact me directly at contact@LakeYS.net. You can also [submit an issue](https://github.com/LakeYS/7DTD-Discord/issues/new) for bugs and support.
+
+**[Join the Discord](https://discord.gg/3s58vwX)**
 
 # Commands
 Commands can be sent via DM or in the specified chat channel.
