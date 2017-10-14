@@ -11,11 +11,11 @@ This script works by connecting to your server's admin console and monitoring it
 # Development and Support
 I will continue to keep this project up-to-date with new features and fixes whenever possible. If running v1.3.0 or higher, notifications for updates are displayed in the terminal.
 
-Note: Development of this project will likely be slow through the month of October as I am be working hard on another project. Normal development will resume soon.
+*Note: Development of this project will likely be slow through the month of October as I am be working hard on another project. Normal development will resume soon.*
 
 For support, questions, and comments, you can join the Discord server or contact me directly at contact@LakeYS.net. You can also [submit an issue](https://github.com/LakeYS/7DTD-Discord/issues/new) for bugs and support.
 
-**[Join the Discord](https://discord.gg/3s58vwX)**
+**[Join the Discord](https://discord.gg/sEMrfBT)**
 
 # Commands
 Commands can be sent via DM or in the specified chat channel.
