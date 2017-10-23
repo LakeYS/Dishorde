@@ -79,6 +79,8 @@ if(typeof config.channel === 'undefined' || config.channel == 'channelid') {
   console.log("WARNING: No Discord channel specified! You will need to set one with '7dtd!setchannel #channelname'");
   skipChannelCheck = 1;
 }
+else
+  skipChannelCheck = 0;
 channelid = config.channel.toString();
 
 // Load the Discord client
@@ -172,10 +174,8 @@ if(config["skip-discord-auth"] !== true) {
 
     channel = client.channels.find("id", channelid);
 
-    if(!channel && !skipChannelCheck) {
-      console.log("Failed to identify channel with ID '" + channelid + "'");
-      process.exit();
-    }
+    if(!channel && !skipChannelCheck)
+      console.log("ERROR: Failed to identify channel with ID '" + channelid + "'");
 
     // Wait until the Discord client is ready before connecting to the game.
     if(connectionInitialized !== 1) {
