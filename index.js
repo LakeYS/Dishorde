@@ -170,6 +170,10 @@ if(config["skip-discord-auth"] !== true) {
     clientStatus = 0;
 
     console.log('Connected to ' + client.guilds.size + ' Discord servers.');
+
+    if(client.guilds.size == 0)
+      console.log("********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********");
+
     client.user.setGame("No connection");
     client.user.setStatus('dnd');
 
