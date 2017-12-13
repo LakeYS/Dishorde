@@ -3,7 +3,7 @@ A Discord bot for 7 Days to Die. This integrates a dedicated game server's chat 
 
 The bot runs as a completely separate application, so no mods are required to run it.
 
-*Note: Dedicated servers only.*
+**See below for download links instructions on how to install the bot. Dedicated servers only.**
 
 # How it Works
 This script works by connecting to your server's admin console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
@@ -68,13 +68,20 @@ You may want to create a shortcut to run.bat or run_silent.vbs in your Startup f
 
 # How to Install - Linux
 ## Android Devices
-The bot can be installed on Android devices using the [Termux](https://play.google.com/store/apps/details?id=com.termux&hl=en) app. Once installed, enter `apt update` and `apt install nodejs curl`. Then, proceed with the installation as a Linux system. Note that you may need access to a desktop computer in order to create the bot account.
+The bot can be installed on Android devices using the [Termux](https://play.google.com/store/apps/details?id=com.termux&hl=en) app. Once installed, enter `apt update` and `apt install nodejs curl`. Then, proceed with the installation as a Linux system. You may need access to a desktop computer in order to create the bot account.
 
-*Warning: For security purposes, please do not run this bot on an unsecured network (such as public wi-fi).*
+*Warning: For security purposes, please avoid running this bot on an unsecured network (such as public wi-fi).*
+
+## Raspberry Pi/Raspbian OS Setup
+The bot can be run from a Raspberry Pi device by installing NodeJS. You may need access to a desktop computer in order to create the bot account.
+
+First, follow the [NodeJS install instructions found here](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions) under "Debian and Ubuntu based Linux distributions".
+ 
+If running the bot on the same network as the Raspberry Pi, you will likely need to enter the computer's internal IP. Open a commant prompt on the system that the server is running on and type `ipconfig`. Look for the field labeled 'IPv4 address' and copy the IP next to it (the IP should start with `196.168`). Then, copy this IP into the config.json under 'ip'. If this does not work, consider forwarding your telnet port (make sure the password is secure) and using the network's external IP.
 
 ## Setting up the bot
 1. Open a terminal on your system.
-2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android device.**
+2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
 3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.4.0/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
@@ -91,7 +98,7 @@ The bot can be installed on Android devices using the [Termux](https://play.goog
 
 ## Configuring the bot
 1. On your server's system, navigate to the game's directory and edit your the config xml file.
-2. Find "TelnetEnabled" and make sure it is set to "true". Set a telnet password and save the file.
+2. Find "TelnetEnabled" and make sure it is set to "true". Set a telnet password and save the file. **Make sure your telnet password is secure , especially if the telnet port is open or the server is running on a VPS.**
 3. Now navigate back to the bot's folder. Edit config.json.
 4. Find the line containing `"password": "changeme",` and replace "changeme" with your server's telnet password.
 5. If running the bot on a different network from the server, change "localhost" to your server's external IP. (If using an external IP to connect the bot, forwarding the telnet port may be required)
