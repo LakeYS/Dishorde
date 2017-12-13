@@ -4,7 +4,7 @@
 ////// # Requirements and Initialization # //////
 const pjson = require('./package.json');
 
-console.log("\x1b[7m* 7DTD Discord Integration v" + pjson.version + " *\x1b[0m");
+console.log("\x1b[7m# 7DTD Discord Integration v" + pjson.version + " #\x1b[0m");
 
 const minimist = require('minimist');
 const https = require('https');
@@ -227,13 +227,19 @@ function parseDiscordCommand(msg) {
       var channelobj = client.channels.find("id", id);
 
       if(channelobj !== null) {
-        msg.reply(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
         channel = channelobj;
         channelid = channel.id;
 
         config.channel = channelid;
 
-        fs.writeFile(configFile, JSON.stringify(config, null, '\t'), "utf8");
+        fs.writeFile(configFile, JSON.stringify(config, null, '\t'), "utf8", (err) => {
+          if(err) {
+            console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
+            msg.reply(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
+          }
+          else
+            msg.reply(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
+        });
       }
       else
         msg.reply(":x: Failed to identify the channel you specified.");
