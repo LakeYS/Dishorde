@@ -63,21 +63,21 @@ else
 
 // Telnet Password
 if(typeof config.password === 'undefined') {
-  console.log("\x1b[31mERROR: No telnet password specified!\x1b[0m");
+  console.error("\x1b[31mERROR: No telnet password specified!\x1b[0m");
   process.exit();
 }
 pass = config.password;
 
 // Discord token
 if(typeof config.token === 'undefined') {
-  console.log("\x1b[31mERROR: No Discord token specified!\x1b[0m");
+  console.error("\x1b[31mERROR: No Discord token specified!\x1b[0m");
   process.exit();
 }
 token = config.token;
 
 // Discord channel
 if(typeof config.channel === 'undefined' || config.channel == 'channelid') {
-  console.log("\x1b[33mWARNING: No Discord channel specified! You will need to set one with '7dtd!setchannel #channelname'\x1b[0m");
+  console.warn("\x1b[33mWARNING: No Discord channel specified! You will need to set one with '7dtd!setchannel #channelname'\x1b[0m");
   skipChannelCheck = 1;
 }
 else
@@ -136,10 +136,10 @@ if(!config['disable-version-check']) {
             var releaseRelative = semver(pjson.version, release);
 
             if(releaseRelative == 1)
-              console.log("********\nNOTICE: You are currently running \x1b[1mv" + pjson.version + "\x1b[0m. This build is considered unstable.\nCheck here for the latest stable versions of this script:\n\x1b[1mhttps://github.com/LakeYS/7DTD-Discord/releases\n\x1b[0m********");
+              console.log("********\nNOTICE: You are currently running\x1b[1m v" + pjson.version + "\x1b[0m. This build is considered unstable.\nCheck here for the latest stable versions of this script:\n\x1b[1m https://github.com/LakeYS/7DTD-Discord/releases \n\x1b[0m********");
 
             if(releaseRelative == -1)
-              console.log("********\nNOTICE: You are currently running \x1b[1mv" + pjson.version + "\x1b[0m. A newer version is available.\nCheck here for the latest version of this script:\n\x1b[1mhttps://github.com/LakeYS/7DTD-Discord/releases\n\x1b[0m********");
+              console.log("********\nNOTICE: You are currently running\x1b[1m v" + pjson.version + "\x1b[0m. A newer version is available.\nCheck here for the latest version of this script:\n\x1b[1m https://github.com/LakeYS/7DTD-Discord/releases \n\x1b[0m********");
             } else {
               console.log(json);
               console.warn("WARNING: Unable to parse version data.");
@@ -147,7 +147,7 @@ if(!config['disable-version-check']) {
           }
         else {
           console.log(input); // Log the input on error
-          console.log("WARNING: Unable to parse version data.");
+          console.warn("WARNING: Unable to parse version data.");
         }
       });
     });
@@ -156,7 +156,7 @@ if(!config['disable-version-check']) {
     process.nextTick(() => {
       request.on('error', (err) => {
         console.log(err);
-        console.log("WARNING: Unable to query version data.");
+        console.warn("WARNING: Unable to query version data.");
       });
     });
   }
@@ -169,7 +169,7 @@ if(config["skip-discord-auth"] !== true) {
   client.on('ready', () => {
     clientStatus = 0;
 
-    console.log('Connected to \x1b[1m' + client.guilds.size + '\x1b[0m Discord server(s).');
+    console.log('Connected to\x1b[1m ' + client.guilds.size + ' \x1b[0mDiscord server(s).');
 
     if(client.guilds.size == 0)
       console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
