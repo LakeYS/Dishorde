@@ -18,7 +18,7 @@ doReconnect = 1;
 waitingForTime = 0;
 waitingForVersion = 0;
 waitingForPlayers = 0;
-waitingForPref = 0;
+//waitingForPref = 0;
 receivedData = 0;
 
 skipVersionCheck = 0;
@@ -331,7 +331,6 @@ function parseDiscordCommand(msg) {
 
                 handlePlayerCount(line, msg);
               }
-              // TODO: Add code to detect player listing
             }
           }
 
@@ -343,34 +342,34 @@ function parseDiscordCommand(msg) {
         });
       }
 
-      if(cmd == "PREF") {
-        connection.exec("getgamepref", function(err, response) {
-          var str = msg.toString().toUpperCase().replace("7DTD!PREF ", "").replace("7DTD!PREF", "");
-          // Sometimes the "response" has more than what we're looking for.
-          // We have to double-check and make sure the correct line is returned.
-          if(response !== undefined) {
-            var lines = response.split("\n");
-            receivedData = 0;
+      //if(cmd == "PREF") {
+      //  connection.exec("getgamepref", function(err, response) {
+      //    var str = msg.toString().toUpperCase().replace("7DTD!PREF ", "").replace("7DTD!PREF", "");
+      //    // Sometimes the "response" has more than what we're looking for.
+      //    // We have to double-check and make sure the correct line is returned.
+      //    if(response !== undefined) {
+      //      var lines = response.split("\n");
+      //      receivedData = 0;
 
-            final = "";
-            for(var i = 0; i <= lines.length-1; i++) {
-              var line = lines[i];
-              if(line.startsWith("GamePref.")) {
-                final = final + "\n" + line.replace("GamePref.","");
-                receivedData = 1;
-              }
-            }
-            msg.author.send(final);
-            msg.channel.send("Server configuration has been sent to you via DM.");
-            // TODO: Make sure user can receive DMs before sending
-          }
+      //      final = "";
+      //      for(var i = 0; i <= lines.length-1; i++) {
+      //        var line = lines[i];
+      //        if(line.startsWith("GamePref.")) {
+      //          final = final + "\n" + line.replace("GamePref.","");
+      //          receivedData = 1;
+      //        }
+      //      }
+      //      msg.author.send(final);
+      //      msg.channel.send("Server configuration has been sent to you via DM.");
+      //      // TODO: Make sure user can receive DMs before sending
+      //    }
 
-          if(!receivedData) {
-            waitingForPref = 1;
-            waitingForPrefMsg = msg;
-          }
-        });
-      }
+      //    if(!receivedData) {
+      //      waitingForPref = 1;
+      //      waitingForPrefMsg = msg;
+      //    }
+      //  });
+      //}
     }
   }
 }
@@ -462,9 +461,9 @@ connection.on('data', function(data) {
     else if(waitingForPlayers && line.startsWith("Total of ")) {
       waitingForPlayersMsg.reply(line);
     }
-    else if(waitingForPref && line.startsWith("GamePref.")) { // TODO: test this
-      waitingForPrefMsg.reply(line);
-    }
+    //else if(waitingForPref && line.startsWith("GamePref.")) {
+    //  waitingForPrefMsg.reply(line);
+    //}
     else
       handleMsgFromGame(line);
   }
