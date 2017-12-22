@@ -404,12 +404,7 @@ connection.on('ready', function(prompt) {
 
 connection.on('failedlogin', function(prompt) {
     console.log("Login to game failed! (" +  Date() + ")");
-});
-
-connection.on('timeout', function() {
-  //console.log('Connection to game timed out. This is normal if the server is empty. Ignoring...');
-  //connection.end();
-  //setTimeout(function(){ connection.connect(params); }, 5000);
+    process.exit();
 });
 
 connection.on('close', function() {
@@ -425,9 +420,17 @@ connection.on('data', function(data) {
   data = data.toString();
   var lines = data.split("\n");
 
-  // Error catcher for password re-prompt
+  if(config['log-telnet'])
+    console.log("[Telnet] " + data);
+
+  // Error catchers for password re-prompts
   if(data == "Please enter password:\r\n\u0000\u0000") {
     console.log("ERROR: Received password prompt!");
+    process.exit();
+  }
+
+  if(data == "Password incorrect, please enter password:\r\n") {
+    console.log("ERROR: Received password prompt! (Telnet password is incorrect)");
     process.exit();
   }
 

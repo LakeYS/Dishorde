@@ -13,5 +13,6 @@
   "disable-gmsgs": false,
   "hide-prefix": false,
   "log-messages": false,
+  "log-telnet": false,
   "disable-version-check": false
 }
