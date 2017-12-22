@@ -35,8 +35,10 @@ argv = minimist(process.argv.slice(2), {string: ['channel','port']});
 
 // This is a simple check to see if we're using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
-if(Object.keys(argv).length > 2)
+if(Object.keys(argv).length > 2) {
   config = argv;
+  console.log("********\nWARNING: Configuring the bot with arguments is no-longer supported and may not work correctly. Please consider using config.json instead.\nThe arguments must be removed from run.bat/run.sh in order for the config file to take effect.\n********");
+}
 else {
   configFile = "./config.json";
 
@@ -85,7 +87,7 @@ else
 channelid = config.channel.toString();
 
 // Load the Discord client
-if(config["skip-discord-auth"] !== true) {
+if(!config["skip-discord-auth"]) {
   Discord = require('discord.js');
   client = new Discord.Client();
 }
@@ -163,7 +165,7 @@ if(!config['disable-version-check']) {
 }
 
 ////// # Discord # //////
-if(config["skip-discord-auth"] !== true) {
+if(!config["skip-discord-auth"]) {
   client.login(token);
 
   client.on('ready', () => {
@@ -257,12 +259,12 @@ function parseDiscordCommand(msg) {
 
       msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
-      if(config["disable-commands"] !== 'true')
+      if(!config["disable-commands"])
         msg.channel.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version, 7dtd!players");
     }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
-    if(config["disable-commands"] !== 'true') {
+    if(!config["disable-commands"]) {
 
       // 7dtd!time
       if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
@@ -389,13 +391,13 @@ params = {
 };
 
 // If Discord auth is skipped, we have to connect now rather than waiting for the Discord client.
-if(config["skip-discord-auth"] == true)
+if(config["skip-discord-auth"])
   connection.connect(params);
 
 connection.on('ready', function(prompt) {
   console.log("Connected to game. (" +  Date() + ")");
 
-  if(clientStatus === 0 && config["skip-discord-auth"] !== true) {
+  if(clientStatus === 0 && !config["skip-discord-auth"]) {
     client.user.setStatus('online');
     client.user.setGame("[Type '7dtd!info']");
     clientStatus = 1;
@@ -475,7 +477,7 @@ connection.on('data', function(data) {
 connection.on('error', function(data) {
   console.log(data);
 
-  if(clientStatus == 1 && config["skip-discord-auth"] !== true) {
+  if(clientStatus == 1 && !config["skip-discord-auth"]) {
     client.user.setGame("Error||Type 7dtd!info");
     client.user.setStatus('dnd');
     clientStatus = 0;
@@ -487,7 +489,7 @@ function handleMsgFromGame(line) {
   var split = line.split(" ");
   var type = split[3];
 
-  if((config["disable-chatmsgs"] !== 'true' && type == "Chat:") || (config["disable-gmsgs"] !== 'true' && type == "GMSG:")) {
+  if((!config["disable-chatmsgs"] && type == "Chat:") || (!config["disable-gmsgs"] && type == "GMSG:")) {
     // Make sure the channel exists.
     if(channel !== null) {
       // Cut off the timestamp and other info
@@ -506,7 +508,7 @@ function handleMsgFromGame(line) {
       // Convert it to Discord-friendly text.
       msg = msg.replace("'","").replace("'","");
 
-      if(config["hide-prefix"] == 'true')
+      if(!config["hide-prefix"])
       {
         // Do nothing if the prefix '/' is in the message.
         if(msg.includes(": /"))
@@ -560,13 +562,13 @@ process.stdin.on('data', function (text) {
 process.on('exit',  () => {
   doReconnect = 0;
 
-  if(config["skip-discord-auth"] !== true)
+  if(!config["skip-discord-auth"])
     client.destroy();
 });
 
 process.on('unhandledRejection', (err) => {
   console.log(err);
-  if(config["skip-discord-auth"] !== true) {
+  if(!config["skip-discord-auth"]) {
     console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
     client.destroy();
     setTimeout(function(){ client.login(token); }, 6000);
