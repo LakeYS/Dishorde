@@ -48,13 +48,10 @@ Temporary Items
 
 # Node modules and security
 node_modules
-run_private.sh
-run_private2.sh
-run_private.bat
-run_private2.bat
-config_private.json
-config_private2.json
-run_private.vbs
+run_private*.sh
+run_private*.bat
+config_private*.json
+run_private*.vbs
 update.sh
 update_private.sh
 
