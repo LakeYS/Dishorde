@@ -32,6 +32,8 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 - `disable-gmsgs` - Disable other messages. Includes deaths, leaves/joins, etc.
 - `hide-prefix` - Hides all chat messages that start with a forward slash. This may be useful if your server uses commands.
 - `log-messages` - Chat messages will show up in the terminal.
+- `log-telnet` - All output from the connection will show up in the terminal.
+- `skip-discord-auth` - The bot will not log in to Discord.
 
 # How to Install - Windows
 ## Creating the bot account
@@ -44,7 +46,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Setting up the bot
-1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.4.0/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
+1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.0/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
 2. Install Node.js LTS from [this website](https://nodejs.org/en/download/).
 3. Once Node.js is finished installing, run install.bat in the bot's folder. This will automatically install the required modules for the bot.
 4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
@@ -76,13 +78,13 @@ The bot can be installed on Android devices using the [Termux](https://play.goog
 The bot can be run from a Raspberry Pi device by installing NodeJS. You may need access to a desktop computer in order to create the bot account.
 
 First, follow the [NodeJS install instructions found here](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions) under "Debian and Ubuntu based Linux distributions".
- 
+
 If running the bot on the same network as the Raspberry Pi, you will likely need to enter the computer's internal IP. Open a commant prompt on the system that the server is running on and type `ipconfig`. Look for the field labeled 'IPv4 address' and copy the IP next to it (the IP should start with `196.168`). Then, copy this IP into the config.json under 'ip'. If this does not work, consider forwarding your telnet port (make sure the password is secure) and using the network's external IP.
 
 ## Setting up the bot
 1. Open a terminal on your system.
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
-3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.4.0/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
+3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.0/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
 6. Type `npm install` to install the required packages for the bot to run.
