@@ -54,4 +54,6 @@ config_private*.json
 run_private*.vbs
 update.sh
 update_private.sh
+7DTD-Discord/
+7DTD-Discord.tar.gz
 
