@@ -522,13 +522,15 @@ function handleMsgFromGame(line) {
 
 function handleMsgToGame(line) {
   // TODO: Ensure connection is valid before executing commands
-  connection.exec("say \"" + line + "\"", function(err, response) {
-    var lines = response.split("\n");
-    for(var i = 0; i <= lines.length-1; i++) {
-      var line = lines[i];
-      handleMsgFromGame(line);
-    }
-  });
+  if(!config["disable-chatmsgs"]) {
+    connection.exec("say \"" + line + "\"", function(err, response) {
+      var lines = response.split("\n");
+      for(var i = 0; i <= lines.length-1; i++) {
+        var line = lines[i];
+        handleMsgFromGame(line);
+      }
+    });
+  }
 }
 
 function handleTime(line, msg) {
