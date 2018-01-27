@@ -8,11 +8,12 @@
   "port": "8081",
   "ip": "localhost",
 
+  "allow-exec-command": false,
   "disable-commands": false,
   "disable-chatmsgs": false,
   "disable-gmsgs": false,
+  "disable-version-check": false,
   "hide-prefix": false,
   "log-messages": false,
   "log-telnet": false,
-  "disable-version-check": false
 }

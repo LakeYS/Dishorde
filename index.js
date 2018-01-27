@@ -249,6 +249,22 @@ function parseDiscordCommand(msg) {
     }
   }
 
+  // 7dtd!exec
+  // This command must be explicitly enabled due to the security risks of allowing it.
+  // TODO: Document this command
+  if(config["allow-exec-command"] == true)
+  {
+    if(cmd.startsWith("EXEC")) {
+      if(msg.member.permissions.has("MANAGE_GUILD")) {
+        var execStr = msg.toString().replace(new RegExp("7DTD!EXEC", "ig"), "");
+        connection.exec(execStr);
+      }
+      else {
+        msg.author.send("You do not have permission to do this. (7dtd!exec)");
+      }
+    }
+  }
+
   // The following commands only work in the specified channel if one is set.
   if(msg.channel == channel || msg.channel.type == "dm") {
 
