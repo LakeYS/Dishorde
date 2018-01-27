@@ -11,7 +11,7 @@ const https = require("https");
 const fs = require("fs");
 
 var telnet = require("telnet-client");
-connection = new telnet();
+const connection = new telnet();
 
 doReconnect = 1;
 
@@ -87,10 +87,8 @@ else
 channelid = config.channel.toString();
 
 // Load the Discord client
-if(!config["skip-discord-auth"]) {
-  Discord = require("discord.js");
-  client = new Discord.Client();
-}
+const Discord = require("discord.js");
+const client = new Discord.Client();
 
 ////// # Version Check # //////
 if(!config["disable-version-check"]) {
@@ -405,8 +403,8 @@ connection.on("ready", function(prompt) {
 });
 
 connection.on("failedlogin", function(prompt) {
-    console.log("Login to game failed! (" +  Date() + ")");
-    process.exit();
+  console.log("Login to game failed! (" +  Date() + ")");
+  process.exit();
 });
 
 connection.on("close", function() {
