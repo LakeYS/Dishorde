@@ -140,11 +140,11 @@ if(!config["disable-version-check"]) {
 
             if(releaseRelative == -1)
               console.log("********\nNOTICE: You are currently running\x1b[1m v" + pjson.version + "\x1b[0m. A newer version is available.\nCheck here for the latest version of this script:\n\x1b[1m https://github.com/LakeYS/7DTD-Discord/releases \n\x1b[0m********");
-            } else {
-              console.log(json);
-              console.warn("WARNING: Unable to parse version data.");
-            }
+          } else {
+            console.log(json);
+            console.warn("WARNING: Unable to parse version data.");
           }
+        }
         else {
           console.log(input); // Log the input on error
           console.warn("WARNING: Unable to parse version data.");
@@ -221,7 +221,7 @@ function parseDiscordCommand(msg) {
 
   // 7dtd!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
-    if(msg.member.permissions.has("MANAGE_GUILD")) {
+    if(msg.channel.type === "text" && msg.member.permissions.has("MANAGE_GUILD")) {
       var str = msg.toString().toUpperCase().replace("7DTD!SETCHANNEL ", "");
       var id = str.replace("<#","").replace(">","");
       var channelobj = client.channels.find("id", id);
@@ -255,7 +255,7 @@ function parseDiscordCommand(msg) {
   if(config["allow-exec-command"] == true)
   {
     if(cmd.startsWith("EXEC")) {
-      if(msg.member.permissions.has("MANAGE_GUILD")) {
+      if(msg.channel.type === "text" && msg.member.permissions.has("MANAGE_GUILD")) {
         var execStr = msg.toString().replace(new RegExp("7DTD!EXEC", "ig"), "");
         connection.exec(execStr);
       }
