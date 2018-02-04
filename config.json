@@ -15,5 +15,5 @@
   "disable-version-check": false,
   "hide-prefix": false,
   "log-messages": false,
-  "log-telnet": false,
+  "log-telnet": false
 }
