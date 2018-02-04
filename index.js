@@ -174,7 +174,7 @@ if(!config["skip-discord-auth"]) {
     if(client.guilds.size == 0)
       console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
 
-    client.user.setGame("No connection");
+    client.user.setActivity("No connection");
     client.user.setStatus("dnd");
 
     channel = client.channels.find("id", channelid);
@@ -413,7 +413,7 @@ connection.on("ready", function(prompt) {
 
   if(clientStatus === 0 && !config["skip-discord-auth"]) {
     client.user.setStatus("online");
-    client.user.setGame("[Type '7dtd!info']");
+    client.user.setActivity("[Type '7dtd!info']");
     clientStatus = 1;
   }
 });
@@ -425,6 +425,9 @@ connection.on("failedlogin", function(prompt) {
 
 connection.on("close", function() {
   console.log("Connection to game closed.");
+
+  client.user.setActivity("No connection");
+  client.user.setStatus("dnd");
 
   if(doReconnect) {
     connection.end(); // Just in case
@@ -492,7 +495,7 @@ connection.on("error", function(data) {
   console.log(data);
 
   if(clientStatus == 1 && !config["skip-discord-auth"]) {
-    client.user.setGame("Error||Type 7dtd!info");
+    client.user.setActivity("Error||Type 7dtd!info");
     client.user.setStatus("dnd");
     clientStatus = 0;
   }
