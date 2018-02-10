@@ -174,10 +174,15 @@ if(!config["skip-discord-auth"]) {
   client.on("ready", () => {
     clientStatus = 0;
 
-    console.log("Connected to\x1b[1m " + client.guilds.size + " \x1b[0mDiscord server(s).");
+    console.log("Discord client connected successfully.");
 
-    if(client.guilds.size == 0)
+    if(client.guilds.size == 0) {
       console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
+    }
+
+    if(client.guilds.size > 1) {
+      console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
+    }
 
     client.user.setActivity("No connection");
     client.user.setStatus("dnd");
@@ -257,7 +262,6 @@ function parseDiscordCommand(msg) {
 
   // 7dtd!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
-  // TODO: Document this command
   if(config["allow-exec-command"] == true)
   {
     if(cmd.startsWith("EXEC")) {
@@ -570,10 +574,19 @@ function handlePlayerCount(line, msg) {
 
 ////// # Console Input # //////
 process.stdin.on("data", function (text) {
-  if(text.toString() == "stop\r\n" || text.toString() == "exit\r\n" || text.toString() == "stop\n" || text.toString() == "exit\n")
+  if(text.toString() == "stop\r\n" || text.toString() == "exit\r\n" || text.toString() == "stop\n" || text.toString() == "exit\n") {
     process.exit();
-  else if(text.toString() == "help\r\n" || text.toString() == "help\n")
+  }
+  else if(text.toString() == "help\r\n" || text.toString() == "help\n") {
     console.log("This is the console for the Discord bot. It currently only accepts JavaScript commands for advanced users. Type 'exit' to shut it down.");
+  }
+  else if(text.toString() == "leaveguilds\r\n" || text.toString() == "leaveguilds\n") {
+    client.guilds.forEach((guild) => {
+      console.log("Leaving guild \"" + guild.name + "\"");
+      guild.leave();
+    });
+    console.log("Left all guilds. Use this link to re-invite the bot: \n\x1b[1m https://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot \x1b[0m");
+  }
   else
   {
     try {
