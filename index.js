@@ -90,6 +90,11 @@ channelid = config.channel.toString();
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
+// 7dtd!exec command
+if(config["allow-exec-command"] == true) {
+  console.warn("\x1b[33mWARNING: Config option 'allow-exec-command' is enabled. This may pose a security risk for your server.\x1b[0m");
+}
+
 ////// # Version Check # //////
 if(!config["disable-version-check"]) {
   // If, for whatever reason, semver-compare isn"t installed, we"ll skip the version check.
@@ -408,7 +413,7 @@ params = {
 if(config["skip-discord-auth"])
   connection.connect(params);
 
-connection.on("ready", function(prompt) {
+connection.on("ready", function() {
   console.log("Connected to game. (" +  Date() + ")");
 
   if(clientStatus === 0 && !config["skip-discord-auth"]) {
@@ -418,7 +423,7 @@ connection.on("ready", function(prompt) {
   }
 });
 
-connection.on("failedlogin", function(prompt) {
+connection.on("failedlogin", function() {
   console.log("Login to game failed! (" +  Date() + ")");
   process.exit();
 });
