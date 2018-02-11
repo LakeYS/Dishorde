@@ -231,7 +231,7 @@ function parseDiscordCommand(msg) {
 
   // 7dtd!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
-    if(msg.channel.type === "text" && msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild) {
+    if(msg.channel.type === "text" && channel !== null?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
       console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
       var str = msg.toString().toUpperCase().replace("7DTD!SETCHANNEL ", "");
       var id = str.replace("<#","").replace(">","");
