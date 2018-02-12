@@ -21,6 +21,7 @@ Commands can be sent via DM or in the specified chat channel.
 `7dtd!info`
 `7dtd!time`
 `7dtd!version`
+`7dtd!players`
 
 # Terminal Commands
 `exit`
@@ -28,25 +29,27 @@ Commands can be sent via DM or in the specified chat channel.
 # Configuration
 The bot can be configured by editing config.json. Here's a list of the preferences:
 - `disable-commands` - Disable Discord commands such as 7dtd!time. Does not disable 7dtd!info.
-- `disable-chatmsgs` - Disable chat messages. Does not disable other messages such as join/leave and deaths.
-- `disable-gmsgs` - Disable other messages. Includes deaths, leaves/joins, etc.
+- `disable-chatmsgs` - Disable chat messages to and from the server. Does not disable other in-game messages such as join/leave and deaths.
+- `disable-gmsgs` - Disable miscellaneous in-game messages. Includes deaths, leaves/joins, etc.
 - `hide-prefix` - Hides all chat messages that start with a forward slash. This may be useful if your server uses commands.
 - `log-messages` - Chat messages will show up in the terminal.
 - `log-telnet` - All output from the connection will show up in the terminal.
 - `skip-discord-auth` - The bot will not log in to Discord.
+- `allow-exec-command` - Enables a command called `7dtd!exec`. This allows anybody with the 'manage server' permission to execute commands on the server. The command works in any channel. **WARNING: Enabling this may pose a security risk for your server.**
 
 # How to Install - Windows
 ## Creating the bot account
 1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) and click "New App".
 2. Name the bot anything you'd like and click "Create App".
 3. Click "Create a Bot User".
-4. Next to "Token:" click the link that says "click to reveal". This is the password for your bot's account. You'll need this and the "Client ID" number later. Copy them both somewhere safe or keep the tab open.
-5. Paste the URL listed below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
+4. Find the checkbox that is labeled "Public bot". Make sure that this is **unchecked**.
+5. Next to "Token:" click the link that says "click to reveal". This is the password for your bot's account. You'll need this and the "Client ID" number later. Copy them both somewhere safe or keep the tab open.
+6. Paste the URL listed below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
 `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Setting up the bot
-1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.0/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
+1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.1/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
 2. Install Node.js LTS from [this website](https://nodejs.org/en/download/).
 3. Once Node.js is finished installing, run install.bat in the bot's folder. This will automatically install the required modules for the bot.
 4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
@@ -84,7 +87,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 ## Setting up the bot
 1. Open a terminal on your system.
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
-3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.0/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
+3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.1/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
 6. Type `npm install` to install the required packages for the bot to run.
@@ -93,8 +96,9 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) in a browser and click "New App".
 2. Name the bot anything you'd like and click "Create App".
 3. Click "Create a Bot User".
-4. Next to "Token:" click the link that says "click to reveal". This is the password for your bot's account. You'll need this and the "Client ID" number later. Copy them both somewhere safe or keep the tab open for later.
-5. Paste the URL listed below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
+4. Find the checkbox that is labeled "Public bot". Make sure that this is **unchecked**.
+5. Next to "Token:" click the link that says "click to reveal". This is the password for your bot's account. You'll need this and the "Client ID" number later. Copy them both somewhere safe or keep the tab open for later.
+6. Paste the URL listed below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
 `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
