@@ -1,3 +1,4 @@
+#!/bin/sh
 mkdir 7DTD-Discord
 cp config.json 7DTD-Discord
 cp package.json 7DTD-Discord
