@@ -1,4 +1,6 @@
 # 7 Days to Die Discord Integration
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d343cf10ae934d9186f0914c977c05a2)](https://www.codacy.com/app/Lake/7DTD-Discord?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=LakeYS/7DTD-Discord&amp;utm_campaign=Badge_Grade)
+
 A Discord bot for 7 Days to Die. This integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
 
 The bot runs as a completely separate application, so no mods are required to run it.
@@ -40,6 +42,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 # How to Install - Windows
 ## Creating the bot account
 1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) and click "New App".
+
 2. Name the bot anything you'd like and click "Create App".
 3. Click "Create a Bot User".
 4. Find the checkbox that is labeled "Public bot". Make sure that this is **unchecked**.
