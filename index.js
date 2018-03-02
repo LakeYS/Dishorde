@@ -235,7 +235,15 @@ function parseDiscordCommand(msg) {
       console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
       var str = msg.toString().toUpperCase().replace("7DTD!SETCHANNEL ", "");
       var id = str.replace("<#","").replace(">","");
-      var channelobj = client.channels.find("id", id);
+
+      // If blank str, use active channel.
+      var channelobj;
+      if(id === "7DTD!SETCHANNEL") {
+        channelobj = msg.channel;
+      }
+      else {
+        channelobj = client.channels.find("id", id);
+      }
 
       if(channelobj !== null) {
         channel = channelobj;
