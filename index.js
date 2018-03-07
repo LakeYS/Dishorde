@@ -13,30 +13,32 @@ const fs = require("fs");
 var telnet = require("telnet-client");
 const connection = new telnet();
 
-doReconnect = 1;
+var d7dtdState = {};
 
-waitingForTime = 0;
-waitingForVersion = 0;
-waitingForPlayers = 0;
-//waitingForPref = 0;
-receivedData = 0;
+d7dtdState.doReconnect = 1;
 
-skipVersionCheck = 0;
+d7dtdState.waitingForTime = 0;
+d7dtdState.waitingForVersion = 0;
+d7dtdState.waitingForPlayers = 0;
+//d7dtdState.waitingForPref = 0;
+d7dtdState.receivedData = 0;
+
+d7dtdState.skipVersionCheck = 0;
 
 // Client status: 0 = Error/Offline, 1 = Online
-clientStatus = 0;
+d7dtdState.clientStatus = 0;
 
 // Connection initialized?
-connectionInitialized = 0;
+d7dtdState.connInitialized = 0;
 
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
-argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
+var argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
 
 // This is a simple check to see if we"re using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
 if(Object.keys(argv).length > 2) {
-  config = argv;
+  var config = argv;
   console.log("********\nWARNING: Configuring the bot with arguments is no-longer supported and may not work correctly. Please consider using config.json instead.\nThe arguments must be removed from run.bat/run.sh in order for the config file to take effect.\n********");
 }
 else {
@@ -52,12 +54,14 @@ else {
 // IP
 // This argument allows you to run the bot on a remote network.
 // For debugging purposes only.
+var ip;
 if(typeof config.ip === "undefined")
   ip = "localhost";
 else
   ip = config.ip;
 
 // Port
+var port;
 if(typeof config.port === "undefined")
   port = 8081; // If no port, default to 8081
 else
@@ -68,23 +72,24 @@ if(typeof config.password === "undefined") {
   console.error("\x1b[31mERROR: No telnet password specified!\x1b[0m");
   process.exit();
 }
-pass = config.password;
+var pass = config.password;
 
 // Discord token
 if(typeof config.token === "undefined") {
   console.error("\x1b[31mERROR: No Discord token specified!\x1b[0m");
   process.exit();
 }
-token = config.token;
+var token = config.token;
 
 // Discord channel
+var skipChannelCheck;
 if(typeof config.channel === "undefined" || config.channel == "channelid") {
   console.warn("\x1b[33mWARNING: No Discord channel specified! You will need to set one with '7dtd!setchannel #channelname'\x1b[0m");
   skipChannelCheck = 1;
 }
 else
   skipChannelCheck = 0;
-channelid = config.channel.toString();
+var channelid = config.channel.toString();
 
 // Load the Discord client
 const Discord = require("discord.js");
@@ -99,17 +104,17 @@ if(config["allow-exec-command"] == true) {
 if(!config["disable-version-check"]) {
   // If, for whatever reason, semver-compare isn"t installed, we"ll skip the version check.
   try {
-    semver = require("semver-compare");
+    var semver = require("semver-compare");
   } catch(err) {
     if(err.code == "MODULE_NOT_FOUND") {
       console.warn("********\nWARNING: semver-compare module not found. The version check will be skipped.\nMake sure to keep the bot up-to-date! Check here for newer versions:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
-      skipVersionCheck = 1;
+      d7dtdState.skipVersionCheck = 1;
     }
     else
       throw(err);
   }
 
-  if(!skipVersionCheck) {
+  if(!d7dtdState.skipVersionCheck) {
     var options = {
       host: "api.github.com",
       path: "/repos/LakeYS/7DTD-Discord/releases/latest",
@@ -118,7 +123,7 @@ if(!config["disable-version-check"]) {
     };
 
     var input = "";
-    json = "";
+    var json = "";
     var request = https.request(options, (res) => {
       res.on("data", (data) => {
         input = input + data; // Combine the data
@@ -135,7 +140,7 @@ if(!config["disable-version-check"]) {
         if(input !== undefined) {
           json = JSON.parse(input.toString());
           if(json.tag_name !== undefined) {
-            release = json.tag_name.replace("v",""); // Mark the release
+            var release = json.tag_name.replace("v",""); // Mark the release
 
             // Compare this build"s version to the latest release.
             var releaseRelative = semver(pjson.version, release);
@@ -172,7 +177,7 @@ if(!config["skip-discord-auth"]) {
   client.login(token);
 
   client.on("ready", () => {
-    clientStatus = 0;
+    d7dtdState.clientStatus = 0;
 
     console.log("Discord client connected successfully.");
 
@@ -193,8 +198,8 @@ if(!config["skip-discord-auth"]) {
       console.log("\x1b[33mERROR: Failed to identify channel with ID '" + channelid + "'\x1b[0m");
 
     // Wait until the Discord client is ready before connecting to the game.
-    if(connectionInitialized !== 1) {
-      connectionInitialized = 1; // Make sure we only do this once
+    if(d7dtdState.connInitialized !== 1) {
+      d7dtdState.connInitialized = 1; // Make sure we only do this once
       connection.connect(params);
     }
   });
@@ -307,11 +312,11 @@ function parseDiscordCommand(msg) {
 
           if(response !== undefined) {
             var lines = response.split("\n");
-            receivedData = 0;
+            d7dtdState.receivedData = 0;
             for(var i = 0; i <= lines.length-1; i++) {
               var line = lines[i];
               if(line.startsWith("Day")) {
-                receivedData = 1;
+                d7dtdState.receivedData = 1;
 
                 handleTime(line, msg);
               }
@@ -319,9 +324,9 @@ function parseDiscordCommand(msg) {
           }
 
           // Sometimes, the response doesn"t have the data we"re looking for...
-          if(!receivedData) {
-            waitingForTime = 1;
-            waitingForTimeMsg = msg;
+          if(!d7dtdState.receivedData) {
+            d7dtdState.waitingForTime = 1;
+            d7dtdState.waitingForTimeMsg = msg;
           }
         });
       }
@@ -333,19 +338,19 @@ function parseDiscordCommand(msg) {
           // We have to double-check and make sure the correct line is returned.
           if(response !== undefined) {
             var lines = response.split("\n");
-            receivedData = 0;
+            d7dtdState.receivedData = 0;
             for(var i = 0; i <= lines.length-1; i++) {
               var line = lines[i];
               if(line.startsWith("Game version:")) {
                 msg.reply(line);
-                receivedData = 1;
+                d7dtdState.receivedData = 1;
               }
             }
           }
 
-          if(!receivedData) {
-            waitingForVersion = 1;
-            waitingForVersionMsg = msg;
+          if(!d7dtdState.receivedData) {
+            d7dtdState.waitingForVersion = 1;
+            d7dtdState.waitingForVersionMsg = msg;
           }
         });
       }
@@ -358,11 +363,11 @@ function parseDiscordCommand(msg) {
 
           if(response !== undefined) {
             var lines = response.split("\n");
-            receivedData = 0;
+            d7dtdState.receivedData = 0;
             for(var i = 0; i <= lines.length-1; i++) {
               var line = lines[i];
               if(line.startsWith("Total of ")) {
-                receivedData = 1;
+                d7dtdState.receivedData = 1;
 
                 handlePlayerCount(line, msg);
               }
@@ -370,9 +375,9 @@ function parseDiscordCommand(msg) {
           }
 
           // Sometimes, the response doesn"t have the data we"re looking for...
-          if(!receivedData) {
-            waitingForPlayers = 1;
-            waitingForPlayersMsg = msg;
+          if(!d7dtdState.receivedData) {
+            d7dtdState.waitingForPlayers = 1;
+            d7dtdState.waitingForPlayersMsg = msg;
           }
         });
       }
@@ -384,14 +389,14 @@ function parseDiscordCommand(msg) {
       //    // We have to double-check and make sure the correct line is returned.
       //    if(response !== undefined) {
       //      var lines = response.split("\n");
-      //      receivedData = 0;
+      //      d7dtdState.receivedData = 0;
 
       //      final = "";
       //      for(var i = 0; i <= lines.length-1; i++) {
       //        var line = lines[i];
       //        if(line.startsWith("GamePref.")) {
       //          final = final + "\n" + line.replace("GamePref.","");
-      //          receivedData = 1;
+      //          d7dtdState.receivedData = 1;
       //        }
       //      }
       //      msg.author.send(final);
@@ -399,9 +404,9 @@ function parseDiscordCommand(msg) {
       //      // TODO: Make sure user can receive DMs before sending
       //    }
 
-      //    if(!receivedData) {
-      //      waitingForPref = 1;
-      //      waitingForPrefMsg = msg;
+      //    if(!d7dtdState.receivedData) {
+      //      d7dtdState.waitingForPref = 1;
+      //      d7dtdState.waitingForPrefMsg = msg;
       //    }
       //  });
       //}
@@ -430,10 +435,10 @@ if(config["skip-discord-auth"])
 connection.on("ready", function() {
   console.log("Connected to game. (" +  Date() + ")");
 
-  if(clientStatus === 0 && !config["skip-discord-auth"]) {
+  if(d7dtdState.clientStatus === 0 && !config["skip-discord-auth"]) {
     client.user.setStatus("online");
     client.user.setActivity("[Type '7dtd!info']");
-    clientStatus = 1;
+    d7dtdState.clientStatus = 1;
   }
 });
 
@@ -448,7 +453,7 @@ connection.on("close", function() {
   client.user.setActivity("No connection");
   client.user.setStatus("dnd");
 
-  if(doReconnect) {
+  if(d7dtdState.doReconnect) {
     connection.end(); // Just in case
     setTimeout(function(){ connection.connect(params); }, 5000);
   }
@@ -493,17 +498,17 @@ connection.on("data", function(data) {
     }
 
     // This is a workaround for responses not working properly, particularly on local connections.
-    if(waitingForTime && line.startsWith("Day")) {
-      handleTime(line, waitingForTimeMsg);
+    if(d7dtdState.waitingForTime && line.startsWith("Day")) {
+      handleTime(line, d7dtdState.waitingForTimeMsg);
     }
-    else if(waitingForVersion && line.startsWith("Game version:")) {
-      waitingForVersionMsg.reply(line);
+    else if(d7dtdState.waitingForVersion && line.startsWith("Game version:")) {
+      d7dtdState.waitingForVersionMsg.reply(line);
     }
-    else if(waitingForPlayers && line.startsWith("Total of ")) {
-      waitingForPlayersMsg.reply(line);
+    else if(d7dtdState.waitingForPlayers && line.startsWith("Total of ")) {
+      d7dtdState.waitingForPlayersMsg.reply(line);
     }
-    //else if(waitingForPref && line.startsWith("GamePref.")) {
-    //  waitingForPrefMsg.reply(line);
+    //else if(d7dtdState.waitingForPref && line.startsWith("GamePref.")) {
+    //  d7dtdState.waitingForPrefMsg.reply(line);
     //}
     else
       handleMsgFromGame(line);
@@ -513,10 +518,10 @@ connection.on("data", function(data) {
 connection.on("error", function(data) {
   console.log(data);
 
-  if(clientStatus == 1 && !config["skip-discord-auth"]) {
+  if(d7dtdState.clientStatus == 1 && !config["skip-discord-auth"]) {
     client.user.setActivity("Error||Type 7dtd!info");
     client.user.setStatus("dnd");
-    clientStatus = 0;
+    d7dtdState.clientStatus = 0;
   }
 });
 
@@ -607,7 +612,7 @@ process.stdin.on("data", function (text) {
 });
 
 process.on("exit",  () => {
-  doReconnect = 0;
+  d7dtdState.doReconnect = 0;
 
   if(!config["skip-discord-auth"])
     client.destroy();
