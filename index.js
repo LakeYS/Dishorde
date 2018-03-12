@@ -250,13 +250,12 @@ function parseDiscordCommand(msg) {
         channelobj = client.channels.find("id", id);
       }
 
-      console.log(`${id} ${channel}`);
-      if(channelobj.id === channel.id) {
-        msg.reply(":warning: This channel is already set as the bot's active channel!");
-        return;
-      }
-
       if(channelobj !== null) {
+        if(channelobj.id === channel.id) {
+          msg.reply(":warning: This channel is already set as the bot's active channel!");
+          return;
+        }
+
         channel = channelobj;
         channelid = channel.id;
 
