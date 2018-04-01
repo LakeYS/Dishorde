@@ -90,7 +90,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 ## Setting up the bot
 1. Open a terminal on your system.
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
-3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.1/7DTD-Discord-master.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
+3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.1/7DTD-Discord.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
 6. Type `npm install` to install the required packages for the bot to run.
