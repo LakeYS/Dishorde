@@ -570,10 +570,15 @@ function handleMsgToGame(line) {
   // TODO: Ensure connection is valid before executing commands
   if(!config["disable-chatmsgs"]) {
     connection.exec("say \"" + line + "\"", function(err, response) {
-      var lines = response.split("\n");
-      for(var i = 0; i <= lines.length-1; i++) {
-        var line = lines[i];
-        handleMsgFromGame(line);
+      if(err) {
+        console.log("Error while attempting to send message: " + err.message);
+      }
+      else {
+        var lines = response.split("\n");
+        for(var i = 0; i <= lines.length-1; i++) {
+          var line = lines[i];
+          handleMsgFromGame(line);
+        }
       }
     });
   }
