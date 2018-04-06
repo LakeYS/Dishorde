@@ -221,8 +221,11 @@ if(!config["skip-discord-auth"]) {
 
   client.on("message", function(msg) {
     if(msg.author != client.user) {
-      if(msg.toString().toUpperCase().startsWith("7DTD!"))
-        parseDiscordCommand(msg);
+      // If the bot is mentioned, pass through as if the user typed 7dtd!info
+      var mentioned = msg.content.includes("<@" + client.user.id + ">");
+
+      if(msg.content.toUpperCase().startsWith("7DTD!") || mentioned)
+        parseDiscordCommand(msg, mentioned);
       else if(msg.channel == channel && msg.channel.type == "text") {
         msg = "[" + msg.author.username + "] " + msg.cleanContent;
         handleMsgToGame(msg);
@@ -231,7 +234,7 @@ if(!config["skip-discord-auth"]) {
   });
 }
 
-function parseDiscordCommand(msg) {
+function parseDiscordCommand(msg, mentioned) {
   var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
 
   // 7dtd!setchannel
@@ -298,7 +301,7 @@ function parseDiscordCommand(msg) {
   if(msg.channel == channel || msg.channel.type == "dm") {
 
     // 7dtd!info
-    if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H") {
+    if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H" || mentioned) {
 
       msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
