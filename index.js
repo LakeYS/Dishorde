@@ -254,7 +254,7 @@ function parseDiscordCommand(msg, mentioned) {
       }
 
       if(channel !== null && channelobj.id === channel.id) {
-        msg.reply(":warning: This channel is already set as the bot's active channel!");
+        msg.channel.send(":warning: This channel is already set as the bot's active channel!");
         return;
       }
 
@@ -267,14 +267,14 @@ function parseDiscordCommand(msg, mentioned) {
         fs.writeFile(configFile, JSON.stringify(config, null, "\t"), "utf8", (err) => {
           if(err) {
             console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
-            msg.reply(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
+            msg.channel.send(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
           }
           else
-            msg.reply(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
+            msg.channel.send(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
         });
       }
       else
-        msg.reply(":x: Failed to identify the channel you specified.");
+        msg.channel.send(":x: Failed to identify the channel you specified.");
     }
     else {
       msg.author.send("You do not have permission to do this. (7dtd!setchannel)");
@@ -350,7 +350,7 @@ function parseDiscordCommand(msg, mentioned) {
             for(var i = 0; i <= lines.length-1; i++) {
               var line = lines[i];
               if(line.startsWith("Game version:")) {
-                msg.reply(line);
+                msg.channel.send(line);
                 d7dtdState.receivedData = 1;
               }
             }
@@ -510,13 +510,13 @@ connection.on("data", function(data) {
       handleTime(line, d7dtdState.waitingForTimeMsg);
     }
     else if(d7dtdState.waitingForVersion && line.startsWith("Game version:")) {
-      d7dtdState.waitingForVersionMsg.reply(line);
+      d7dtdState.waitingForVersionMsg.channel.send(line);
     }
     else if(d7dtdState.waitingForPlayers && line.startsWith("Total of ")) {
-      d7dtdState.waitingForPlayersMsg.reply(line);
+      d7dtdState.waitingForPlayersMsg.channel.send(line);
     }
     //else if(d7dtdState.waitingForPref && line.startsWith("GamePref.")) {
-    //  d7dtdState.waitingForPrefMsg.reply(line);
+    //  d7dtdState.waitingForPrefMsg.channel.send(line);
     //}
     else
       handleMsgFromGame(line);
@@ -591,11 +591,11 @@ function handleTime(line, msg) {
   var day = line.split(",")[0].replace("Day ","");
   var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
 
-  msg.reply(line + "\n" + dayHorde + " days to next horde.");
+  msg.channel.send(line + "\n" + dayHorde + " days to next horde.");
 }
 
 function handlePlayerCount(line, msg) {
-  msg.reply(line);
+  msg.channel.send(line);
 }
 
 ////// # Console Input # //////
