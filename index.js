@@ -83,7 +83,7 @@ var token = config.token;
 
 // Discord channel
 var skipChannelCheck;
-if(typeof config.channel === "undefined" || config.channel == "channelid") {
+if(typeof config.channel === "undefined" || config.channel === "channelid") {
   console.warn("\x1b[33mWARNING: No Discord channel specified! You will need to set one with '7dtd!setchannel #channelname'\x1b[0m");
   skipChannelCheck = 1;
 }
@@ -96,7 +96,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 
 // 7dtd!exec command
-if(config["allow-exec-command"] == true) {
+if(config["allow-exec-command"] === true) {
   console.warn("\x1b[33mWARNING: Config option 'allow-exec-command' is enabled. This may pose a security risk for your server.\x1b[0m");
 }
 
@@ -106,7 +106,7 @@ if(!config["disable-version-check"]) {
   try {
     var semver = require("semver-compare");
   } catch(err) {
-    if(err.code == "MODULE_NOT_FOUND") {
+    if(err.code === "MODULE_NOT_FOUND") {
       console.warn("********\nWARNING: semver-compare module not found. The version check will be skipped.\nMake sure to keep the bot up-to-date! Check here for newer versions:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
       d7dtdState.skipVersionCheck = 1;
     }
@@ -145,10 +145,10 @@ if(!config["disable-version-check"]) {
             // Compare this build"s version to the latest release.
             var releaseRelative = semver(pjson.version, release);
 
-            if(releaseRelative == 1)
+            if(releaseRelative === 1)
               console.log("********\nNOTICE: You are currently running\x1b[1m v" + pjson.version + "\x1b[0m. This build is considered unstable.\nCheck here for the latest stable versions of this script:\n\x1b[1m https://github.com/LakeYS/7DTD-Discord/releases \n\x1b[0m********");
 
-            if(releaseRelative == -1)
+            if(releaseRelative === -1)
               console.log("********\nNOTICE: You are currently running\x1b[1m v" + pjson.version + "\x1b[0m. A newer version is available.\nCheck here for the latest version of this script:\n\x1b[1m https://github.com/LakeYS/7DTD-Discord/releases \n\x1b[0m********");
           } else {
             console.log(json);
@@ -181,7 +181,7 @@ if(!config["skip-discord-auth"]) {
 
     console.log("Discord client connected successfully.");
 
-    if(client.guilds.size == 0) {
+    if(client.guilds.size === 0) {
       console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
     }
 
@@ -226,7 +226,7 @@ if(!config["skip-discord-auth"]) {
 
       if(msg.content.toUpperCase().startsWith("7DTD!") || mentioned)
         parseDiscordCommand(msg, mentioned);
-      else if(msg.channel == channel && msg.channel.type == "text") {
+      else if(msg.channel === channel && msg.channel.type === "text") {
         msg = "[" + msg.author.username + "] " + msg.cleanContent;
         handleMsgToGame(msg);
       }
@@ -283,7 +283,7 @@ function parseDiscordCommand(msg, mentioned) {
 
   // 7dtd!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
-  if(config["allow-exec-command"] == true)
+  if(config["allow-exec-command"] === true)
   {
     if(cmd.startsWith("EXEC")) {
       if(msg.channel.type === "text" && msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild) {
@@ -298,10 +298,10 @@ function parseDiscordCommand(msg, mentioned) {
   }
 
   // The following commands only work in the specified channel if one is set.
-  if(msg.channel == channel || msg.channel.type == "dm") {
+  if(msg.channel === channel || msg.channel.type === "dm") {
 
     // 7dtd!info
-    if(cmd == "INFO" || cmd == "I" || cmd == "HELP" || cmd == "H" || mentioned) {
+    if(cmd === "INFO" || cmd === "I" || cmd === "HELP" || cmd === "H" || mentioned) {
 
       msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
@@ -313,7 +313,7 @@ function parseDiscordCommand(msg, mentioned) {
     if(!config["disable-commands"]) {
 
       // 7dtd!time
-      if(cmd == "TIME" || cmd == "T" || cmd == "DAY") {
+      if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
         connection.exec("gettime", function(err, response) {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
@@ -340,7 +340,7 @@ function parseDiscordCommand(msg, mentioned) {
       }
 
       // 7dtd!version
-      if(cmd == "VERSION" || cmd == "V") {
+      if(cmd === "VERSION" || cmd === "V") {
         connection.exec("version", function(err, response) {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
@@ -364,7 +364,7 @@ function parseDiscordCommand(msg, mentioned) {
       }
 
       // 7dtd!players
-      if(cmd == "PLAYERS" || cmd == "P" || cmd == "PL" || cmd == "LP") {
+      if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
         connection.exec("lp", function(err, response) {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
@@ -390,7 +390,7 @@ function parseDiscordCommand(msg, mentioned) {
         });
       }
 
-      //if(cmd == "PREF") {
+      //if(cmd === "PREF") {
       //  connection.exec("getgamepref", function(err, response) {
       //    var str = msg.toString().toUpperCase().replace("7DTD!PREF ", "").replace("7DTD!PREF", "");
       //    // Sometimes the "response" has more than what we"re looking for.
@@ -475,12 +475,12 @@ connection.on("data", function(data) {
     console.log("[Telnet] " + data);
 
   // Error catchers for password re-prompts
-  if(data == "Please enter password:\r\n\u0000\u0000") {
+  if(data === "Please enter password:\r\n\u0000\u0000") {
     console.log("ERROR: Received password prompt!");
     process.exit();
   }
 
-  if(data == "Password incorrect, please enter password:\r\n") {
+  if(data === "Password incorrect, please enter password:\r\n") {
     console.log("ERROR: Received password prompt! (Telnet password is incorrect)");
     process.exit();
   }
@@ -493,7 +493,7 @@ connection.on("data", function(data) {
 
     var split = line.split(" ");
 
-    if(split[2] == "INF" && split[3] == "[NET]" && split[4] == "ServerShutdown\r") {
+    if(split[2] === "INF" && split[3] === "[NET]" && split[4] === "ServerShutdown\r") {
       // If we don"t destroy the connection, crashes will happen when someone types a message.
       // This is a workaround until better measures can be put in place for sending data to the game.
       console.log("The server has shut down. Closing connection...");
@@ -526,7 +526,7 @@ connection.on("data", function(data) {
 connection.on("error", function(data) {
   console.log(data);
 
-  if(d7dtdState.clientStatus == 1 && !config["skip-discord-auth"]) {
+  if(d7dtdState.clientStatus === 1 && !config["skip-discord-auth"]) {
     client.user.setActivity("Error||Type 7dtd!info");
     client.user.setStatus("dnd");
     d7dtdState.clientStatus = 0;
@@ -538,7 +538,7 @@ function handleMsgFromGame(line) {
   var split = line.split(" ");
   var type = split[3];
 
-  if((!config["disable-chatmsgs"] && type == "Chat:") || (!config["disable-gmsgs"] && type == "GMSG:")) {
+  if((!config["disable-chatmsgs"] && type === "Chat:") || (!config["disable-gmsgs"] && type === "GMSG:")) {
     // Make sure the channel exists.
     if(channel !== null) {
       // Cut off the timestamp and other info
@@ -600,13 +600,13 @@ function handlePlayerCount(line, msg) {
 
 ////// # Console Input # //////
 process.stdin.on("data", function (text) {
-  if(text.toString() == "stop\r\n" || text.toString() == "exit\r\n" || text.toString() == "stop\n" || text.toString() == "exit\n") {
+  if(text.toString() === "stop\r\n" || text.toString() === "exit\r\n" || text.toString() === "stop\n" || text.toString() === "exit\n") {
     process.exit();
   }
-  else if(text.toString() == "help\r\n" || text.toString() == "help\n") {
+  else if(text.toString() === "help\r\n" || text.toString() === "help\n") {
     console.log("This is the console for the Discord bot. It currently only accepts JavaScript commands for advanced users. Type 'exit' to shut it down.");
   }
-  else if(text.toString() == "leaveguilds\r\n" || text.toString() == "leaveguilds\n") {
+  else if(text.toString() === "leaveguilds\r\n" || text.toString() === "leaveguilds\n") {
     client.guilds.forEach((guild) => {
       console.log("Leaving guild \"" + guild.name + "\"");
       guild.leave();
