@@ -11,6 +11,7 @@ var telnet = require("telnet-client");
 const connection = new telnet();
 
 var d7dtdState = {};
+var channel = undefined;
 
 d7dtdState.doReconnect = 1;
 
@@ -420,7 +421,7 @@ function parseDiscordCommand(msg, mentioned) {
 }
 
 ////// # Telnet # //////
-params = {
+var params = {
   host: ip,
   port: port,
   timeout: 15000,
