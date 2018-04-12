@@ -1,6 +1,3 @@
-/*jshint esversion: 6 */
-/*jshint evil:true */
-
 ////// # Requirements and Initialization # //////
 const pjson = require("./package.json");
 
