@@ -589,7 +589,7 @@ function handleTime(line, msg) {
   var day = line.split(",")[0].replace("Day ","");
   var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
 
-  msg.channel.send(line + "\n" + dayHorde + " days to next horde.");
+  msg.channel.send(`${line}\n${dayHorde} day${dayHorde==1?"":"s"} to next horde.`);
 }
 
 function handlePlayerCount(line, msg) {
