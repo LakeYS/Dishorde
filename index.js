@@ -251,7 +251,7 @@ function parseDiscordCommand(msg, mentioned) {
         channelobj = client.channels.find("id", id);
       }
 
-      if(channel !== null && channelobj.id === channel.id) {
+      if(channel !== null && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
         msg.channel.send(":warning: This channel is already set as the bot's active channel!");
         return;
       }
@@ -266,9 +266,12 @@ function parseDiscordCommand(msg, mentioned) {
           if(err) {
             console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
             msg.channel.send(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
+            d7dtdState.setChannelError = err;
           }
-          else
+          else {
+            d7dtdState.setChannelError = void 0;
             msg.channel.send(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
+          }
         });
       }
       else
