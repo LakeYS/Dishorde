@@ -48,10 +48,10 @@ Temporary Items
 
 # Node modules and security
 node_modules
-run_private*.sh
-run_private*.bat
-config_private*.json
-run_private*.vbs
+run*.sh
+run*.bat
+config*.json
+run*.vbs
 update.sh
 update_private.sh
 7DTD-Discord/
