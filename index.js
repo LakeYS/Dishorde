@@ -42,8 +42,8 @@ if(Object.keys(argv).length > 2) {
 else {
   configFile = "./config.json";
 
-  if(argv.configfile !== undefined) {
-    var configFile = argv.configfile;
+  if(argv.configFile !== undefined) {
+    var configFile = argv.configFile;
   }
 
   config = require(configFile);
@@ -51,7 +51,6 @@ else {
 
 // IP
 // This argument allows you to run the bot on a remote network.
-// For debugging purposes only.
 var ip;
 if(typeof config.ip === "undefined")
   ip = "localhost";
@@ -82,12 +81,21 @@ var token = config.token;
 // Discord channel
 var skipChannelCheck;
 if(typeof config.channel === "undefined" || config.channel === "channelid") {
-  console.warn("\x1b[33mWARNING: No Discord channel specified! You will need to set one with '7dtd!setchannel #channelname'\x1b[0m");
+  console.warn("\x1b[33mWARNING: No Discord channel specified! You will need to set one with 'setchannel #channelname'\x1b[0m");
   skipChannelCheck = 1;
 }
 else
   skipChannelCheck = 0;
 var channelid = config.channel.toString();
+
+// Prefix
+var prefix;
+if(typeof config.prefix !== "string") {
+  prefix = "7dtd!";
+}
+else {
+  prefix = config.prefix.toUpperCase();
+}
 
 // Load the Discord client
 const Discord = require("discord.js");
@@ -222,7 +230,7 @@ if(!config["skip-discord-auth"]) {
       // If the bot is mentioned, pass through as if the user typed 7dtd!info
       var mentioned = msg.content.includes("<@" + client.user.id + ">");
 
-      if(msg.content.toUpperCase().startsWith("7DTD!") || mentioned)
+      if(msg.content.toUpperCase().startsWith(prefix) || mentioned)
         parseDiscordCommand(msg, mentioned);
       else if(msg.channel === channel && msg.channel.type === "text") {
         msg = "[" + msg.author.username + "] " + msg.cleanContent;
@@ -233,18 +241,18 @@ if(!config["skip-discord-auth"]) {
 }
 
 function parseDiscordCommand(msg, mentioned) {
-  var cmd = msg.toString().toUpperCase().replace("7DTD!", "");
+  var cmd = msg.toString().toUpperCase().replace(prefix, "");
 
   // 7dtd!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
     if(msg.channel.type === "text" && channel !== null?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
       console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-      var str = msg.toString().toUpperCase().replace("7DTD!SETCHANNEL ", "");
+      var str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
       var id = str.replace("<#","").replace(">","");
 
       // If blank str, use active channel.
       var channelobj;
-      if(id === "7DTD!SETCHANNEL") {
+      if(id === prefix + "SETCHANNEL") {
         channelobj = msg.channel;
       }
       else {
@@ -278,7 +286,7 @@ function parseDiscordCommand(msg, mentioned) {
         msg.channel.send(":x: Failed to identify the channel you specified.");
     }
     else {
-      msg.author.send("You do not have permission to do this. (7dtd!setchannel)");
+      msg.author.send("You do not have permission to do this. (setchannel)");
     }
   }
 
@@ -289,11 +297,11 @@ function parseDiscordCommand(msg, mentioned) {
     if(cmd.startsWith("EXEC")) {
       if(msg.channel.type === "text" && msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild) {
         console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-        var execStr = msg.toString().replace(new RegExp("7DTD!EXEC", "ig"), "");
+        var execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
         connection.exec(execStr);
       }
       else {
-        msg.author.send("You do not have permission to do this. (7dtd!exec)");
+        msg.author.send("You do not have permission to do this. (exec)");
       }
     }
   }
@@ -307,7 +315,7 @@ function parseDiscordCommand(msg, mentioned) {
       msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
       if(!config["disable-commands"])
-        msg.channel.send("**Commands:** 7dtd!info, 7dtd!time, 7dtd!version, 7dtd!players");
+        msg.channel.send(`**Commands:** ${prefix}info, ${prefix}time, ${prefix}version, ${prefix}players`);
     }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
@@ -393,7 +401,7 @@ function parseDiscordCommand(msg, mentioned) {
 
       //if(cmd === "PREF") {
       //  connection.exec("getgamepref", function(err, response) {
-      //    var str = msg.toString().toUpperCase().replace("7DTD!PREF ", "").replace("7DTD!PREF", "");
+      //    var str = msg.toString().toUpperCase().replace(prefix + "PREF ", "").replace(prefix + "PREF", "");
       //    // Sometimes the "response" has more than what we"re looking for.
       //    // We have to double-check and make sure the correct line is returned.
       //    if(response !== undefined) {
@@ -446,7 +454,7 @@ connection.on("ready", function() {
 
   if(d7dtdState.clientStatus === 0 && !config["skip-discord-auth"]) {
     client.user.setStatus("online");
-    client.user.setActivity("[Type '7dtd!info']");
+    client.user.setActivity("[Type '" + prefix + "info']");
     d7dtdState.clientStatus = 1;
   }
 });
@@ -528,7 +536,7 @@ connection.on("error", function(data) {
   console.log(data);
 
   if(d7dtdState.clientStatus === 1 && !config["skip-discord-auth"]) {
-    client.user.setActivity("Error||Type 7dtd!info");
+    client.user.setActivity("Error||Type " + prefix + "info");
     client.user.setStatus("dnd");
     d7dtdState.clientStatus = 0;
   }

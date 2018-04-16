@@ -30,14 +30,16 @@ Commands can be sent via DM or in the specified chat channel.
 
 # Configuration
 The bot can be configured by editing config.json. Here's a list of the preferences:
+- `allow-exec-command` - Enables a command called `7dtd!exec`. This allows anybody with the 'manage server' permission to execute commands on the server. The command works in any channel. **WARNING: Enabling this may pose a security risk for your server.**
 - `disable-commands` - Disable Discord commands such as 7dtd!time. Does not disable 7dtd!info.
 - `disable-chatmsgs` - Disable chat messages to and from the server. Does not disable other in-game messages such as join/leave and deaths.
 - `disable-gmsgs` - Disable miscellaneous in-game messages. Includes deaths, leaves/joins, etc.
 - `hide-prefix` - Hides all chat messages that start with a forward slash. This may be useful if your server uses commands.
 - `log-messages` - Chat messages will show up in the terminal.
 - `log-telnet` - All output from the connection will show up in the terminal.
+- `prefix` - The prefix for bot commands. ('7dtd!' by default)
+
 - `skip-discord-auth` - The bot will not log in to Discord.
-- `allow-exec-command` - Enables a command called `7dtd!exec`. This allows anybody with the 'manage server' permission to execute commands on the server. The command works in any channel. **WARNING: Enabling this may pose a security risk for your server.**
 
 # How to Install - Windows
 ## Creating the bot account
