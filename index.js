@@ -314,8 +314,10 @@ function parseDiscordCommand(msg, mentioned) {
 
       msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
 
-      if(!config["disable-commands"])
-        msg.channel.send(`**Commands:** ${prefix}info, ${prefix}time, ${prefix}version, ${prefix}players`);
+      if(!config["disable-commands"]) {
+        var pre = prefix.toLowerCase();
+        msg.channel.send(`**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`);
+      }
     }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
@@ -454,7 +456,7 @@ connection.on("ready", function() {
 
   if(d7dtdState.clientStatus === 0 && !config["skip-discord-auth"]) {
     client.user.setStatus("online");
-    client.user.setActivity("[Type '" + prefix + "info']");
+    client.user.setActivity("[Type '" + prefix.toLowerCase() + "info']");
     d7dtdState.clientStatus = 1;
   }
 });
@@ -536,7 +538,7 @@ connection.on("error", function(data) {
   console.log(data);
 
   if(d7dtdState.clientStatus === 1 && !config["skip-discord-auth"]) {
-    client.user.setActivity("Error||Type " + prefix + "info");
+    client.user.setActivity("Error||Type " + prefix.toLowerCase() + "info");
     client.user.setStatus("dnd");
     d7dtdState.clientStatus = 0;
   }
