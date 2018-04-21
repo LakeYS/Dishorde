@@ -11,7 +11,7 @@ var telnet = require("telnet-client");
 const Telnet = new telnet();
 
 var d7dtdState = {};
-var channel = undefined;
+var channel = void 0;
 
 d7dtdState.doReconnect = 1;
 
@@ -35,15 +35,17 @@ var argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
 
 // This is a simple check to see if we"re using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
+var config;
+var configFile;
 if(Object.keys(argv).length > 2) {
-  var config = argv;
+  config = argv;
   console.log("********\nWARNING: Configuring the bot with arguments is no-longer supported and may not work correctly. Please consider using config.json instead.\nThe arguments must be removed from run.bat/run.sh in order for the config file to take effect.\n********");
 }
 else {
   configFile = "./config.json";
 
-  if(argv.configFile !== undefined) {
-    var configFile = argv.configFile;
+  if(typeof argv.configFile !== "undefined") {
+    configFile = argv.configFile;
   }
 
   config = require(configFile);
@@ -114,8 +116,9 @@ if(config["allow-exec-command"] === true) {
 ////// # Version Check # //////
 if(!config["disable-version-check"]) {
   // If, for whatever reason, semver-compare isn"t installed, we"ll skip the version check.
+  var semver;
   try {
-    var semver = require("semver-compare");
+    semver = require("semver-compare");
   } catch(err) {
     if(err.code === "MODULE_NOT_FOUND") {
       console.warn("********\nWARNING: semver-compare module not found. The version check will be skipped.\nMake sure to keep the bot up-to-date! Check here for newer versions:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
@@ -149,9 +152,9 @@ if(!config["disable-version-check"]) {
 
       // Note that if there is an error while parsing the JSON data, the bot will crash.
       res.on("end", function() {
-        if(input !== undefined) {
+        if(typeof input !== "undefined") {
           json = JSON.parse(input.toString());
-          if(json.tag_name !== undefined) {
+          if(typeof json.tag_name !== "undefined") {
             var release = json.tag_name.replace("v",""); // Mark the release
 
             // Compare this build"s version to the latest release.
@@ -292,8 +295,9 @@ function parseDiscordCommand(msg, mentioned) {
           }
         });
       }
-      else
+      else {
         msg.channel.send(":x: Failed to identify the channel you specified.");
+      }
     }
     else {
       msg.author.send("You do not have permission to do this. (setchannel)");
@@ -334,11 +338,11 @@ function parseDiscordCommand(msg, mentioned) {
 
       // 7dtd!time
       if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
-        Telnet.exec("gettime", function(err, response) {
+        Telnet.exec("gettime", (err, response) => {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
 
-          if(response !== undefined) {
+          if(typeof response !== "undefined") {
             var lines = response.split("\n");
             d7dtdState.receivedData = 0;
             for(var i = 0; i <= lines.length-1; i++) {
@@ -444,7 +448,7 @@ function parseDiscordCommand(msg, mentioned) {
 ////// # Telnet # //////
 var params = {
   host: ip,
-  port: port,
+  port,
   timeout: 15000,
   username: "",
   password: pass,
@@ -456,8 +460,9 @@ var params = {
 };
 
 // If Discord auth is skipped, we have to connect now rather than waiting for the Discord client.
-if(config["skip-discord-auth"])
+if(config["skip-discord-auth"]) {
   Telnet.connect(params);
+}
 
 Telnet.on("ready", function() {
   console.log("Connected to game. (" +  Date() + ")");
