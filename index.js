@@ -543,8 +543,9 @@ Telnet.on("data", function(data) {
     //else if(d7dtdState.waitingForPref && line.startsWith("GamePref.")) {
     //  d7dtdState.waitingForPrefMsg.channel.send(line);
     //}
-    else
+    else {
       handleMsgFromGame(line);
+    }
   }
 });
 
@@ -568,16 +569,19 @@ function handleMsgFromGame(line) {
     if(channel !== null) {
       // Cut off the timestamp and other info
       var msg = split[4];
-      for(var i = 5; i <= split.length-1; i++)
+      for(var i = 5; i <= split.length-1; i++) {
         msg = msg + " " + split[i];
+      }
 
-      if(config["log-messages"])
+      if(config["log-messages"]) {
         console.log(msg);
+      }
 
       // When using a local connection, messages go through as new data rather than a response.
       // This string check is a workaround for that.
-      if(msg.startsWith("'Server': ["))
+      if(msg.startsWith("'Server': [")) {
         return;
+      }
 
       // Convert it to Discord-friendly text.
       msg = msg.replace("'","").replace("'","");
@@ -585,8 +589,9 @@ function handleMsgFromGame(line) {
       if(!config["hide-prefix"])
       {
         // Do nothing if the prefix "/" is in the message.
-        if(msg.includes(": /"))
+        if(msg.includes(": /")) {
           return;
+        }
       }
 
       channel.send(msg);
@@ -616,7 +621,7 @@ function handleTime(line, msg) {
   var day = line.split(",")[0].replace("Day ","");
   var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
 
-  msg.channel.send(`${line}\n${dayHorde} day${dayHorde==1?"":"s"} to next horde.`);
+  msg.channel.send(`${line}\n${dayHorde} day${dayHorde===1?"":"s"} to next horde.`);
 }
 
 function handlePlayerCount(line, msg) {
@@ -652,8 +657,9 @@ process.stdin.on("data", function (text) {
 process.on("exit",  () => {
   d7dtdState.doReconnect = 0;
 
-  if(!config["skip-discord-auth"])
+  if(!config["skip-discord-auth"]) {
     client.destroy();
+  }
 });
 
 process.on("unhandledRejection", (err) => {
