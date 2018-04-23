@@ -23,11 +23,12 @@ d7dtdState.receivedData = 0;
 
 d7dtdState.skipVersionCheck = 0;
 
-// Client status: 0 = Error/Offline, 1 = Online
-d7dtdState.clientStatus = 0;
-
 // Connection initialized?
 d7dtdState.connInitialized = 0;
+
+// Connection status
+// -1 = Error, 0 = No connection, 1 = Online, -100 = Override or N/A (value is ignored)
+d7dtdState.connStatus = -100;
 
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
@@ -190,12 +191,26 @@ if(!config["disable-version-check"]) {
 }
 
 ////// # Discord # //////
+function updateDiscordStatus(status) {
+  if(status === 0 && d7dtdState.connStatus !== 0) {
+    client.user.setActivity(`No connection | Type ${prefix}help`);
+    client.user.setStatus("dnd");
+  } else if(status === -1 && d7dtdState.connStatus !== -1) {
+    client.user.setActivity(`Error | Type ${prefix}help`);
+    client.user.setStatus("dnd");
+  } else if(status === 1 && d7dtdState.connStatus !== 1) {
+    client.user.setActivity(`7DTD | Type ${prefix}help`);
+    client.user.setStatus("online");
+  }
+
+  // Update the status so we don't keep sending duplicates to Discord
+  d7dtdState.connStatus = status;
+}
+
 if(!config["skip-discord-auth"]) {
   client.login(token);
 
   client.on("ready", () => {
-    d7dtdState.clientStatus = 0;
-
     console.log("Discord client connected successfully.");
 
     if(client.guilds.size === 0) {
@@ -206,8 +221,7 @@ if(!config["skip-discord-auth"]) {
       console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
     }
 
-    client.user.setActivity("No connection");
-    client.user.setStatus("dnd");
+    updateDiscordStatus(0);
 
     channel = client.channels.find("id", channelid);
 
@@ -467,10 +481,8 @@ if(config["skip-discord-auth"]) {
 Telnet.on("ready", function() {
   console.log("Connected to game. (" +  Date() + ")");
 
-  if(d7dtdState.clientStatus === 0 && !config["skip-discord-auth"]) {
-    client.user.setStatus("online");
-    client.user.setActivity("[Type '" + prefix.toLowerCase() + "info']");
-    d7dtdState.clientStatus = 1;
+  if(!config["skip-discord-auth"]) {
+    updateDiscordStatus(1);
   }
 });
 
@@ -482,8 +494,10 @@ Telnet.on("failedlogin", function() {
 Telnet.on("close", function() {
   console.log("Connection to game closed.");
 
-  client.user.setActivity("No connection");
-  client.user.setStatus("dnd");
+  // If there is no error, update status to 'No connection'
+  if(d7dtdState.connStatus !== -1) {
+    updateDiscordStatus(0);
+  }
 
   if(d7dtdState.doReconnect) {
     Telnet.end(); // Just in case
@@ -552,11 +566,7 @@ Telnet.on("data", function(data) {
 Telnet.on("error", function(data) {
   console.log(data);
 
-  if(d7dtdState.clientStatus === 1 && !config["skip-discord-auth"]) {
-    client.user.setActivity("Error||Type " + prefix.toLowerCase() + "info");
-    client.user.setStatus("dnd");
-    d7dtdState.clientStatus = 0;
-  }
+  updateDiscordStatus(-1);
 });
 
 ////// # Functions # //////
