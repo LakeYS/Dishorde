@@ -152,7 +152,7 @@ if(!config["disable-version-check"]) {
       });
 
       // Note that if there is an error while parsing the JSON data, the bot will crash.
-      res.on("end", function() {
+      res.on("end", () => {
         if(typeof input !== "undefined") {
           json = JSON.parse(input.toString());
           if(typeof json.tag_name !== "undefined") {
@@ -236,22 +236,22 @@ if(!config["skip-discord-auth"]) {
     }
   });
 
-  client.on("disconnect", function(event) {
+  client.on("disconnect", (event) => {
     if(event.code !== 1000) {
       console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
-      setTimeout(function(){ client.login(token); }, 6000);
+      setTimeout(() => { client.login(token); }, 6000);
     }
   });
 
-  client.on("error", function(err) {
+  client.on("error", (err) => {
     console.log(err);
     console.log("Discord client error '" + err.code + "'. Attempting to reconnect in 6s...");
 
     client.destroy();
-    setTimeout(function(){ client.login(config.token); }, 6000);
+    setTimeout(() => { client.login(config.token); }, 6000);
   });
 
-  client.on("message", function(msg) {
+  client.on("message", (msg) => {
     if(msg.author !== client.user) {
       // If the bot is mentioned, pass through as if the user typed 7dtd!info
       var mentioned = msg.content.includes("<@" + client.user.id + ">");
@@ -378,7 +378,7 @@ function parseDiscordCommand(msg, mentioned) {
 
       // 7dtd!version
       if(cmd === "VERSION" || cmd === "V") {
-        Telnet.exec("version", function(err, response) {
+        Telnet.exec("version", (err, response) => {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
           if(response !== undefined) {
@@ -402,7 +402,7 @@ function parseDiscordCommand(msg, mentioned) {
 
       // 7dtd!players
       if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
-        Telnet.exec("lp", function(err, response) {
+        Telnet.exec("lp", (err, response) => {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
 
@@ -428,7 +428,7 @@ function parseDiscordCommand(msg, mentioned) {
       }
 
       //if(cmd === "PREF") {
-      //  Telnet.exec("getgamepref", function(err, response) {
+      //  Telnet.exec("getgamepref", (err, response) => {
       //    var str = msg.toString().toUpperCase().replace(prefix + "PREF ", "").replace(prefix + "PREF", "");
       //    // Sometimes the "response" has more than what we"re looking for.
       //    // We have to double-check and make sure the correct line is returned.
@@ -478,7 +478,7 @@ if(config["skip-discord-auth"]) {
   Telnet.connect(params);
 }
 
-Telnet.on("ready", function() {
+Telnet.on("ready", () => {
   console.log("Connected to game. (" +  Date() + ")");
 
   if(!config["skip-discord-auth"]) {
@@ -486,12 +486,12 @@ Telnet.on("ready", function() {
   }
 });
 
-Telnet.on("failedlogin", function() {
+Telnet.on("failedlogin", () => {
   console.log("Login to game failed! (" +  Date() + ")");
   process.exit();
 });
 
-Telnet.on("close", function() {
+Telnet.on("close", () => {
   console.log("Connection to game closed.");
 
   // If there is no error, update status to 'No connection'
@@ -501,11 +501,11 @@ Telnet.on("close", function() {
 
   if(d7dtdState.doReconnect) {
     Telnet.end(); // Just in case
-    setTimeout(function(){ Telnet.connect(params); }, 5000);
+    setTimeout(() => { Telnet.connect(params); }, 5000);
   }
 });
 
-Telnet.on("data", function(data) {
+Telnet.on("data", (data) => {
   data = data.toString();
   var lines = data.split("\n");
 
@@ -563,7 +563,7 @@ Telnet.on("data", function(data) {
   }
 });
 
-Telnet.on("error", function(data) {
+Telnet.on("error", (data) => {
   console.log(data);
 
   updateDiscordStatus(-1);
@@ -612,7 +612,7 @@ function handleMsgFromGame(line) {
 function handleMsgToGame(line) {
   // TODO: Ensure connection is valid before executing commands
   if(!config["disable-chatmsgs"]) {
-    Telnet.exec("say \"" + line + "\"", function(err, response) {
+    Telnet.exec("say \"" + line + "\"", (err, response) => {
       if(err) {
         console.log("Error while attempting to send message: " + err.message);
       }
@@ -639,7 +639,7 @@ function handlePlayerCount(line, msg) {
 }
 
 ////// # Console Input # //////
-process.stdin.on("data", function (text) {
+process.stdin.on("data", (text) => {
   if(text.toString() === "stop\r\n" || text.toString() === "exit\r\n" || text.toString() === "stop\n" || text.toString() === "exit\n") {
     process.exit();
   }
@@ -677,6 +677,6 @@ process.on("unhandledRejection", (err) => {
   if(!config["skip-discord-auth"]) {
     console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
     client.destroy();
-    setTimeout(function(){ client.login(token); }, 6000);
+    setTimeout(() => { client.login(token); }, 6000);
   }
 });
