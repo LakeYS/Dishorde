@@ -260,6 +260,10 @@ function handlePlayerCount(line, msg) {
 }
 
 ////// # Discord # //////
+
+// updateDiscordStatus
+// NOTE: This function will 'cache' the current status to avoid re-sending it.
+// If you want to forcibly re-send the same status, set 'd7dtdState.connStatus' to -100 first.
 function updateDiscordStatus(status) {
   if(status === 0 && d7dtdState.connStatus !== 0) {
     client.user.setActivity(`No connection | Type ${prefix}help`);
@@ -578,11 +582,25 @@ Telnet.on("error", (data) => {
   updateDiscordStatus(-1);
 });
 
+var firstLogin;
 if(!config["skip-discord-auth"]) {
   client.login(token);
 
   client.on("ready", () => {
-    console.log("Discord client connected successfully.");
+    if(firstLogin !== 1) {
+      updateDiscordStatus(0);
+      firstLogin = 1;
+      console.log("Discord client connected successfully.");
+    }
+    else {
+      console.log("Discord client re-connected successfully.");
+
+      // When the client reconnects, we have to re-establish the status.
+      var status = d7dtdState.connStatus;
+      d7dtdState.connStatus = -100;
+      updateDiscordStatus(status);
+    }
+
 
     if(client.guilds.size === 0) {
       console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
@@ -591,8 +609,6 @@ if(!config["skip-discord-auth"]) {
     if(client.guilds.size > 1) {
       console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
     }
-
-    updateDiscordStatus(0);
 
     channel = client.channels.find("id", channelid);
 
