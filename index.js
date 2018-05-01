@@ -7,8 +7,8 @@ const minimist = require("minimist");
 const https = require("https");
 const fs = require("fs");
 
-var telnet = require("telnet-client");
-const Telnet = new telnet();
+var TelnetClient = require("telnet-client");
+const Telnet = new TelnetClient();
 
 var d7dtdState = {};
 var channel = void 0;
@@ -190,6 +190,75 @@ if(!config["disable-version-check"]) {
   }
 }
 
+////// # Functions # //////
+function handleMsgFromGame(line) {
+  var split = line.split(" ");
+  var type = split[3];
+
+  if((!config["disable-chatmsgs"] && type === "Chat:") || (!config["disable-gmsgs"] && type === "GMSG:")) {
+    // Make sure the channel exists.
+    if(channel !== null) {
+      // Cut off the timestamp and other info
+      var msg = split[4];
+      for(var i = 5; i <= split.length-1; i++) {
+        msg = msg + " " + split[i];
+      }
+
+      if(config["log-messages"]) {
+        console.log(msg);
+      }
+
+      // When using a local connection, messages go through as new data rather than a response.
+      // This string check is a workaround for that.
+      if(msg.startsWith("'Server': [")) {
+        return;
+      }
+
+      // Convert it to Discord-friendly text.
+      msg = msg.replace("'","").replace("'","");
+
+      if(!config["hide-prefix"])
+      {
+        // Do nothing if the prefix "/" is in the message.
+        if(msg.includes(": /")) {
+          return;
+        }
+      }
+
+      channel.send(msg);
+    }
+  }
+}
+
+function handleMsgToGame(line) {
+  // TODO: Ensure connection is valid before executing commands
+  if(!config["disable-chatmsgs"]) {
+    Telnet.exec("say \"" + line + "\"", (err, response) => {
+      if(err) {
+        console.log("Error while attempting to send message: " + err.message);
+      }
+      else {
+        var lines = response.split("\n");
+        for(var i = 0; i <= lines.length-1; i++) {
+          var line = lines[i];
+          handleMsgFromGame(line);
+        }
+      }
+    });
+  }
+}
+
+function handleTime(line, msg) {
+  var day = line.split(",")[0].replace("Day ","");
+  var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+
+  msg.channel.send(`${line}\n${dayHorde} day${dayHorde===1?"":"s"} to next horde.`);
+}
+
+function handlePlayerCount(line, msg) {
+  msg.channel.send(line);
+}
+
 ////// # Discord # //////
 function updateDiscordStatus(status) {
   if(status === 0 && d7dtdState.connStatus !== 0) {
@@ -205,66 +274,6 @@ function updateDiscordStatus(status) {
 
   // Update the status so we don't keep sending duplicates to Discord
   d7dtdState.connStatus = status;
-}
-
-if(!config["skip-discord-auth"]) {
-  client.login(token);
-
-  client.on("ready", () => {
-    console.log("Discord client connected successfully.");
-
-    if(client.guilds.size === 0) {
-      console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
-    }
-
-    if(client.guilds.size > 1) {
-      console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
-    }
-
-    updateDiscordStatus(0);
-
-    channel = client.channels.find("id", channelid);
-
-    if(!channel && !skipChannelCheck) {
-      console.log("\x1b[33mERROR: Failed to identify channel with ID '" + channelid + "'\x1b[0m");
-    }
-
-    // Wait until the Discord client is ready before connecting to the game.
-    if(d7dtdState.connInitialized !== 1) {
-      d7dtdState.connInitialized = 1; // Make sure we only do this once
-      Telnet.connect(params);
-    }
-  });
-
-  client.on("disconnect", (event) => {
-    if(event.code !== 1000) {
-      console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
-      setTimeout(() => { client.login(token); }, 6000);
-    }
-  });
-
-  client.on("error", (err) => {
-    console.log(err);
-    console.log("Discord client error '" + err.code + "'. Attempting to reconnect in 6s...");
-
-    client.destroy();
-    setTimeout(() => { client.login(config.token); }, 6000);
-  });
-
-  client.on("message", (msg) => {
-    if(msg.author !== client.user) {
-      // If the bot is mentioned, pass through as if the user typed 7dtd!info
-      var mentioned = msg.content.includes("<@" + client.user.id + ">");
-
-      if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
-        parseDiscordCommand(msg, mentioned);
-      }
-      else if(msg.channel === channel && msg.channel.type === "text") {
-        msg = "[" + msg.author.username + "] " + msg.cleanContent;
-        handleMsgToGame(msg);
-      }
-    }
-  });
 }
 
 function parseDiscordCommand(msg, mentioned) {
@@ -381,7 +390,7 @@ function parseDiscordCommand(msg, mentioned) {
         Telnet.exec("version", (err, response) => {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
-          if(response !== undefined) {
+          if(typeof response !== "undefined") {
             var lines = response.split("\n");
             d7dtdState.receivedData = 0;
             for(var i = 0; i <= lines.length-1; i++) {
@@ -406,7 +415,7 @@ function parseDiscordCommand(msg, mentioned) {
           // Sometimes the "response" has more than what we"re looking for.
           // We have to double-check and make sure the correct line is returned.
 
-          if(response !== undefined) {
+          if(typeof response !== "undefined") {
             var lines = response.split("\n");
             d7dtdState.receivedData = 0;
             for(var i = 0; i <= lines.length-1; i++) {
@@ -432,7 +441,7 @@ function parseDiscordCommand(msg, mentioned) {
       //    var str = msg.toString().toUpperCase().replace(prefix + "PREF ", "").replace(prefix + "PREF", "");
       //    // Sometimes the "response" has more than what we"re looking for.
       //    // We have to double-check and make sure the correct line is returned.
-      //    if(response !== undefined) {
+      //    if(typeof response !== "undefined") {
       //      var lines = response.split("\n");
       //      d7dtdState.receivedData = 0;
 
@@ -569,73 +578,64 @@ Telnet.on("error", (data) => {
   updateDiscordStatus(-1);
 });
 
-////// # Functions # //////
-function handleMsgFromGame(line) {
-  var split = line.split(" ");
-  var type = split[3];
+if(!config["skip-discord-auth"]) {
+  client.login(token);
 
-  if((!config["disable-chatmsgs"] && type === "Chat:") || (!config["disable-gmsgs"] && type === "GMSG:")) {
-    // Make sure the channel exists.
-    if(channel !== null) {
-      // Cut off the timestamp and other info
-      var msg = split[4];
-      for(var i = 5; i <= split.length-1; i++) {
-        msg = msg + " " + split[i];
-      }
+  client.on("ready", () => {
+    console.log("Discord client connected successfully.");
 
-      if(config["log-messages"]) {
-        console.log(msg);
-      }
-
-      // When using a local connection, messages go through as new data rather than a response.
-      // This string check is a workaround for that.
-      if(msg.startsWith("'Server': [")) {
-        return;
-      }
-
-      // Convert it to Discord-friendly text.
-      msg = msg.replace("'","").replace("'","");
-
-      if(!config["hide-prefix"])
-      {
-        // Do nothing if the prefix "/" is in the message.
-        if(msg.includes(": /")) {
-          return;
-        }
-      }
-
-      channel.send(msg);
+    if(client.guilds.size === 0) {
+      console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
     }
-  }
-}
 
-function handleMsgToGame(line) {
-  // TODO: Ensure connection is valid before executing commands
-  if(!config["disable-chatmsgs"]) {
-    Telnet.exec("say \"" + line + "\"", (err, response) => {
-      if(err) {
-        console.log("Error while attempting to send message: " + err.message);
+    if(client.guilds.size > 1) {
+      console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
+    }
+
+    updateDiscordStatus(0);
+
+    channel = client.channels.find("id", channelid);
+
+    if(!channel && !skipChannelCheck) {
+      console.log("\x1b[33mERROR: Failed to identify channel with ID '" + channelid + "'\x1b[0m");
+    }
+
+    // Wait until the Discord client is ready before connecting to the game.
+    if(d7dtdState.connInitialized !== 1) {
+      d7dtdState.connInitialized = 1; // Make sure we only do this once
+      Telnet.connect(params);
+    }
+  });
+
+  client.on("disconnect", (event) => {
+    if(event.code !== 1000) {
+      console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
+      setTimeout(() => { client.login(token); }, 6000);
+    }
+  });
+
+  client.on("error", (err) => {
+    console.log(err);
+    console.log("Discord client error '" + err.code + "'. Attempting to reconnect in 6s...");
+
+    client.destroy();
+    setTimeout(() => { client.login(config.token); }, 6000);
+  });
+
+  client.on("message", (msg) => {
+    if(msg.author !== client.user) {
+      // If the bot is mentioned, pass through as if the user typed 7dtd!info
+      var mentioned = msg.content.includes("<@" + client.user.id + ">");
+
+      if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
+        parseDiscordCommand(msg, mentioned);
       }
-      else {
-        var lines = response.split("\n");
-        for(var i = 0; i <= lines.length-1; i++) {
-          var line = lines[i];
-          handleMsgFromGame(line);
-        }
+      else if(msg.channel === channel && msg.channel.type === "text") {
+        msg = "[" + msg.author.username + "] " + msg.cleanContent;
+        handleMsgToGame(msg);
       }
-    });
-  }
-}
-
-function handleTime(line, msg) {
-  var day = line.split(",")[0].replace("Day ","");
-  var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
-
-  msg.channel.send(`${line}\n${dayHorde} day${dayHorde===1?"":"s"} to next horde.`);
-}
-
-function handlePlayerCount(line, msg) {
-  msg.channel.send(line);
+    }
+  });
 }
 
 ////// # Console Input # //////
