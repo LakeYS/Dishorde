@@ -266,7 +266,7 @@ function handlePlayerCount(line, msg) {
 // If you want to forcibly re-send the same status, set 'd7dtdState.connStatus' to -100 first.
 function updateDiscordStatus(status) {
   if(status === 0 && d7dtdState.connStatus !== 0) {
-    client.user.setActivity(`No connection | Type ${prefix}help`);
+    client.user.setActivity(`Connecting... | Type ${prefix}help`);
     client.user.setStatus("dnd");
   } else if(status === -1 && d7dtdState.connStatus !== -1) {
     client.user.setActivity(`Error | Type ${prefix}help`);
@@ -278,6 +278,17 @@ function updateDiscordStatus(status) {
 
   // Update the status so we don't keep sending duplicates to Discord
   d7dtdState.connStatus = status;
+}
+
+// This function prevent's the bot's staus from showing up as blank.
+function d7dtdHeartbeat() {
+  var status = d7dtdState.connStatus;
+  d7dtdState.connStatus = -100;
+  updateDiscordStatus(status);
+
+  d7dtdState.timeout = setTimeout(() => {
+    d7dtdHeartbeat();
+  }, 3.6e+6); // Heartbeat every hour
 }
 
 function parseDiscordCommand(msg, mentioned) {
@@ -588,9 +599,12 @@ if(!config["skip-discord-auth"]) {
 
   client.on("ready", () => {
     if(firstLogin !== 1) {
-      updateDiscordStatus(0);
       firstLogin = 1;
       console.log("Discord client connected successfully.");
+
+      // Set the initial status and begin the heartbeat timer.
+      d7dtdState.connStatus = 0;
+      d7dtdHeartbeat();
     }
     else {
       console.log("Discord client re-connected successfully.");
