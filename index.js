@@ -34,7 +34,7 @@ d7dtdState.connStatus = -100;
 // We have to treat the channel ID as a string or the number will parse incorrectly.
 var argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
 
-// This is a simple check to see if we"re using arguments or the config file.
+// This is a simple check to see if we're using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
 var config;
 var configFile;
@@ -116,7 +116,7 @@ if(config["allow-exec-command"] === true) {
 
 ////// # Version Check # //////
 if(!config["disable-version-check"]) {
-  // If, for whatever reason, semver-compare isn"t installed, we"ll skip the version check.
+  // If, for whatever reason, semver-compare isn't installed, we'll skip the version check.
   var semver;
   try {
     semver = require("semver-compare");
@@ -377,7 +377,7 @@ function parseDiscordCommand(msg, mentioned) {
       // 7dtd!time
       if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
         Telnet.exec("gettime", (err, response) => {
-          // Sometimes the "response" has more than what we"re looking for.
+          // Sometimes the "response" has more than what we're looking for.
           // We have to double-check and make sure the correct line is returned.
 
           if(typeof response !== "undefined") {
@@ -392,7 +392,7 @@ function parseDiscordCommand(msg, mentioned) {
             }
           }
 
-          // Sometimes, the response doesn"t have the data we"re looking for...
+          // Sometimes, the response doesn't have the data we're looking for...
           if(!d7dtdState.receivedData) {
             d7dtdState.waitingForTime = 1;
             d7dtdState.waitingForTimeMsg = msg;
@@ -403,7 +403,7 @@ function parseDiscordCommand(msg, mentioned) {
       // 7dtd!version
       if(cmd === "VERSION" || cmd === "V") {
         Telnet.exec("version", (err, response) => {
-          // Sometimes the "response" has more than what we"re looking for.
+          // Sometimes the "response" has more than what we're looking for.
           // We have to double-check and make sure the correct line is returned.
           if(typeof response !== "undefined") {
             var lines = response.split("\n");
@@ -427,7 +427,7 @@ function parseDiscordCommand(msg, mentioned) {
       // 7dtd!players
       if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
         Telnet.exec("lp", (err, response) => {
-          // Sometimes the "response" has more than what we"re looking for.
+          // Sometimes the "response" has more than what we're looking for.
           // We have to double-check and make sure the correct line is returned.
 
           if(typeof response !== "undefined") {
@@ -443,7 +443,7 @@ function parseDiscordCommand(msg, mentioned) {
             }
           }
 
-          // Sometimes, the response doesn"t have the data we"re looking for...
+          // Sometimes, the response doesn't have the data we're looking for...
           if(!d7dtdState.receivedData) {
             d7dtdState.waitingForPlayers = 1;
             d7dtdState.waitingForPlayersMsg = msg;
@@ -454,7 +454,7 @@ function parseDiscordCommand(msg, mentioned) {
       //if(cmd === "PREF") {
       //  Telnet.exec("getgamepref", (err, response) => {
       //    var str = msg.toString().toUpperCase().replace(prefix + "PREF ", "").replace(prefix + "PREF", "");
-      //    // Sometimes the "response" has more than what we"re looking for.
+      //    // Sometimes the "response" has more than what we're looking for.
       //    // We have to double-check and make sure the correct line is returned.
       //    if(typeof response !== "undefined") {
       //      var lines = response.split("\n");
@@ -557,7 +557,7 @@ Telnet.on("data", (data) => {
     var split = line.split(" ");
 
     if(split[2] === "INF" && split[3] === "[NET]" && split[4] === "ServerShutdown\r") {
-      // If we don"t destroy the connection, crashes will happen when someone types a message.
+      // If we don't destroy the connection, crashes will happen when someone types a message.
       // This is a workaround until better measures can be put in place for sending data to the game.
       console.log("The server has shut down. Closing connection...");
       Telnet.destroy();
