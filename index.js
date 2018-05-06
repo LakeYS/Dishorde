@@ -272,12 +272,24 @@ function updateDiscordStatus(status) {
     client.user.setActivity(`Error | Type ${prefix}help`);
     client.user.setStatus("dnd");
   } else if(status === 1 && d7dtdState.connStatus !== 1) {
-    client.user.setActivity(`7DTD | Type ${prefix}help`);
-    client.user.setStatus("online");
+    if(typeof config.channel === "undefined" || config.channel === "channelid") {
+      client.user.setActivity(`No channel | Type ${prefix}setchannel`);
+      client.user.setStatus("idle");
+    }
+    else {
+      client.user.setActivity(`7DTD | Type ${prefix}help`);
+      client.user.setStatus("online");
+    }
   }
 
   // Update the status so we don't keep sending duplicates to Discord
   d7dtdState.connStatus = status;
+}
+
+function refreshDiscordStatus() {
+  var status = d7dtdState.connStatus;
+  d7dtdState.connStatus = -100;
+  updateDiscordStatus(status);
 }
 
 // This function prevent's the bot's staus from showing up as blank.
@@ -332,6 +344,8 @@ function parseDiscordCommand(msg, mentioned) {
             msg.channel.send(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
           }
         });
+
+        refreshDiscordStatus();
       }
       else {
         msg.channel.send(":x: Failed to identify the channel you specified.");
@@ -610,9 +624,7 @@ if(!config["skip-discord-auth"]) {
       console.log("Discord client re-connected successfully.");
 
       // When the client reconnects, we have to re-establish the status.
-      var status = d7dtdState.connStatus;
-      d7dtdState.connStatus = -100;
-      updateDiscordStatus(status);
+      refreshDiscordStatus();
     }
 
 
