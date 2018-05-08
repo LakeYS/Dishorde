@@ -265,25 +265,27 @@ function handlePlayerCount(line, msg) {
 // NOTE: This function will 'cache' the current status to avoid re-sending it.
 // If you want to forcibly re-send the same status, set 'd7dtdState.connStatus' to -100 first.
 function updateDiscordStatus(status) {
-  if(status === 0 && d7dtdState.connStatus !== 0) {
-    client.user.setActivity(`Connecting... | Type ${prefix}help`);
-    client.user.setStatus("dnd");
-  } else if(status === -1 && d7dtdState.connStatus !== -1) {
-    client.user.setActivity(`Error | Type ${prefix}help`);
-    client.user.setStatus("dnd");
-  } else if(status === 1 && d7dtdState.connStatus !== 1) {
-    if(typeof config.channel === "undefined" || config.channel === "channelid") {
-      client.user.setActivity(`No channel | Type ${prefix}setchannel`);
-      client.user.setStatus("idle");
+  if(!config["disable-status-updates"]) {
+    if(status === 0 && d7dtdState.connStatus !== 0) {
+      client.user.setActivity(`Connecting... | Type ${prefix}help`);
+      client.user.setStatus("dnd");
+    } else if(status === -1 && d7dtdState.connStatus !== -1) {
+      client.user.setActivity(`Error | Type ${prefix}help`);
+      client.user.setStatus("dnd");
+    } else if(status === 1 && d7dtdState.connStatus !== 1) {
+      if(typeof config.channel === "undefined" || config.channel === "channelid") {
+        client.user.setActivity(`No channel | Type ${prefix}setchannel`);
+        client.user.setStatus("idle");
+      }
+      else {
+        client.user.setActivity(`7DTD | Type ${prefix}help`);
+        client.user.setStatus("online");
+      }
     }
-    else {
-      client.user.setActivity(`7DTD | Type ${prefix}help`);
-      client.user.setStatus("online");
-    }
-  }
 
-  // Update the status so we don't keep sending duplicates to Discord
-  d7dtdState.connStatus = status;
+    // Update the status so we don't keep sending duplicates to Discord
+    d7dtdState.connStatus = status;
+  }
 }
 
 function refreshDiscordStatus() {
