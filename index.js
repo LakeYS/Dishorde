@@ -27,7 +27,7 @@ d7dtdState.skipVersionCheck = 0;
 d7dtdState.connInitialized = 0;
 
 // Connection status
-// -1 = Error, 0 = No connection, 1 = Online, -100 = Override or N/A (value is ignored)
+// -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
 d7dtdState.connStatus = -100;
 
 ////// # Arguments # //////
@@ -267,7 +267,7 @@ function handlePlayerCount(line, msg) {
 function updateDiscordStatus(status) {
   if(!config["disable-status-updates"]) {
     if(status === 0 && d7dtdState.connStatus !== 0) {
-      client.user.setActivity(`Connecting... | Type ${prefix}help`);
+      client.user.setActivity(`Connecting... | Type ${prefix}info`);
       client.user.setStatus("dnd");
     } else if(status === -1 && d7dtdState.connStatus !== -1) {
       client.user.setActivity(`Error | Type ${prefix}help`);
@@ -378,9 +378,23 @@ function parseDiscordCommand(msg, mentioned) {
   if(msg.channel === channel || msg.channel.type === "dm") {
     // 7dtd!info
     if(cmd === "INFO" || cmd === "I" || cmd === "HELP" || cmd === "H" || mentioned) {
+      // -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
+      var statusMsg;
+      switch(d7dtdState.connStatus) {
+      case -1:
+        statusMsg = ":red_circle: Error";
+        break;
+      case 0:
+        statusMsg = ":white_circle: Connecting...";
+        break;
+      case 1:
+        statusMsg = ":large_blue_circle: Online";
+        break;
+      }
 
-      msg.channel.send("**Info:** This bot relays chat messages to and from a 7 Days to Die server. Commands are accepted in DMs as well.\nRunning v" + pjson.version + "\n**Source code:** https://github.com/LakeYS/7DTD-Discord");
+      msg.channel.send(`**7DTD-Discord v${pjson.version}** - Discord Integration for 7 Days to Die\n\nServer connection status: ${statusMsg}`);
 
+      // TODO: Merge this with the main message instead of sending it in its own message
       if(!config["disable-commands"]) {
         var pre = prefix.toLowerCase();
         msg.channel.send(`**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`);
@@ -604,7 +618,9 @@ Telnet.on("data", (data) => {
 });
 
 Telnet.on("error", (data) => {
+  console.log("An error occurred while connecting to the game.");
   console.log(data);
+  //d7dtdState.lastTelnetErr = data.message;
 
   updateDiscordStatus(-1);
 });
