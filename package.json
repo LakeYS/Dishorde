@@ -1,6 +1,6 @@
 {
   "name": "7dtd-discord",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "Discord integration for 7 Days to Die.",
   "main": "index.js",
   "scripts": {
