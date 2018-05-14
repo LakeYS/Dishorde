@@ -392,13 +392,13 @@ function parseDiscordCommand(msg, mentioned) {
         break;
       }
 
-      msg.channel.send(`**7DTD-Discord v${pjson.version}** - Discord Integration for 7 Days to Die\n\nServer connection status: ${statusMsg}`);
-
-      // TODO: Merge this with the main message instead of sending it in its own message
+      var cmdString = "";
       if(!config["disable-commands"]) {
         var pre = prefix.toLowerCase();
-        msg.channel.send(`**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`);
+        cmdString = `\n**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`;
       }
+
+      msg.channel.send(`**7DTD-Discord v${pjson.version}** - Discord Integration for 7 Days to Die\n\nServer connection status: ${statusMsg}${cmdString}`);
     }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
