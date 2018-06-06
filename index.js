@@ -214,6 +214,11 @@ function handleMsgFromGame(line) {
         return;
       }
 
+      // Remove join and leave messages.
+      if(msg.endsWith("the game")){
+        return;
+      }
+
       // Convert it to Discord-friendly text.
       msg = msg.replace("'","").replace("'","");
 
