@@ -214,13 +214,13 @@ function handleMsgFromGame(line) {
         return;
       }
 
+      // Convert it to Discord-friendly text.
+      msg = msg.replace("'","").replace("'","").replace("\n","");
+
       // Remove join and leave messages.
       if(msg.endsWith("the game") && type === "GMSG:") {
         return;
       }
-
-      // Convert it to Discord-friendly text.
-      msg = msg.replace("'","").replace("'","");
 
       if(!config["hide-prefix"])
       {
