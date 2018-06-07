@@ -215,7 +215,7 @@ function handleMsgFromGame(line) {
       }
 
       // Remove join and leave messages.
-      if(msg.endsWith("the game")){
+      if(msg.endsWith("the game") && type === "GMSG:") {
         return;
       }
 
