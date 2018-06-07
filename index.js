@@ -215,7 +215,19 @@ function handleMsgFromGame(line) {
       }
 
       // Convert it to Discord-friendly text.
-      msg = msg.replace("'","").replace("'","");
+      msg = msg.replace("'","").replace("'","").replace("\n","");
+
+      if(type === "GMSG:") {
+        // Remove join and leave messages.
+        if(msg.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
+          return;
+        }
+
+        // Remove other global messages (player deaths, etc.)
+        if(!msg.endsWith("the game") && config["disable-misc-gmsgs"]) {
+          return;
+        }
+      }
 
       if(!config["hide-prefix"])
       {
