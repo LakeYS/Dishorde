@@ -607,7 +607,14 @@ Telnet.on("data", (data) => {
       channel.send({embed: {
         color: 14164000,
         description: "The server has shut down."
-      }});
+      }})
+        .catch(() => {
+        // Try re-sending without the embed if an error occurs.
+          channel.send("**The server has shut down.**")
+            .catch((err) => {
+              console.log("Failed to send message with error: " + err.message);
+            });
+        });
     }
 
     // This is a workaround for responses not working properly, particularly on local connections.
