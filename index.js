@@ -410,7 +410,7 @@ function parseDiscordCommand(msg, mentioned) {
         cmdString = `\n**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`;
       }
 
-      msg.channel.send(`**7DTD-Discord v${pjson.version}** - Discord Integration for 7 Days to Die\n\nServer connection status: ${statusMsg}${cmdString}`);
+      msg.channel.send(`Server connection: ${statusMsg}${cmdString}\n\n*7DTD-Discord v${pjson.version} - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}*`);
     }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
