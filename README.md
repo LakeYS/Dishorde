@@ -8,7 +8,7 @@ The bot runs as a completely separate application, so no mods are required to ru
 **See below for download links instructions on how to install the bot. Dedicated servers only.**
 
 # How it Works
-This script works by connecting to your server's admin console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
+This script works by connecting to your server's console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
 
 # Development and Support
 I will continue to keep this project up-to-date with new features and fixes whenever possible. If running v1.3.0 or higher, notifications for updates are displayed in the terminal.
@@ -33,7 +33,9 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 - `allow-exec-command` - Enables a command called `7dtd!exec`. This allows anybody with the 'manage server' permission to execute commands on the server. The command works in any channel. **WARNING: Enabling this may pose a security risk for your server.**
 - `disable-commands` - Disable Discord commands such as 7dtd!time. Does not disable 7dtd!info.
 - `disable-chatmsgs` - Disable chat messages to and from the server. Does not disable other in-game messages such as join/leave and deaths.
-- `disable-gmsgs` - Disable miscellaneous in-game messages. Includes deaths, leaves/joins, etc.
+- `disable-join-leave-gmsgs` - Disables player join/leave messages.
+- `disable-misc-gmsgs` - Disables all other global messages (player deaths, etc.)
+- `disable-status-updates` - Disable the bot's presence and online status display.
 - `hide-prefix` - Hides all chat messages that start with a forward slash. This may be useful if your server uses commands.
 - `log-messages` - Chat messages will show up in the terminal.
 - `log-telnet` - All output from the connection will show up in the terminal.
@@ -54,7 +56,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Setting up the bot
-1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.2/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
+1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.6.0/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
 2. Install Node.js LTS from [this website](https://nodejs.org/en/download/).
 3. Once Node.js is finished installing, run install.bat in the bot's folder. This will automatically install the required modules for the bot.
 4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
@@ -92,7 +94,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 ## Setting up the bot
 1. Open a terminal on your system.
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
-3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.5.2/7DTD-Discord.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
+3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.6.0/7DTD-Discord.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
 6. Type `npm install` to install the required packages for the bot to run.

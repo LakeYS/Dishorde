@@ -12,7 +12,6 @@
   "allow-exec-command": false,
   "disable-commands": false,
   "disable-chatmsgs": false,
-  "disable-gmsgs": false,
   "disable-join-leave-gmsgs": false,
   "disable-misc-gmsgs": false,
   "disable-status-updates": false,
