@@ -716,7 +716,8 @@ if(!config["skip-discord-auth"]) {
   client.on("message", (msg) => {
     if(msg.author !== client.user) {
       // If the bot is mentioned, pass through as if the user typed 7dtd!info
-      var mentioned = msg.content.includes("<@" + client.user.id + ">");
+      // Also includes overrides for the default prefix.
+      var mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7dtd!info" || msg.content === "7dtd!help";
 
       if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
         parseDiscordCommand(msg, mentioned);
