@@ -410,7 +410,15 @@ function parseDiscordCommand(msg, mentioned) {
         cmdString = `\n**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`;
       }
 
-      msg.channel.send(`Server connection: ${statusMsg}${cmdString}\n\n*7DTD-Discord v${pjson.version} - http://lakeys.net/discord7dtd - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}.*`);
+
+      var string = `Server connection: ${statusMsg}${cmdString}\n\n*7DTD-Discord v${pjson.version} - http://lakeys.net/discord7dtd - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}.*`;
+      msg.channel.send({embed: {
+        description: string
+      }})
+        .catch(() => {
+          // If the embed fails, try sending without it.
+          msg.channel.send(string);
+        });
     }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
