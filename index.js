@@ -320,6 +320,10 @@ function d7dtdHeartbeat() {
 function parseDiscordCommand(msg, mentioned) {
   var cmd = msg.toString().toUpperCase().replace(prefix, "");
 
+  if(msg.author.bot === true) {
+    return;
+  }
+
   // 7dtd!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
     if(msg.channel.type === "text" && channel !== null?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
