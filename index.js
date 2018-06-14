@@ -701,7 +701,20 @@ if(!config["skip-discord-auth"]) {
 
   client.on("disconnect", (event) => {
     if(event.code !== 1000) {
-      console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + "). Attempting to reconnect in 6s...");
+      console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + ").");
+
+      if(event.code === 4004) {
+        if(token.length < 50) {
+          console.log("It appears that you have entered a client secret or other invalid string. Please ensure that you have entered a bot token and try again.");
+        }
+        else {
+          console.log("Please double-check the configured token and try again.");
+        }
+        process.exit();
+        return;
+      }
+
+      console.log("Attempting to reconnect in 6s...");
       setTimeout(() => { client.login(token); }, 6000);
     }
   });
