@@ -8,7 +8,6 @@ const https = require("https");
 const fs = require("fs");
 
 var TelnetClient = require("telnet-client");
-const Telnet = new TelnetClient();
 
 var d7dtdState = {};
 var channel = void 0;
@@ -51,6 +50,8 @@ else {
 
   config = require(configFile);
 }
+
+const Telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
 
 // IP
 // This argument allows you to run the bot on a remote network.
