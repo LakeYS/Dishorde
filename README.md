@@ -15,6 +15,8 @@ I will continue to keep this project up-to-date with new features and fixes when
 
 For support, questions, and comments, you can join the Discord server or contact me directly at contact@LakeYS.net. You can also [submit an issue](https://github.com/LakeYS/7DTD-Discord/issues/new) for bugs and support.
 
+**[Support me on Patreon](https://www.patreon.com/LakeYS)**
+
 **[Join the Discord](https://discord.gg/s3vCQba)**
 
 # Commands
