@@ -318,6 +318,18 @@ function d7dtdHeartbeat() {
   }, 3.6e+6); // Heartbeat every hour
 }
 
+function processTelnetResponse(response, callback) {
+  // Sometimes the "response" has more than what we're looking for.
+  // We have to double-check and make sure the correct line is returned.
+  if(typeof response !== "undefined") {
+    var lines = response.split("\n");
+    d7dtdState.receivedData = 0;
+    for(var i = 0; i <= lines.length-1; i++) {
+      callback(lines[i]);
+    }
+  }
+}
+
 function parseDiscordCommand(msg, mentioned) {
   var cmd = msg.toString().toUpperCase().replace(prefix, "");
 
@@ -432,20 +444,12 @@ function parseDiscordCommand(msg, mentioned) {
       // 7dtd!time
       if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
         Telnet.exec("gettime", (err, response) => {
-          // Sometimes the "response" has more than what we're looking for.
-          // We have to double-check and make sure the correct line is returned.
-
-          if(typeof response !== "undefined") {
-            var lines = response.split("\n");
-            d7dtdState.receivedData = 0;
-            for(var i = 0; i <= lines.length-1; i++) {
-              var line = lines[i];
-              if(line.startsWith("Day")) {
-                d7dtdState.receivedData = 1;
-                handleTime(line, msg);
-              }
+          processTelnetResponse(response, (line) => {
+            if(line.startsWith("Day")) {
+              d7dtdState.receivedData = 1;
+              handleTime(line, msg);
             }
-          }
+          });
 
           // Sometimes, the response doesn't have the data we're looking for...
           if(!d7dtdState.receivedData) {
@@ -458,19 +462,12 @@ function parseDiscordCommand(msg, mentioned) {
       // 7dtd!version
       if(cmd === "VERSION" || cmd === "V") {
         Telnet.exec("version", (err, response) => {
-          // Sometimes the "response" has more than what we're looking for.
-          // We have to double-check and make sure the correct line is returned.
-          if(typeof response !== "undefined") {
-            var lines = response.split("\n");
-            d7dtdState.receivedData = 0;
-            for(var i = 0; i <= lines.length-1; i++) {
-              var line = lines[i];
-              if(line.startsWith("Game version:")) {
-                msg.channel.send(line);
-                d7dtdState.receivedData = 1;
-              }
+          processTelnetResponse(response, (line) => {
+            if(line.startsWith("Game version:")) {
+              msg.channel.send(line);
+              d7dtdState.receivedData = 1;
             }
-          }
+          });
 
           if(!d7dtdState.receivedData) {
             d7dtdState.waitingForVersion = 1;
@@ -482,23 +479,13 @@ function parseDiscordCommand(msg, mentioned) {
       // 7dtd!players
       if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
         Telnet.exec("lp", (err, response) => {
-          // Sometimes the "response" has more than what we're looking for.
-          // We have to double-check and make sure the correct line is returned.
-
-          if(typeof response !== "undefined") {
-            var lines = response.split("\n");
-            d7dtdState.receivedData = 0;
-            for(var i = 0; i <= lines.length-1; i++) {
-              var line = lines[i];
-              if(line.startsWith("Total of ")) {
-                d7dtdState.receivedData = 1;
-
-                handlePlayerCount(line, msg);
-              }
+          processTelnetResponse(response, (line) => {
+            if(line.startsWith("Total of ")) {
+              d7dtdState.receivedData = 1;
+              handlePlayerCount(line, msg);
             }
-          }
+          });
 
-          // Sometimes, the response doesn't have the data we're looking for...
           if(!d7dtdState.receivedData) {
             d7dtdState.waitingForPlayers = 1;
             d7dtdState.waitingForPlayersMsg = msg;
