@@ -9,25 +9,27 @@ const fs = require("fs");
 
 var TelnetClient = require("telnet-client");
 
-var d7dtdState = {};
 var channel = void 0;
 
-d7dtdState.doReconnect = 1;
+var d7dtdState = {
+  doReconnect: 1,
 
-d7dtdState.waitingForTime = 0;
-d7dtdState.waitingForVersion = 0;
-d7dtdState.waitingForPlayers = 0;
-//d7dtdState.waitingForPref = 0;
-d7dtdState.receivedData = 0;
+  waitingForTime: 0,
+  waitingForVersion: 0,
+  waitingForPlayers: 0,
+  //waitingForPref: 0,
+  receivedData: 0,
 
-d7dtdState.skipVersionCheck = 0;
+  skipVersionCheck: 0,
 
-// Connection initialized?
-d7dtdState.connInitialized = 0;
+  // Connection initialized?
+  connInitialized: 0,
 
-// Connection status
-// -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
-d7dtdState.connStatus = -100;
+  // Connection status
+  // -1 = Error, 0 = No connection/connecting, 1 = Online
+  // -100 = Override or N/A (value is ignored)
+  connStatus: -100
+};
 
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
