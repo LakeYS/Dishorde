@@ -119,7 +119,8 @@ if(config["allow-exec-command"] === true) {
 ////// # Init/Version Check # //////
 const configPrivate = {
   githubAuthor: "LakeYS",
-  githubName: "7DTD-Discord"
+  githubName: "7DTD-Discord",
+  socketPort: 7383
 };
 
 require("./lib/init.js")(pjson, config, configPrivate);
