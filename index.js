@@ -4,7 +4,6 @@ const pjson = require("./package.json");
 console.log("\x1b[7m# 7DTD Discord Integration v" + pjson.version + " #\x1b[0m");
 
 const minimist = require("minimist");
-const https = require("https");
 const fs = require("fs");
 
 var TelnetClient = require("telnet-client");
@@ -117,81 +116,13 @@ if(config["allow-exec-command"] === true) {
   console.warn("\x1b[33mWARNING: Config option 'allow-exec-command' is enabled. This may pose a security risk for your server.\x1b[0m");
 }
 
-////// # Version Check # //////
-if(!config["disable-version-check"]) {
-  // If, for whatever reason, semver-compare isn't installed, we'll skip the version check.
-  var semver;
-  try {
-    semver = require("semver-compare");
-  } catch(err) {
-    if(err.code === "MODULE_NOT_FOUND") {
-      console.warn("********\nWARNING: semver-compare module not found. The version check will be skipped.\nMake sure to keep the bot up-to-date! Check here for newer versions:\nhttps://github.com/LakeYS/7DTD-Discord/releases\n********");
-      d7dtdState.skipVersionCheck = 1;
-    }
-    else {
-      throw(err);
-    }
-  }
+////// # Init/Version Check # //////
+const configPrivate = {
+  githubAuthor: "LakeYS",
+  githubName: "7DTD-Discord"
+};
 
-  if(!d7dtdState.skipVersionCheck) {
-    var options = {
-      host: "api.github.com",
-      path: "/repos/LakeYS/7DTD-Discord/releases/latest",
-      method: "GET",
-      headers: {"user-agent":"7DTD-Discord-Integration"}
-    };
-
-    var input = "";
-    var json = "";
-    var request = https.request(options, (res) => {
-      res.on("data", (data) => {
-        input = input + data; // Combine the data
-      });
-      res.on("error", (err) => {
-        console.log(err);
-      });
-      res.on("uncaughtException", (err) => {
-        console.log(err);
-      });
-
-      // Note that if there is an error while parsing the JSON data, the bot will crash.
-      res.on("end", () => {
-        if(typeof input !== "undefined") {
-          json = JSON.parse(input.toString());
-          if(typeof json.tag_name !== "undefined") {
-            var release = json.tag_name.replace("v",""); // Mark the release
-
-            // Compare this build"s version to the latest release.
-            var releaseRelative = semver(pjson.version, release);
-
-            if(releaseRelative === 1) {
-              console.log("********\nNOTICE: You are currently running\x1b[1m v" + pjson.version + "\x1b[0m. This build is considered unstable.\nCheck here for the latest stable versions of this script:\n\x1b[1m https://github.com/LakeYS/7DTD-Discord/releases \n\x1b[0m********");
-            }
-
-            if(releaseRelative === -1) {
-              console.log("********\nNOTICE: You are currently running\x1b[1m v" + pjson.version + "\x1b[0m. A newer version is available.\nCheck here for the latest version of this script:\n\x1b[1m https://github.com/LakeYS/7DTD-Discord/releases \n\x1b[0m********");
-            }
-          } else {
-            console.log(json);
-            console.warn("WARNING: Unable to parse version data.");
-          }
-        }
-        else {
-          console.log(input); // Log the input on error
-          console.warn("WARNING: Unable to parse version data.");
-        }
-      });
-    });
-
-    request.end();
-    process.nextTick(() => {
-      request.on("error", (err) => {
-        console.log(err);
-        console.warn("WARNING: Unable to query version data.");
-      });
-    });
-  }
-}
+require("./lib/init.js")(pjson, config, configPrivate);
 
 ////// # Functions # //////
 function handleMsgFromGame(line) {
