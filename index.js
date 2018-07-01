@@ -625,7 +625,10 @@ if(!config["skip-discord-auth"]) {
       console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + ").");
 
       if(event.code === 4004) {
-        if(token.length < 50) {
+        if(token === "your_token_here") {
+          console.log("It appears that you have not yet added a token. Please replace \"your_token_here\" with a valid token in the config file.");
+        }
+        else if(token.length < 50) {
           console.log("It appears that you have entered a client secret or other invalid string. Please ensure that you have entered a bot token and try again.");
         }
         else {
