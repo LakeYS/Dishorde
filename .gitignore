@@ -48,7 +48,8 @@ Temporary Items
 
 # Node modules and security
 node_modules
-run*.sh
+run_dev*.sh
+run_private*.sh
 run*.bat
 config*.json
 run*.vbs
@@ -56,4 +57,3 @@ update.sh
 update_private.sh
 7DTD-Discord/
 7DTD-Discord.tar.gz
-
