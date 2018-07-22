@@ -47,13 +47,11 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 
 # How to Install - Windows
 ## Creating the bot account
-1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) and click "New App".
-
-2. Name the bot anything you'd like and click "Create App".
-3. Click "Create a Bot User".
-4. Find the checkbox that is labeled "Public bot". Make sure that this is **unchecked**.
-5. Next to "Token:" click the link that says "click to reveal". This is the password for your bot's account. You'll need this and the "Client ID" number later. Copy them both somewhere safe or keep the tab open.
-6. Paste the URL listed below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
+1. Log in to the [Discord Developer Portal](https://discordapp.com/developers/applications/) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
+2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Now you can set an avatar for your bot if desired.
+3. Once your bot is created, find the switch that is labeled "Public bot". Make sure that this is **OFF**. Click "Save Changes" to confirm.
+4. Under "Token" click the link that says "Click to Reveal Token". This is the password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open.
+5. Paste the URL below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
 `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
@@ -102,14 +100,13 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 6. Type `npm install` to install the required packages for the bot to run.
 
 ## Creating the bot account
-1. Log in to the [Discord developers section](https://discordapp.com/developers/applications/me) in a browser and click "New App".
-2. Name the bot anything you'd like and click "Create App".
-3. Click "Create a Bot User".
-4. Find the checkbox that is labeled "Public bot". Make sure that this is **unchecked**.
-5. Next to "Token:" click the link that says "click to reveal". This is the password for your bot's account. You'll need this and the "Client ID" number later. Copy them both somewhere safe or keep the tab open for later.
-6. Paste the URL listed below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
+1. Log in to the [Discord Developer Portal](https://discordapp.com/developers/applications/) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
+2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Now you can set an avatar for your bot if desired.
+3. Once your bot is created, find the switch that is labeled "Public bot". Make sure that this is **OFF**. Click "Save Changes" to confirm.
+4. Under "Token" click the link that says "Click to Reveal Token". This is the password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open.
+5. Paste the URL below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
-`https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+`https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Configuring the bot
 1. On your server's system, navigate to the game's directory and edit your the config xml file.
