@@ -9,7 +9,7 @@
   "author": "LakeYS",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^11.3.0",
+    "discord.js": "^11.4.0",
     "minimist": "^1.2.0",
     "semver-compare": "^1.0.0",
     "telnet-client": "^0.15.8"
