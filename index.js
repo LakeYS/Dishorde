@@ -570,9 +570,8 @@ Telnet.on("data", (data) => {
   }
 });
 
-Telnet.on("error", (data) => {
-  console.log("An error occurred while connecting to the game.");
-  console.log(data);
+Telnet.on("error", (error) => {
+  console.log(`An error occurred while connecting to the game:\n${error.message}`);
   //d7dtdState.lastTelnetErr = data.message;
 
   updateDiscordStatus(-1);
@@ -644,8 +643,7 @@ if(!config["skip-discord-auth"]) {
   });
 
   client.on("error", (err) => {
-    console.log(err);
-    console.log("Discord client error '" + err.code + "'. Attempting to reconnect in 6s...");
+    console.log(`Discord client error '${err.code}' (${err.message}). Attempting to reconnect in 6s...`);
 
     client.destroy();
     setTimeout(() => { client.login(config.token); }, 6000);
@@ -703,9 +701,8 @@ process.on("exit",  () => {
 });
 
 process.on("unhandledRejection", (err) => {
-  console.log(err);
   if(!config["skip-discord-auth"]) {
-    console.log("Unhandled rejection: '" + err.code + "'. Attempting to reconnect...");
+    console.log("Unhandled rejection: '" + err.message + "'. Attempting to reconnect...");
     client.destroy();
     setTimeout(() => { client.login(token); }, 6000);
   }
