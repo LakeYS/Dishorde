@@ -101,7 +101,7 @@ var channelid = config.channel.toString();
 // Prefix
 var prefix;
 if(typeof config.prefix !== "string") {
-  prefix = "7dtd!";
+  prefix = "7d!";
 }
 else {
   prefix = config.prefix.toUpperCase();
