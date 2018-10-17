@@ -22,18 +22,18 @@ For support, questions, and comments, you can join the Discord server or contact
 # Commands
 Commands can be sent via DM or in the specified chat channel.
 
-`7dtd!info`
-`7dtd!time`
-`7dtd!version`
-`7dtd!players`
+`7d!info`
+`7d!time`
+`7d!version`
+`7d!players`
 
 # Terminal Commands
 `exit`
 
 # Configuration
 The bot can be configured by editing config.json. Here's a list of the preferences:
-- `allow-exec-command` - Enables a command called `7dtd!exec`. This allows anybody with the 'manage server' permission to execute commands on the server. The command works in any channel. **WARNING: Enabling this may pose a security risk for your server.**
-- `disable-commands` - Disable Discord commands such as 7dtd!time. Does not disable 7dtd!info.
+- `allow-exec-command` - Enables a command called `7d!exec`. This allows anybody with the 'manage server' permission to execute commands on the server. The command works in any channel. **WARNING: Enabling this may pose a security risk for your server.**
+- `disable-commands` - Disable Discord commands such as 7d!time. Does not disable 7d!info.
 - `disable-chatmsgs` - Disable chat messages to and from the server. Does not disable other in-game messages such as join/leave and deaths.
 - `disable-join-leave-gmsgs` - Disables player join/leave messages.
 - `disable-misc-gmsgs` - Disables all other global messages (player deaths, etc.)
@@ -41,7 +41,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 - `hide-prefix` - Hides all chat messages that start with a forward slash. This may be useful if your server uses commands.
 - `log-messages` - Chat messages will show up in the terminal.
 - `log-telnet` - All output from the connection will show up in the terminal.
-- `prefix` - The prefix for bot commands. ('7dtd!' by default)
+- `prefix` - The prefix for bot commands. ('7d!' by default)
 
 - `skip-discord-auth` - The bot will not log in to Discord.
 
@@ -68,7 +68,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 Once you complete all of this, you will be able to run the bot by opening run.bat. If you've done all of this correctly, you will see the following in the terminal:
 `Connected to game. Connected to 1 Discord Servers.`
 
-To set the channel for your server's chat, open Discord and type `7dtd!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
+To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
 
 
 Note that if you close this terminal the bot will be disconnected. The bot can be run in the background with no terminal by opening run_silent.vbs.
@@ -120,4 +120,4 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 Once you complete all of this, you will be able to run the bot by executing run.sh (Navigate to the bot's directory and enter `./run.sh`). If you've done all of this correctly, you will see the following:
 `Connected to game. Connected to 1 Discord Servers.`
 
-To set the channel for your server's chat, open Discord and type `7dtd!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
+To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!

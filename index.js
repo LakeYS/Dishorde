@@ -111,7 +111,7 @@ else {
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-// 7dtd!exec command
+// 7d!exec command
 if(config["allow-exec-command"] === true) {
   console.warn("\x1b[33mWARNING: Config option 'allow-exec-command' is enabled. This may pose a security risk for your server.\x1b[0m");
 }
@@ -271,7 +271,7 @@ function parseDiscordCommand(msg, mentioned) {
     return;
   }
 
-  // 7dtd!setchannel
+  // 7d!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
     if(msg.channel.type === "text" && channel !== null?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
       console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
@@ -321,7 +321,7 @@ function parseDiscordCommand(msg, mentioned) {
     }
   }
 
-  // 7dtd!exec
+  // 7d!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
   if(config["allow-exec-command"] === true)
   {
@@ -339,7 +339,7 @@ function parseDiscordCommand(msg, mentioned) {
 
   // The following commands only work in the specified channel if one is set.
   if(msg.channel === channel || msg.channel.type === "dm") {
-    // 7dtd!info
+    // 7d!info
     if(cmd === "INFO" || cmd === "I" || cmd === "HELP" || cmd === "H" || mentioned) {
       // -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
       var statusMsg;
@@ -375,7 +375,7 @@ function parseDiscordCommand(msg, mentioned) {
     // The following commands only work if disable-commands is OFF. (includes above conditions)
     if(!config["disable-commands"]) {
 
-      // 7dtd!time
+      // 7d!time
       if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
         Telnet.exec("gettime", (err, response) => {
           processTelnetResponse(response, (line) => {
@@ -393,7 +393,7 @@ function parseDiscordCommand(msg, mentioned) {
         });
       }
 
-      // 7dtd!version
+      // 7d!version
       if(cmd === "VERSION" || cmd === "V") {
         Telnet.exec("version", (err, response) => {
           processTelnetResponse(response, (line) => {
@@ -410,7 +410,7 @@ function parseDiscordCommand(msg, mentioned) {
         });
       }
 
-      // 7dtd!players
+      // 7d!players
       if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
         Telnet.exec("lp", (err, response) => {
           processTelnetResponse(response, (line) => {
@@ -651,9 +651,9 @@ if(!config["skip-discord-auth"]) {
 
   client.on("message", (msg) => {
     if(msg.author !== client.user) {
-      // If the bot is mentioned, pass through as if the user typed 7dtd!info
+      // If the bot is mentioned, pass through as if the user typed 7d!info
       // Also includes overrides for the default prefix.
-      var mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7dtd!info" || msg.content === "7dtd!help";
+      var mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7d!info" || msg.content === "7d!help";
 
       if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
         parseDiscordCommand(msg, mentioned);
