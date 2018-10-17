@@ -284,7 +284,7 @@ function parseDiscordCommand(msg, mentioned) {
         channelobj = msg.channel;
       }
       else {
-        channelobj = client.channels.find("id", id);
+        channelobj = client.channels.find((channelobj) => (channelobj.id === id));
       }
 
       if(channel !== null && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
@@ -606,7 +606,7 @@ if(!config["skip-discord-auth"]) {
       console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
     }
 
-    channel = client.channels.find("id", channelid);
+    channel = client.channels.find((channel) => (channel.id === channelid));
 
     if(!channel && !skipChannelCheck) {
       console.log("\x1b[33mERROR: Failed to identify channel with ID '" + channelid + "'\x1b[0m");
