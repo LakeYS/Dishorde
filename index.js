@@ -2,6 +2,7 @@
 const pjson = require("./package.json");
 
 console.log("\x1b[7m# 7DTD Discord Integration v" + pjson.version + " #\x1b[0m");
+console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
 
 const minimist = require("minimist");
 const fs = require("fs");
