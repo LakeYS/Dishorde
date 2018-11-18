@@ -1,7 +1,7 @@
 {
   "name": "7dtd-discord",
   "version": "1.7.0",
-  "description": "Discord integration for 7 Days to Die.",
+  "description": "A Discord bridge bot for 7 Days to Die. This integrates a dedicated server with Discord, allowing players to access the game's chat from any device or location.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
