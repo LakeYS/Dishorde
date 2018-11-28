@@ -131,7 +131,11 @@ function handleMsgFromGame(line) {
   var split = line.split(" ");
   var type = split[3];
 
-  if((!config["disable-chatmsgs"] && type === "Chat:") || (!config["disable-gmsgs"] && type === "GMSG:")) {
+  if(typeof type !== "undefined") {
+    type = type.replace(":", "");
+  }
+
+  if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG:")) {
     // Make sure the channel exists.
     if(channel !== null) {
       // Cut off the timestamp and other info
