@@ -147,7 +147,6 @@ function handleMsgFromGame(line) {
       if(config["log-messages"]) {
         console.log(msg);
       }
-
       // When using a local connection, messages go through as new data rather than a response.
       // This string check is a workaround for that.
       if(msg.startsWith("'Server': [")) {
@@ -157,7 +156,7 @@ function handleMsgFromGame(line) {
       // Convert it to Discord-friendly text.
       msg = msg.replace("'","").replace("'","").replace("\n","");
 
-      if(type === "GMSG:") {
+      if(type === "GMSG") {
         // Remove join and leave messages.
         if(msg.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
           return;
