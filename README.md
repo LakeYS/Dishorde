@@ -52,13 +52,7 @@ You may experience bugs if running older versions of the game with this bot. Her
 Bot Version | Game Version |
 ----------  | ----------
 v1.7 (WIP)  | Alpha 17
-v1.6        | Alpha 16.4
-v1.5        | Alpha 16.4
-v1.4        | Alpha 16.4
-v1.3        | Alpha 16.4
-v1.2        | Alpha 16.4
-v1.1        | Alpha 16.4
-v1.0        | Alpha 16.4
+v1.0 - v1.6 | Alpha 16.4
 
 # How to Install - Windows
 ## Creating the bot account
