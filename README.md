@@ -46,6 +46,20 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 
 - `skip-discord-auth` - The bot will not log in to Discord.
 
+# Compatibility
+You may experience bugs if running older versions of the game with this bot. Here are the versions used to develop the bot:
+
+Bot Version | Game Version |
+----------  | ----------
+v1.7 (WIP)  | Alpha 17
+v1.6        | Alpha 16.4
+v1.5        | Alpha 16.4
+v1.4        | Alpha 16.4
+v1.3        | Alpha 16.4
+v1.2        | Alpha 16.4
+v1.1        | Alpha 16.4
+v1.0        | Alpha 16.4
+
 # How to Install - Windows
 ## Creating the bot account
 1. Log in to the [Discord Developer Portal](https://discordapp.com/developers/applications/) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
