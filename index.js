@@ -199,6 +199,20 @@ function handleMsgToGame(line) {
   }
 }
 
+function handleCmdError(err) {
+  if(err) {
+    if(err.message === "response not received") {
+      channel.send("Command failed because the server is not responding. It may be frozen or loading.");
+    }
+    else if(err.message === "socket not writable") {
+      channel.send("Command failed because the bot is not connected to the server. Type 7d!info to see the current status.");
+    }
+    else {
+      channel.send(`Command failed with error "${err.message}"`);
+    }
+  }
+}
+
 function handleTime(line, msg) {
   var day = line.split(",")[0].replace("Day ","");
   var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
@@ -377,22 +391,27 @@ function parseDiscordCommand(msg, mentioned) {
     }
 
     // The following commands only work if disable-commands is OFF. (includes above conditions)
+    // TODO: Refactor
     if(!config["disable-commands"]) {
-
       // 7d!time
       if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
         Telnet.exec("gettime", (err, response) => {
-          processTelnetResponse(response, (line) => {
-            if(line.startsWith("Day")) {
-              d7dtdState.receivedData = 1;
-              handleTime(line, msg);
-            }
-          });
+          if(!err) {
+            processTelnetResponse(response, (line) => {
+              if(line.startsWith("Day")) {
+                d7dtdState.receivedData = 1;
+                handleTime(line, msg);
+              }
+            });
 
-          // Sometimes, the response doesn't have the data we're looking for...
-          if(!d7dtdState.receivedData) {
-            d7dtdState.waitingForTime = 1;
-            d7dtdState.waitingForTimeMsg = msg;
+            // Sometimes, the response doesn't have the data we're looking for...
+            if(!d7dtdState.receivedData) {
+              d7dtdState.waitingForTime = 1;
+              d7dtdState.waitingForTimeMsg = msg;
+            }
+          }
+          else {
+            handleCmdError(err);
           }
         });
       }
@@ -400,16 +419,21 @@ function parseDiscordCommand(msg, mentioned) {
       // 7d!version
       if(cmd === "VERSION" || cmd === "V") {
         Telnet.exec("version", (err, response) => {
-          processTelnetResponse(response, (line) => {
-            if(line.startsWith("Game version:")) {
-              msg.channel.send(line);
-              d7dtdState.receivedData = 1;
-            }
-          });
+          if(!err) {
+            processTelnetResponse(response, (line) => {
+              if(line.startsWith("Game version:")) {
+                msg.channel.send(line);
+                d7dtdState.receivedData = 1;
+              }
+            });
 
-          if(!d7dtdState.receivedData) {
-            d7dtdState.waitingForVersion = 1;
-            d7dtdState.waitingForVersionMsg = msg;
+            if(!d7dtdState.receivedData) {
+              d7dtdState.waitingForVersion = 1;
+              d7dtdState.waitingForVersionMsg = msg;
+            }
+          }
+          else {
+            handleCmdError(err);
           }
         });
       }
@@ -417,45 +441,55 @@ function parseDiscordCommand(msg, mentioned) {
       // 7d!players
       if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
         Telnet.exec("lp", (err, response) => {
-          processTelnetResponse(response, (line) => {
-            if(line.startsWith("Total of ")) {
-              d7dtdState.receivedData = 1;
-              handlePlayerCount(line, msg);
-            }
-          });
+          if(!err) {
+            processTelnetResponse(response, (line) => {
+              if(line.startsWith("Total of ")) {
+                d7dtdState.receivedData = 1;
+                handlePlayerCount(line, msg);
+              }
+            });
 
-          if(!d7dtdState.receivedData) {
-            d7dtdState.waitingForPlayers = 1;
-            d7dtdState.waitingForPlayersMsg = msg;
+            if(!d7dtdState.receivedData) {
+              d7dtdState.waitingForPlayers = 1;
+              d7dtdState.waitingForPlayersMsg = msg;
+            }
+          }
+          else {
+            handleCmdError(err);
           }
         });
       }
 
       //if(cmd === "PREF") {
       //  Telnet.exec("getgamepref", (err, response) => {
-      //    var str = msg.toString().toUpperCase().replace(prefix + "PREF ", "").replace(prefix + "PREF", "");
-      //    // Sometimes the "response" has more than what we're looking for.
-      //    // We have to double-check and make sure the correct line is returned.
-      //    if(typeof response !== "undefined") {
-      //      var lines = response.split("\n");
-      //      d7dtdState.receivedData = 0;
+      //    if(!err) {
+      //      var str = msg.toString().toUpperCase().replace(prefix + "PREF ", "").replace(prefix + "PREF", "");
+      //      // Sometimes the "response" has more than what we're looking for.
+      //      // We have to double-check and make sure the correct line is returned.
+      //      if(typeof response !== "undefined") {
+      //        var lines = response.split("\n");
+      //        d7dtdState.receivedData = 0;
 
-      //      final = "";
-      //      for(var i = 0; i <= lines.length-1; i++) {
-      //        var line = lines[i];
-      //        if(line.startsWith("GamePref.")) {
-      //          final = final + "\n" + line.replace("GamePref.","");
-      //          d7dtdState.receivedData = 1;
+      //        final = "";
+      //        for(var i = 0; i <= lines.length-1; i++) {
+      //          var line = lines[i];
+      //          if(line.startsWith("GamePref.")) {
+      //            final = final + "\n" + line.replace("GamePref.","");
+      //            d7dtdState.receivedData = 1;
+      //          }
       //        }
+      //        msg.author.send(final);
+      //        msg.channel.send("Server configuration has been sent to you via DM.");
+      //        // TODO: Make sure user can receive DMs before sending
       //      }
-      //      msg.author.send(final);
-      //      msg.channel.send("Server configuration has been sent to you via DM.");
-      //      // TODO: Make sure user can receive DMs before sending
-      //    }
 
-      //    if(!d7dtdState.receivedData) {
-      //      d7dtdState.waitingForPref = 1;
-      //      d7dtdState.waitingForPrefMsg = msg;
+      //      if(!d7dtdState.receivedData) {
+      //        d7dtdState.waitingForPref = 1;
+      //        d7dtdState.waitingForPrefMsg = msg;
+      //      }
+      //    }
+      //    else {
+      //      handleCmdError(err);
       //    }
       //  });
       //}
