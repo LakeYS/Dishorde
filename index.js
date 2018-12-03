@@ -147,6 +147,12 @@ function handleMsgFromGame(line) {
       if(config["log-messages"]) {
         console.log(msg);
       }
+
+      // Replace the source information
+      if(type === "Chat") {
+        msg = msg.replace(/ *\([^)]*\): */g, "");
+      }
+
       // When using a local connection, messages go through as new data rather than a response.
       // This string check is a workaround for that.
       if(msg.startsWith("'Server': [")) {
@@ -565,6 +571,9 @@ Telnet.on("data", (data) => {
   for(var i = 0; i <= lines.length-1; i++) {
     //console.log("*LINE" + " " + i + " " + lines[i]);
     var line = lines[i];
+
+    // escapeRegExp
+    lines[i] = lines[i].replace(/[.*+?^${}()|[\]\\]/g, " ");
 
     //console.log("LINE: " + line);
 
