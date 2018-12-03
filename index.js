@@ -135,7 +135,7 @@ function handleMsgFromGame(line) {
     type = type.replace(":", "");
   }
 
-  if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG:")) {
+  if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG")) {
     // Make sure the channel exists.
     if(channel !== null) {
       // Cut off the timestamp and other info
