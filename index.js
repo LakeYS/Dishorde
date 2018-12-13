@@ -569,13 +569,10 @@ Telnet.on("data", (data) => {
   }
 
   for(var i = 0; i <= lines.length-1; i++) {
-    //console.log("*LINE" + " " + i + " " + lines[i]);
     var line = lines[i];
 
     // escapeRegExp
     lines[i] = lines[i].replace(/[.*+?^${}()|[\]\\]/g, " ");
-
-    //console.log("LINE: " + line);
 
     var split = line.split(" ");
 
