@@ -4,7 +4,7 @@
 [How to Install](https://github.com/LakeYS/7DTD-Discord#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/s3vCQba) | [Website](http://lakeys.net/discord7dtd)
 ------------ | ------------- | ------------- | -------------
 
-**NOTE: Currently only partially compatible with Alpha 17.**
+**NOTE: 7DTD-Discord currently does NOT work on Alpha 17 servers. Alpha 17 support is coming soon.**
 
 7DTD-Discord is a Discord bot for 7 Days to Die. It integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
 
