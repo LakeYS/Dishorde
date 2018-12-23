@@ -148,6 +148,12 @@ function handleMsgFromGame(line) {
         console.log(msg);
       }
 
+      // For reasons unknown, sometimes messages are limited to exactly 64 characters.
+      if(line.length == 64) {
+        channel.send("Failed to parse message.");
+        return;
+      }
+
       // Replace the source information
       if(type === "Chat") {
         msg = msg.replace(/ *\([^)]*\): */g, "");
