@@ -135,6 +135,12 @@ function handleMsgFromGame(line) {
     type = type.replace(":", "");
   }
 
+  // TODO: Extra checks to make sure other lines do not leak.
+  if(d7dtdState.waitingForChatMsg) {
+    //console.log("The rest of the line: " + line);
+    d7dtdState.waitingForChatMsg = 0;
+  }
+
   if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG")) {
     // Make sure the channel exists.
     if(channel !== null) {
@@ -148,14 +154,18 @@ function handleMsgFromGame(line) {
         console.log(msg);
       }
 
-      // For reasons unknown, sometimes messages are limited to exactly 64 characters.
-      if(line.length == 64) {
-        channel.send("Failed to parse message.");
-        return;
-      }
-
       // Replace the source information
       if(type === "Chat") {
+        // For reasons unknown, sometimes messages are limited to exactly 64 characters.
+        // Time for yet another band-aid workaround: Re-combining the message before sending it.
+        if(line.length == 64) {
+          console.log("Failed to parse message.");
+          channel.send("Failed to parse message.");
+          d7dtdState.waitingForChatMsg = 1;
+
+          return;
+        }
+
         msg = msg.replace(/ *\([^)]*\): */g, "");
       }
 
