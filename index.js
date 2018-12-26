@@ -136,9 +136,11 @@ function handleMsgFromGame(line) {
   }
 
   // TODO: Extra checks to make sure other lines do not leak.
-  if(d7dtdState.waitingForChatMsg) {
-    //console.log("The rest of the line: " + line);
-    d7dtdState.waitingForChatMsg = 0;
+  if(type !== "INF" && type !== "NET" && d7dtdState.waitingForMsg) {
+    d7dtdState.waitingForMsg = 0;
+    type = "Chat"; // Manual override of type
+
+    split = d7dtdState.waitingForMsgData.concat(split);
   }
 
   if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG")) {
@@ -150,24 +152,25 @@ function handleMsgFromGame(line) {
         msg = msg + " " + split[i];
       }
 
-      if(config["log-messages"]) {
-        console.log(msg);
-      }
 
       // Replace the source information
       if(type === "Chat") {
         // For reasons unknown, sometimes messages are limited to exactly 64 characters.
         // Time for yet another band-aid workaround: Re-combining the message before sending it.
         if(line.length == 64) {
-          console.log("Failed to parse message.");
-          channel.send("Failed to parse message.");
-          d7dtdState.waitingForChatMsg = 1;
+          d7dtdState.waitingForMsg = 1;
+          d7dtdState.waitingForMsgData = split;
 
           return;
         }
 
         msg = msg.replace(/ *\([^)]*\): */g, "");
       }
+
+
+            if(config["log-messages"]) {
+              console.log(msg);
+            }
 
       // When using a local connection, messages go through as new data rather than a response.
       // This string check is a workaround for that.
