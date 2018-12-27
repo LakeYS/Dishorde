@@ -168,9 +168,9 @@ function handleMsgFromGame(line) {
       }
 
 
-            if(config["log-messages"]) {
-              console.log(msg);
-            }
+      if(config["log-messages"]) {
+        console.log(msg);
+      }
 
       // When using a local connection, messages go through as new data rather than a response.
       // This string check is a workaround for that.
