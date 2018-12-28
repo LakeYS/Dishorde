@@ -4,8 +4,6 @@
 [How to Install](https://github.com/LakeYS/7DTD-Discord#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/s3vCQba) | [Website](http://lakeys.net/discord7dtd)
 ------------ | ------------- | ------------- | -------------
 
-**NOTE: 7DTD-Discord currently does NOT work on Alpha 17 servers. Alpha 17 support is coming soon.**
-
 7DTD-Discord is a Discord bot for 7 Days to Die. It integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
 
 The bot runs as a completely separate application, so no mods are required to run it.
@@ -53,7 +51,7 @@ You may experience bugs if running older versions of the game with this bot. Her
 
 Bot Version | Game Version |
 ----------  | ----------
-v1.7 (WIP)  | Alpha 17
+v1.7        | Alpha 17
 v1.0 - v1.6 | Alpha 16.4
 
 # How to Install - Windows
@@ -67,7 +65,7 @@ v1.0 - v1.6 | Alpha 16.4
 `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Setting up the bot
-1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.6.0/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
+1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.7.0/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
 2. Install Node.js LTS from [this website](https://nodejs.org/en/download/).
 3. Once Node.js is finished installing, run install.bat in the bot's folder. This will automatically install the required modules for the bot.
 4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
@@ -105,7 +103,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 ## Setting up the bot
 1. Open a terminal on your system.
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
-3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.6.0/7DTD-Discord.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
+3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.7.0/7DTD-Discord.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
 6. Type `npm install` to install the required packages for the bot to run.
