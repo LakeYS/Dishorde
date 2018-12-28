@@ -7,4 +7,5 @@ cp install.bat 7DTD-Discord
 cp run.bat 7DTD-Discord
 cp profile.png 7DTD-Discord
 cp README.md 7DTD-Discord
+cp lib 7DTD-Discord/lib -r
 cp run_silent.vbs 7DTD-Discord
