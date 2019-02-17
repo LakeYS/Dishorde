@@ -164,6 +164,13 @@ function handleMsgFromGame(line) {
           return;
         }
 
+        var checkString = "'Global'):";
+
+        if(split[10] !== checkString && split[11] !== checkString) {
+          console.log("Non-global detected, message will not send");
+          return;
+        }
+
         msg = msg.replace(/ *\([^)]*\): */, "");
       }
 
