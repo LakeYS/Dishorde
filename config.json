@@ -15,6 +15,7 @@
   "disable-chatmsgs": false,
   "disable-join-leave-gmsgs": false,
   "disable-misc-gmsgs": false,
+  "show-private-chat": false,
   "disable-status-updates": false,
   "disable-version-check": false,
   "hide-prefix": false,

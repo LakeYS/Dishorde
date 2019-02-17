@@ -152,7 +152,6 @@ function handleMsgFromGame(line) {
         msg = msg + " " + split[i];
       }
 
-
       // Replace the source information
       if(type === "Chat") {
         // For reasons unknown, sometimes messages are limited to exactly 64 characters.
@@ -164,16 +163,20 @@ function handleMsgFromGame(line) {
           return;
         }
 
+        msg = msg.replace(/ *\([^)]*\): */, "");
+
         var checkString = "'Global'):";
 
         if(split[10] !== checkString && split[11] !== checkString) {
-          console.log("Non-global detected, message will not send");
-          return;
+          if(config["show-private-chat"]) {
+            msg = `*(Private)* ${msg}`;
+          }
+          else {
+            return;
+          }
         }
 
-        msg = msg.replace(/ *\([^)]*\): */, "");
       }
-
 
       if(config["log-messages"]) {
         console.log(msg);
