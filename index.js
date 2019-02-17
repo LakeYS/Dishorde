@@ -164,7 +164,7 @@ function handleMsgFromGame(line) {
           return;
         }
 
-        msg = msg.replace(/ *\([^)]*\): */g, "");
+        msg = msg.replace(/ *\([^)]*\): */, "");
       }
 
 
