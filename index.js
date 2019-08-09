@@ -644,7 +644,8 @@ Telnet.on("data", (data) => {
 });
 
 Telnet.on("error", (error) => {
-  console.log(`An error occurred while connecting to the game:\n${error.message}`);
+  var errMsg = error.message || error;
+  console.log(`An error occurred while connecting to the game:\n${errMsg}`);
   //d7dtdState.lastTelnetErr = data.message;
 
   updateDiscordStatus(-1);
