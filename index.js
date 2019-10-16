@@ -580,6 +580,11 @@ Telnet.on("close", () => {
 
 Telnet.on("data", (data) => {
   data = data.toString();
+
+  if(config["debug-mode"]) {
+    console.log("[DEBUG] Buffer length: " + data.length + "; Buffer dump: " + data);
+  }
+
   var lines = data.split("\n");
 
   if(config["log-telnet"]) {
