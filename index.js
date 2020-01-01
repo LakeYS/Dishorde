@@ -404,7 +404,7 @@ function parseDiscordCommand(msg, mentioned) {
         statusMsg = ":white_circle: Connecting...";
         break;
       case 1:
-        statusMsg = ":blue_circle: Online";
+        statusMsg = ":green_circle: Online";
         break;
       }
 
