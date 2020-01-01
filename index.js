@@ -415,7 +415,7 @@ function parseDiscordCommand(msg, mentioned) {
       }
 
 
-      var string = `Server connection: ${statusMsg}${cmdString}\n\n*7DTD-Discord v${pjson.version} - http://lakeys.net/discord7dtd - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}.*`;
+      var string = `Server connection: ${statusMsg}${cmdString}\n\n*7DTD-Discord v${pjson.version} - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}.*`;
       msg.channel.send({embed: {
         description: string
       }})
