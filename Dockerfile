@@ -2,7 +2,7 @@ FROM node:12-stretch-slim
 
 WORKDIR /bot
 
-ADD . /bot
+COPY . /bot
 
 RUN mkdir /data
 RUN npm install
