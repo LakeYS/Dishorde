@@ -106,7 +106,9 @@ You can use a docker container to run the bot.
 
 You have to replace PATH_TO_CONFIG with a directory containing your version of the [./config.json] file.
 
-Note: If you are using docker to run the actual 7 days to die server, consider making a docker network to share ports.
+Networking: 
+If you are using docker to run the actual 7 days to die server, consider making a docker network to share ports.
+If you are running the server locally, you should use the --net="host" option or otherwise forward the telnet port into the container.
 
 
 ## Setting up the bot
