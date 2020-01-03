@@ -104,7 +104,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 You can use a docker container to run the bot. 
 `docker run --restart="always" -v PATH_TO_CONFIG:/data -d thaelah/7days-to-die-discord`
 
-You have to replace PATH_TO_CONFIG with a directory containing your version of the [./config.json] file.
+You have to replace PATH_TO_CONFIG with a directory containing your version of the [config.json](./config.json) file.
 
 Networking: 
 If you are using docker to run the actual 7 days to die server, consider making a docker network to share ports.
