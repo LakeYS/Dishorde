@@ -115,7 +115,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 4. Under "Token" click the link that says "Click to Reveal Token". This is the password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open.
 5. Paste the URL below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
-`https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+`https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Configuring the bot
 1. On your server's system, navigate to the game's directory and edit your the config xml file.
