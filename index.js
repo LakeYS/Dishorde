@@ -135,14 +135,6 @@ function handleMsgFromGame(line) {
     type = type.replace(":", "");
   }
 
-  // TODO: Extra checks to make sure other lines do not leak.
-  if(type !== "INF" && type !== "NET" && d7dtdState.waitingForMsg) {
-    d7dtdState.waitingForMsg = 0;
-    type = "Chat"; // Manual override of type
-
-    split = d7dtdState.waitingForMsgData.concat(split);
-  }
-
   if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG")) {
     // Make sure the channel exists.
     if(channel !== null) {
@@ -154,15 +146,6 @@ function handleMsgFromGame(line) {
 
       // Replace the source information
       if(type === "Chat") {
-        // For reasons unknown, sometimes messages are limited to exactly 64 characters.
-        // Time for yet another band-aid workaround: Re-combining the message before sending it.
-        if(line.length == 64) {
-          d7dtdState.waitingForMsg = 1;
-          d7dtdState.waitingForMsgData = split;
-
-          return;
-        }
-
         msg = msg.replace(/ *\([^)]*\): */, "");
 
         var checkString = "'Global'):";
@@ -567,6 +550,9 @@ Telnet.on("failedlogin", () => {
 Telnet.on("close", () => {
   console.log("Connection to game closed.");
 
+  // Empty the cache.
+  d7dtdState.data = "";
+
   // If there is no error, update status to 'No connection'
   if(d7dtdState.connStatus !== -1) {
     updateDiscordStatus(0);
@@ -579,10 +565,24 @@ Telnet.on("close", () => {
 });
 
 Telnet.on("data", (data) => {
-  data = data.toString();
+  data = d7dtdState.data + data.toString();
 
   if(config["debug-mode"]) {
     console.log("[DEBUG] Buffer length: " + data.length + "; Buffer dump: " + data);
+  }
+
+  if(data.endsWith("\n")) {
+    d7dtdState.data = ""; // Clear the existing data cache.
+
+    console.log("Received fill, complete string: " + data);
+  }
+  else {
+    console.log("Filling the data cache with " + data);
+    // Fill the cache to be completed on the next "data" call.
+    d7dtdState.data = d7dtdState.data + data;
+
+    // Await further information.
+    return;
   }
 
   var lines = data.split("\n");
