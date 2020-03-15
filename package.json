@@ -11,7 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^11.6.2",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "semver-compare": "^1.0.0",
     "telnet-client": "^0.15.8"
   }
