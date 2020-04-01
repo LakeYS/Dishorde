@@ -573,11 +573,8 @@ Telnet.on("data", (data) => {
 
   if(data.endsWith("\n")) {
     d7dtdState.data = ""; // Clear the existing data cache.
-
-    console.log("Received fill, complete string: " + data);
   }
   else {
-    console.log("Filling the data cache with " + data);
     // Fill the cache to be completed on the next "data" call.
     d7dtdState.data = d7dtdState.data + data;
 
