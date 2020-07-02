@@ -8,6 +8,8 @@
 
 The bot runs as a completely separate application, so no mods are required to run it.
 
+**This has tested well with the experimental Alpha 19 builds so far, but if you encounter any problems, feel free to open an issue.**
+
 **See below for download links instructions on how to install the bot. Dedicated servers on PC only.**
 
 # How it Works
