@@ -686,6 +686,7 @@ if(!config["skip-discord-auth"]) {
 
     if(!channel && !skipChannelCheck) {
       console.log("\x1b[33mERROR: Failed to identify channel with ID '" + channelid + "'\x1b[0m");
+      config.channel = "channelid";
     }
 
     // Wait until the Discord client is ready before connecting to the game.
