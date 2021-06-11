@@ -137,7 +137,7 @@ function handleMsgFromGame(line) {
 
   if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG")) {
     // Make sure the channel exists.
-    if(channel !== null) {
+    if(typeof channel !== "undefined") {
       // Cut off the timestamp and other info
       var msg = split[4];
       for(var i = 5; i <= split.length-1; i++) {
@@ -250,19 +250,27 @@ function handlePlayerCount(line, msg) {
 function updateDiscordStatus(status) {
   if(!config["disable-status-updates"]) {
     if(status === 0 && d7dtdState.connStatus !== 0) {
-      client.user.setActivity(`Connecting... | Type ${prefix}info`);
-      client.user.setStatus("dnd");
+      client.user.setPresence({ 
+        activity: { name: `Connecting... | Type ${prefix}info` },
+        status: "dnd"
+      });
     } else if(status === -1 && d7dtdState.connStatus !== -1) {
-      client.user.setActivity(`Error | Type ${prefix}help`);
-      client.user.setStatus("dnd");
+      client.user.setPresence({ 
+        activity: { name: `Error | Type ${prefix}help` },
+        status: "dnd"
+      });
     } else if(status === 1 && d7dtdState.connStatus !== 1) {
       if(typeof config.channel === "undefined" || config.channel === "channelid") {
-        client.user.setActivity(`No channel | Type ${prefix}setchannel`);
-        client.user.setStatus("idle");
+        client.user.setPresence({ 
+          activity: { name: `No channel | Type ${prefix}setchannel` },
+          status: "idle"
+        });
       }
       else {
-        client.user.setActivity(`7DTD | Type ${prefix}help`);
-        client.user.setStatus("online");
+        client.user.setPresence({ 
+          activity: { name: `7DTD | Type ${prefix}help` },
+          status: "online"
+        });
       }
     }
 
@@ -309,7 +317,8 @@ function parseDiscordCommand(msg, mentioned) {
 
   // 7d!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
-    if(msg.channel.type === "text" && channel !== null?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
+    var channelExists = (typeof channel !== "undefined");
+    if(msg.channel.type === "text" && channelExists?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
       console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
       var str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
       var id = str.replace("<#","").replace(">","");
@@ -320,15 +329,15 @@ function parseDiscordCommand(msg, mentioned) {
         channelobj = msg.channel;
       }
       else {
-        channelobj = client.channels.find((channelobj) => (channelobj.id === id));
+        channelobj = client.channels.cache.find((channelobj) => (channelobj.id === id));
       }
 
-      if(channel !== null && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
+      if(typeof channel !== "undefined" && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
         msg.channel.send(":warning: This channel is already set as the bot's active channel!");
         return;
       }
 
-      if(channelobj !== null) {
+      if(typeof channelobj !== "undefined") {
         channel = channelobj;
         channelid = channel.id;
 
@@ -674,15 +683,15 @@ if(!config["skip-discord-auth"]) {
     }
 
 
-    if(client.guilds.size === 0) {
+    if(client.guilds.cache.size === 0) {
       console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
     }
 
-    if(client.guilds.size > 1) {
+    if(client.guilds.cache.size > 1) {
       console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
     }
 
-    channel = client.channels.find((channel) => (channel.id === channelid));
+    channel = client.channels.cache.find((channel) => (channel.id === channelid));
 
     if(!channel && !skipChannelCheck) {
       console.log("\x1b[33mERROR: Failed to identify channel with ID '" + channelid + "'\x1b[0m");
@@ -752,7 +761,7 @@ process.stdin.on("data", (text) => {
     console.log("This is the console for the Discord bot. It currently only accepts JavaScript commands for advanced users. Type 'exit' to shut it down.");
   }
   else if(text.toString() === "leaveguilds\r\n" || text.toString() === "leaveguilds\n") {
-    client.guilds.forEach((guild) => {
+    client.guilds.cache.forEach((guild) => {
       console.log("Leaving guild \"" + guild.name + "\"");
       guild.leave();
     });
