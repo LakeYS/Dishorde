@@ -778,6 +778,7 @@ process.on("exit",  () => {
 
 process.on("unhandledRejection", (err) => {
   if(!config["skip-discord-auth"]) {
+    console.log(err.stack);
     console.log("Unhandled rejection: '" + err.message + "'. Attempting to reconnect...");
     client.destroy();
     setTimeout(() => { client.login(token); }, 6000);
