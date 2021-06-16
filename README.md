@@ -18,9 +18,11 @@ This script works by connecting to your server's console and monitoring it for c
 # Development and Support
 I will continue to keep this project up-to-date with new features and fixes whenever possible. If running v1.3.0 or higher, notifications for updates are displayed in the terminal.
 
-For support, questions, and comments, you can join the Discord server or contact me directly at contact@LakeYS.net. You can also [submit an issue](https://github.com/LakeYS/7DTD-Discord/issues/new) for bugs and support.
+For support, questions, and comments, you can join the Discord server, or [submit an issue](https://github.com/LakeYS/7DTD-Discord/issues/new) for bugs and support.
 
 For developers: If you are interested in helping out, [GitHub pull requests](https://help.github.com/articles/about-pull-requests/) are welcome and greatly appreciated.
+
+For business inquiries, contact: contact@lakeys.net
 
 # Commands
 Commands can be sent via DM or in the specified chat channel.
