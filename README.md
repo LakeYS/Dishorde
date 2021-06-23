@@ -48,14 +48,6 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 
 - `skip-discord-auth` - The bot will not log in to Discord.
 
-# Compatibility
-You may experience bugs if running older versions of the game with this bot. Here are the versions used to develop the bot:
-
-Bot Version | Game Version |
-----------  | ----------
-v1.7        | Alpha 17
-v1.0 - v1.6 | Alpha 16.4
-
 # How to Install - Windows
 ## Creating the bot account
 1. Log in to the [Discord Developer Portal](https://discordapp.com/developers/applications/) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
@@ -90,11 +82,6 @@ You may want to create a shortcut to run.bat or run_silent.vbs in your Startup f
 
 
 # How to Install - Linux
-## Android Devices
-The bot can be installed on Android devices using the [Termux](https://play.google.com/store/apps/details?id=com.termux&hl=en) app. Once installed, enter `apt update` and `apt install nodejs curl`. Then, proceed with the installation as a Linux system. You may need access to a desktop computer in order to create the bot account.
-
-*Warning: For security purposes, please avoid running this bot on an unsecured network (such as public wi-fi).*
-
 ## Raspberry Pi/Raspbian OS Setup
 The bot can be run from a Raspberry Pi device by installing NodeJS. You may need access to a desktop computer in order to create the bot account.
 
