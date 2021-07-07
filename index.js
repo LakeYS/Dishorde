@@ -318,52 +318,57 @@ function parseDiscordCommand(msg, mentioned) {
   // 7d!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
     var channelExists = (typeof channel !== "undefined");
-    if(msg.channel.type === "text" && channelExists?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
-      console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-      var str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
-      var id = str.replace("<#","").replace(">","");
 
-      // If blank str, use active channel.
-      var channelobj;
-      if(id === prefix + "SETCHANNEL") {
-        channelobj = msg.channel;
-      }
-      else {
-        channelobj = client.channels.cache.find((channelobj) => (channelobj.id === id));
-      }
+    if(!channelExists || msg.channel.type !== "text") {
+      return;
+    }
 
-      if(typeof channel !== "undefined" && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
-        msg.channel.send(":warning: This channel is already set as the bot's active channel!");
-        return;
-      }
+    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+      msg.author.send("You do not have permission to do this. (setchannel)");
+      return;
+    }
 
-      if(typeof channelobj !== "undefined") {
-        channel = channelobj;
-        channelid = channel.id;
+    console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
+    var str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
+    var id = str.replace("<#","").replace(">","");
 
-        config.channel = channelid;
-
-        fs.writeFile(configFile, JSON.stringify(config, null, "\t"), "utf8", (err) => {
-          if(err) {
-            console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
-            msg.channel.send(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
-            d7dtdState.setChannelError = err;
-          }
-          else {
-            d7dtdState.setChannelError = void 0;
-            msg.channel.send(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
-          }
-        });
-
-        refreshDiscordStatus();
-      }
-      else {
-        msg.channel.send(":x: Failed to identify the channel you specified.");
-      }
+    // If blank str, use active channel.
+    var channelobj;
+    if(id === prefix + "SETCHANNEL") {
+      channelobj = msg.channel;
     }
     else {
-      msg.author.send("You do not have permission to do this. (setchannel)");
+      channelobj = client.channels.cache.find((channelobj) => (channelobj.id === id));
     }
+
+    if(typeof channel !== "undefined" && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
+      msg.channel.send(":warning: This channel is already set as the bot's active channel!");
+      return;
+    }
+
+    if(typeof channelobj === "undefined") {
+      msg.channel.send(":x: Failed to identify the channel you specified.");
+      return;
+    }
+
+    channel = channelobj;
+    channelid = channel.id;
+
+    config.channel = channelid;
+
+    fs.writeFile(configFile, JSON.stringify(config, null, "\t"), "utf8", (err) => {
+      if(err) {
+        console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
+        msg.channel.send(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
+        d7dtdState.setChannelError = err;
+      }
+      else {
+        d7dtdState.setChannelError = void 0;
+        msg.channel.send(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
+      }
+    });
+
+    refreshDiscordStatus();
   }
 
   // 7d!exec
