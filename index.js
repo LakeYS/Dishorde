@@ -668,9 +668,17 @@ Telnet.on("error", (error) => {
   updateDiscordStatus(-1);
 });
 
+function doLogin() {
+  client.login(token)
+  .catch((error) => {
+    // We want the error event to trigger if this part fails.
+    client.emit("error", error);
+  });
+}
+
 var firstLogin;
 if(!config["skip-discord-auth"]) {
-  client.login(token);
+  doLogin();
 
   client.on("ready", () => {
     if(firstLogin !== 1) {
@@ -711,34 +719,25 @@ if(!config["skip-discord-auth"]) {
     }
   });
 
-  client.on("disconnect", (event) => {
-    if(event.code !== 1000) {
-      console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + ").");
+  client.on("error", (error) => {
+  console.log("Discord client disconnected with reason: " + error);
 
-      if(event.code === 4004) {
-        if(token === "your_token_here") {
-          console.log("It appears that you have not yet added a token. Please replace \"your_token_here\" with a valid token in the config file.");
-        }
-        else if(token.length < 50) {
-          console.log("It appears that you have entered a client secret or other invalid string. Please ensure that you have entered a bot token and try again.");
-        }
-        else {
-          console.log("Please double-check the configured token and try again.");
-        }
-        process.exit();
-        return;
+    if(error.code === "TOKEN_INVALID") {
+      if(token === "your_token_here") {
+        console.log("It appears that you have not yet added a token. Please replace \"your_token_here\" with a valid token in the config file.");
       }
-
-      console.log("Attempting to reconnect in 6s...");
-      setTimeout(() => { client.login(token); }, 6000);
+      else if(token.length < 50) {
+        console.log("It appears that you have entered a client secret or other invalid string. Please ensure that you have entered a bot token and try again.");
+      }
+      else {
+        console.log("Please double-check the configured token and try again.");
+      }
+      process.exit();
+      return;
     }
-  });
 
-  client.on("error", (err) => {
-    console.log(`Discord client error '${err.code}' (${err.message}). Attempting to reconnect in 6s...`);
-
-    client.destroy();
-    setTimeout(() => { client.login(config.token); }, 6000);
+    console.log("Attempting to reconnect in 6s...");
+    setTimeout(() => { doLogin() }, 6000);
   });
 
   client.on("message", (msg) => {
@@ -797,6 +796,6 @@ process.on("unhandledRejection", (err) => {
     console.log(err.stack);
     console.log("Unhandled rejection: '" + err.message + "'. Attempting to reconnect...");
     client.destroy();
-    setTimeout(() => { client.login(token); }, 6000);
+    setTimeout(() => { doLogin(); }, 6000);
   }
 });
