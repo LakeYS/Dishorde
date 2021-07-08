@@ -1,11 +1,11 @@
 #!/bin/sh
-mkdir 7DTD-Discord
-cp config.json 7DTD-Discord
-cp package.json 7DTD-Discord
-cp index.js 7DTD-Discord
-cp install.bat 7DTD-Discord
-cp run.bat 7DTD-Discord
-cp profile.png 7DTD-Discord
-cp README.md 7DTD-Discord
-cp lib 7DTD-Discord/lib -r
-cp run_silent.vbs 7DTD-Discord
+mkdir Dishorde
+cp config.json Dishorde
+cp package.json Dishorde
+cp index.js Dishorde
+cp install.bat Dishorde
+cp run.bat Dishorde
+cp profile.png Dishorde
+cp README.md Dishorde
+cp lib Dishorde/lib -r
+cp run_silent.vbs Dishorde
