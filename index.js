@@ -373,18 +373,19 @@ function parseDiscordCommand(msg, mentioned) {
 
   // 7d!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
-  if(config["allow-exec-command"] === true)
-  {
-    if(cmd.startsWith("EXEC")) {
-      if(msg.channel.type === "text" && msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild) {
-        console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-        var execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
-        Telnet.exec(execStr);
-      }
-      else {
-        msg.author.send("You do not have permission to do this. (exec)");
-      }
+  if(cmd.startsWith("EXEC")) {
+    if(msg.channel.type !== "text" || !config["allow-exec-command"]) {
+      return;
     }
+
+    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+      msg.author.send("You do not have permission to do this. (exec)");
+      return;
+    }
+
+    console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
+    var execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
+    Telnet.exec(execStr);
   }
 
   // The following commands only work in the specified channel if one is set.
