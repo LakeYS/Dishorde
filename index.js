@@ -127,6 +127,13 @@ const configPrivate = {
 require("./lib/init.js")(pjson, config, configPrivate);
 
 ////// # Functions # //////
+function sanitizeMsg(msg) {
+  // Replace @everyone and @here
+  msg = msg.replace(/\@everyone|@here|<@.*>/g, "\`\$&\`");
+
+  return msg;
+}
+
 function handleMsgFromGame(line) {
   var split = line.split(" ");
   var type = split[3];
@@ -194,7 +201,12 @@ function handleMsgFromGame(line) {
         }
       }
 
-      channel.send(msg);
+      var msg = sanitizeMsg(msg);
+
+      // If we didn't filter the message down to nothing, send it.
+      if(msg !== "") {
+        channel.send(msg);
+      }
     }
   }
 }
