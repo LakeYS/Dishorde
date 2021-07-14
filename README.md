@@ -1,5 +1,4 @@
 # 7 Days to Die Discord Integration
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d343cf10ae934d9186f0914c977c05a2)](https://www.codacy.com/app/Lake/7DTD-Discord?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=LakeYS/7DTD-Discord&amp;utm_campaign=Badge_Grade)
 
 [How to Install](https://github.com/LakeYS/7DTD-Discord#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/s3vCQba) | [Website](http://lakeys.net/discord7dtd)
 ------------ | ------------- | ------------- | -------------
