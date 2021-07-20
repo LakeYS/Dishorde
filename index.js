@@ -124,6 +124,13 @@ const configPrivate = {
 require("./lib/init.js")(pjson, config, configPrivate);
 
 ////// # Functions # //////
+function sanitizeMsg(msg) {
+  // Replace @everyone and @here
+  msg = msg.replace(/\@everyone|@here|<@.*>/g, "\`\$&\`");
+
+  return msg;
+}
+
 function handleMsgFromGame(line) {
   var split = line.split(" ");
   var type = split[3];
@@ -191,7 +198,12 @@ function handleMsgFromGame(line) {
         }
       }
 
-      channel.send(msg);
+      var msg = sanitizeMsg(msg);
+
+      // If we didn't filter the message down to nothing, send it.
+      if(msg !== "") {
+        channel.send(msg);
+      }
     }
   }
 }
@@ -315,68 +327,74 @@ function parseDiscordCommand(msg, mentioned) {
   // 7d!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
     var channelExists = (typeof channel !== "undefined");
-    if(msg.channel.type === "text" && channelExists?(msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild):1) {
-      console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-      var str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
-      var id = str.replace("<#","").replace(">","");
 
-      // If blank str, use active channel.
-      var channelobj;
-      if(id === prefix + "SETCHANNEL") {
-        channelobj = msg.channel;
-      }
-      else {
-        channelobj = client.channels.cache.find((channelobj) => (channelobj.id === id));
-      }
+    if(!channelExists || msg.channel.type !== "text") {
+      return;
+    }
 
-      if(typeof channel !== "undefined" && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
-        msg.channel.send(":warning: This channel is already set as the bot's active channel!");
-        return;
-      }
+    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+      msg.author.send("You do not have permission to do this. (setchannel)");
+      return;
+    }
 
-      if(typeof channelobj !== "undefined") {
-        channel = channelobj;
-        channelid = channel.id;
+    console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
+    var str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
+    var id = str.replace("<#","").replace(">","");
 
-        config.channel = channelid;
-
-        fs.writeFile(configFile, JSON.stringify(config, null, "\t"), "utf8", (err) => {
-          if(err) {
-            console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
-            msg.channel.send(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
-            d7dtdState.setChannelError = err;
-          }
-          else {
-            d7dtdState.setChannelError = void 0;
-            msg.channel.send(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
-          }
-        });
-
-        refreshDiscordStatus();
-      }
-      else {
-        msg.channel.send(":x: Failed to identify the channel you specified.");
-      }
+    // If blank str, use active channel.
+    var channelobj;
+    if(id === prefix + "SETCHANNEL") {
+      channelobj = msg.channel;
     }
     else {
-      msg.author.send("You do not have permission to do this. (setchannel)");
+      channelobj = client.channels.cache.find((channelobj) => (channelobj.id === id));
     }
+
+    if(typeof channel !== "undefined" && channelobj.id === channel.id && typeof d7dtdState.setChannelError == "undefined") {
+      msg.channel.send(":warning: This channel is already set as the bot's active channel!");
+      return;
+    }
+
+    if(typeof channelobj === "undefined") {
+      msg.channel.send(":x: Failed to identify the channel you specified.");
+      return;
+    }
+
+    channel = channelobj;
+    channelid = channel.id;
+
+    config.channel = channelid;
+
+    fs.writeFile(configFile, JSON.stringify(config, null, "\t"), "utf8", (err) => {
+      if(err) {
+        console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
+        msg.channel.send(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
+        d7dtdState.setChannelError = err;
+      }
+      else {
+        d7dtdState.setChannelError = void 0;
+        msg.channel.send(":white_check_mark: The channel has been successfully set to <#" + channelobj.id + "> (" + channelobj.id + ")");
+      }
+    });
+
+    refreshDiscordStatus();
   }
 
   // 7d!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
-  if(config["allow-exec-command"] === true)
-  {
-    if(cmd.startsWith("EXEC")) {
-      if(msg.channel.type === "text" && msg.member.permissions.has("MANAGE_GUILD") && msg.guild === channel.guild) {
-        console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-        var execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
-        Telnet.exec(execStr);
-      }
-      else {
-        msg.author.send("You do not have permission to do this. (exec)");
-      }
+  if(cmd.startsWith("EXEC")) {
+    if(msg.channel.type !== "text" || !config["allow-exec-command"]) {
+      return;
     }
+
+    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+      msg.author.send("You do not have permission to do this. (exec)");
+      return;
+    }
+
+    console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
+    var execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
+    Telnet.exec(execStr);
   }
 
   // The following commands only work in the specified channel if one is set.
@@ -659,9 +677,17 @@ Telnet.on("error", (error) => {
   updateDiscordStatus(-1);
 });
 
+function doLogin() {
+  client.login(token)
+  .catch((error) => {
+    // We want the error event to trigger if this part fails.
+    client.emit("error", error);
+  });
+}
+
 var firstLogin;
 if(!config["skip-discord-auth"]) {
-  client.login(token);
+  doLogin();
 
   client.on("ready", () => {
     if(firstLogin !== 1) {
@@ -702,34 +728,25 @@ if(!config["skip-discord-auth"]) {
     }
   });
 
-  client.on("disconnect", (event) => {
-    if(event.code !== 1000) {
-      console.log("Discord client disconnected with reason: " + event.reason + " (" + event.code + ").");
+  client.on("error", (error) => {
+  console.log("Discord client disconnected with reason: " + error);
 
-      if(event.code === 4004) {
-        if(token === "your_token_here") {
-          console.log("It appears that you have not yet added a token. Please replace \"your_token_here\" with a valid token in the config file.");
-        }
-        else if(token.length < 50) {
-          console.log("It appears that you have entered a client secret or other invalid string. Please ensure that you have entered a bot token and try again.");
-        }
-        else {
-          console.log("Please double-check the configured token and try again.");
-        }
-        process.exit();
-        return;
+    if(error.code === "TOKEN_INVALID") {
+      if(token === "your_token_here") {
+        console.log("It appears that you have not yet added a token. Please replace \"your_token_here\" with a valid token in the config file.");
       }
-
-      console.log("Attempting to reconnect in 6s...");
-      setTimeout(() => { client.login(token); }, 6000);
+      else if(token.length < 50) {
+        console.log("It appears that you have entered a client secret or other invalid string. Please ensure that you have entered a bot token and try again.");
+      }
+      else {
+        console.log("Please double-check the configured token and try again.");
+      }
+      process.exit();
+      return;
     }
-  });
 
-  client.on("error", (err) => {
-    console.log(`Discord client error '${err.code}' (${err.message}). Attempting to reconnect in 6s...`);
-
-    client.destroy();
-    setTimeout(() => { client.login(config.token); }, 6000);
+    console.log("Attempting to reconnect in 6s...");
+    setTimeout(() => { doLogin() }, 6000);
   });
 
   client.on("message", (msg) => {
@@ -788,6 +805,6 @@ process.on("unhandledRejection", (err) => {
     console.log(err.stack);
     console.log("Unhandled rejection: '" + err.message + "'. Attempting to reconnect...");
     client.destroy();
-    setTimeout(() => { client.login(token); }, 6000);
+    setTimeout(() => { doLogin(); }, 6000);
   }
 });
