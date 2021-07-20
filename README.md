@@ -1,6 +1,6 @@
 # Dishorde - 7 Days to Die Discord Integration
 
-[How to Install](https://github.com/LakeYS/7DTD-Discord#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/s3vCQba) | [Website](http://lakeys.net/discord7dtd)
+[How to Install](https://github.com/LakeYS/Dishorde#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/s3vCQba) | [Website](http://lakeys.net/dishorde)
 ------------ | ------------- | ------------- | -------------
 
 Dishorde is a Discord bridge bot for 7 Days to Die. It integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
@@ -15,7 +15,7 @@ This script works by connecting to your server's console and monitoring it for c
 # Development and Support
 I will continue to keep this project up-to-date with new features and fixes whenever possible. If running v1.3.0 or higher, notifications for updates are displayed in the terminal.
 
-For support, questions, and comments, you can join the Discord server, or [submit an issue](https://github.com/LakeYS/7DTD-Discord/issues/new) for bugs and support.
+For support, questions, and comments, you can join the Discord server, or [submit an issue](https://github.com/LakeYS/Dishorde/issues/new) for bugs and support.
 
 For developers: If you are interested in helping out, [GitHub pull requests](https://help.github.com/articles/about-pull-requests/) are welcome and greatly appreciated.
 
@@ -58,7 +58,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Setting up the bot
-1. [Download](https://github.com/LakeYS/7DTD-Discord/releases/download/v1.7.3/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
+1. [Download](https://github.com/LakeYS/Dishorde/releases/download/v1.7.3/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
 2. Install Node.js LTS from [this website](https://nodejs.org/en/download/).
 3. Once Node.js is finished installing, run install.bat in the bot's folder. This will automatically install the required modules for the bot.
 4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
@@ -70,7 +70,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 Once you complete all of this, you will be able to run the bot by opening run.bat. If you've done all of this correctly, you will see the following in the terminal:
 `Connected to game. Connected to 1 Discord Servers.`
 
-To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
+To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/Dishorde/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
 
 
 Note that if you close this terminal the bot will be disconnected. The bot can be run in the background with no terminal by opening run_silent.vbs.
@@ -91,7 +91,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 ## Setting up the bot
 1. Open a terminal on your system.
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
-3. Type `curl -L https://github.com/LakeYS/7DTD-Discord/releases/download/v1.7.3/7DTD-Discord.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
+3. Type `curl -L https://github.com/LakeYS/Dishorde/releases/download/v1.7.3/7DTD-Discord.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
 6. Type `npm install` to install the required packages for the bot to run.
@@ -117,4 +117,4 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 Once you complete all of this, you will be able to run the bot by executing run.sh (Navigate to the bot's directory and enter `./run.sh`). If you've done all of this correctly, you will see the following:
 `Connected to game. Connected to 1 Discord Servers.`
 
-To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/7DTD-Discord/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
+To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/Dishorde/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
