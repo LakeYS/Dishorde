@@ -5,16 +5,14 @@
 
 Dishorde is a Discord bridge bot for 7 Days to Die. It integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
 
-The bot runs as a completely separate application, so no mods are required to run it.
+Dishorde runs as a completely separate application, so no mods are required to run it.
 
 **See below for download links instructions on how to install the bot. Dedicated servers on PC only.**
 
 # How it Works
-This script works by connecting to your server's console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
+Dishorde works by connecting to your server's console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
 
 # Development and Support
-I will continue to keep this project up-to-date with new features and fixes whenever possible. If running v1.3.0 or higher, notifications for updates are displayed in the terminal.
-
 For support, questions, and comments, you can join the Discord server, or [submit an issue](https://github.com/LakeYS/Dishorde/issues/new) for bugs and support.
 
 For developers: If you are interested in helping out, [GitHub pull requests](https://help.github.com/articles/about-pull-requests/) are welcome and greatly appreciated.
@@ -49,13 +47,13 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 
 # How to Install - Windows
 ## Creating the bot account
-1. Log in to the [Discord Developer Portal](https://discordapp.com/developers/applications/) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
+1. Log in to the [Discord Developer Portal](https://discord.com/developers) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
 2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Now you can set an avatar for your bot if desired.
 3. Once your bot is created, find the switch that is labeled "Public bot". Make sure that this is **OFF**. Click "Save Changes" to confirm.
 4. Under "Token" click the link that says "Click to Reveal Token". This is the password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open.
 5. Paste the URL below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
-`https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+`https://discord.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Setting up the bot
 1. [Download](https://github.com/LakeYS/Dishorde/releases/download/v1.7.3/7DTD-Discord.zip) this repository and extract it somewhere on your server's system.
@@ -97,13 +95,13 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 6. Type `npm install` to install the required packages for the bot to run.
 
 ## Creating the bot account
-1. Log in to the [Discord Developer Portal](https://discordapp.com/developers/applications/) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
+1. Log in to the [Discord Developer Portal](https://discord.com/developers) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
 2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Now you can set an avatar for your bot if desired.
 3. Once your bot is created, find the switch that is labeled "Public bot". Make sure that this is **OFF**. Click "Save Changes" to confirm.
 4. Under "Token" click the link that says "Click to Reveal Token". This is the password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open.
 5. Paste the URL below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
-`https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+`https://discord.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
 
 ## Configuring the bot
 1. On your server's system, navigate to the game's directory and edit your the config xml file.
