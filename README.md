@@ -9,6 +9,10 @@ Dishorde runs as a completely separate application, so no mods are required to r
 
 **See below for download links instructions on how to install the bot. Dedicated servers on PC only.**
 
+# Sponsors
+| [Your Organization Here!](https://github.com/LakeYS/Dishorde) | Your organization could be listed here! Visit the [Sponsors Page](https://github.com/sponsors/LakeYS) or e-mail contact@lakeys.net for more information about becoming a sponsor. |
+| ------------ | ------------- |
+
 # How it Works
 Dishorde works by connecting to your server's console and monitoring it for chat messages. Messages are relayed to and from the server using Discord, allowing for communication between in-game players and Discord users.
 
