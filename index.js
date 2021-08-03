@@ -117,7 +117,7 @@ if(config["allow-exec-command"] === true) {
 ////// # Init/Version Check # //////
 const configPrivate = {
   githubAuthor: "LakeYS",
-  githubName: "7DTD-Discord",
+  githubName: "Dishorde",
   socketPort: 7383
 };
 
