@@ -2,6 +2,7 @@ const minimist = require("minimist");
 const fs = require("fs");
 var TelnetClient = require("telnet-client");
 const pjson = require("./package.json");
+const Discord = require("discord.js");
 
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
 console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
@@ -106,7 +107,6 @@ else {
 }
 
 // Load the Discord client
-const Discord = require("discord.js");
 const client = new Discord.Client();
 
 // 7d!exec command
@@ -198,7 +198,7 @@ function handleMsgFromGame(line) {
         }
       }
 
-      var msg = sanitizeMsg(msg);
+      msg = sanitizeMsg(msg);
 
       // If we didn't filter the message down to nothing, send it.
       if(msg !== "") {
@@ -679,10 +679,10 @@ Telnet.on("error", (error) => {
 
 function doLogin() {
   client.login(token)
-  .catch((error) => {
+    .catch((error) => {
     // We want the error event to trigger if this part fails.
-    client.emit("error", error);
-  });
+      client.emit("error", error);
+    });
 }
 
 var firstLogin;
@@ -729,7 +729,7 @@ if(!config["skip-discord-auth"]) {
   });
 
   client.on("error", (error) => {
-  console.log("Discord client disconnected with reason: " + error);
+    console.log("Discord client disconnected with reason: " + error);
 
     if(error.code === "TOKEN_INVALID") {
       if(token === "your_token_here") {
@@ -742,11 +742,10 @@ if(!config["skip-discord-auth"]) {
         console.log("Please double-check the configured token and try again.");
       }
       process.exit();
-      return;
     }
 
     console.log("Attempting to reconnect in 6s...");
-    setTimeout(() => { doLogin() }, 6000);
+    setTimeout(() => { doLogin(); }, 6000);
   });
 
   client.on("message", (msg) => {
