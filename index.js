@@ -707,11 +707,11 @@ if(!config["skip-discord-auth"]) {
 
 
     if(client.guilds.cache.size === 0) {
-      console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
+      console.log("\x1b[31m********\nWARNING: The bot is currently not in a Discord server. You can invite it to a guild using this invite link:\nhttps://discord.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot\n********\x1b[0m");
     }
 
     if(client.guilds.cache.size > 1) {
-      console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discordapp.com/developers/applications/me/" + client.user.id + " \x1b[0m\n\x1b[31m********\x1b[0m");
+      console.log("\x1b[31m********\nWARNING: The bot is currently in more than one guild. Please type 'leaveguilds' in the console to clear the bot from all guilds.\nIt is highly recommended that you verify 'Public bot' is UNCHECKED on this page:\n\x1b[1m https://discord.com/developers/applications/" + client.user.id + "/information \x1b[0m\n\x1b[31m********\x1b[0m");
     }
 
     channel = client.channels.cache.find((channel) => (channel.id === channelid));
@@ -778,7 +778,7 @@ process.stdin.on("data", (text) => {
       console.log("Leaving guild \"" + guild.name + "\"");
       guild.leave();
     });
-    console.log("Left all guilds. Use this link to re-invite the bot: \n\x1b[1m https://discordapp.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot \x1b[0m");
+    console.log("Left all guilds. Use this link to re-invite the bot: \n\x1b[1m https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&scope=bot \x1b[0m");
   }
   else
   {
