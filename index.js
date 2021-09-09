@@ -3,6 +3,8 @@ const fs = require("fs");
 var TelnetClient = require("telnet-client");
 const pjson = require("./package.json");
 const Discord = require("discord.js");
+const { Client, Intents } = Discord;
+var intents = ["GUILDS", "GUILD_MESSAGES"];
 
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
 console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
@@ -107,7 +109,11 @@ else {
 }
 
 // Load the Discord client
-const client = new Discord.Client();
+const client = new Client({
+  intents: new Intents(intents),
+  retryLimit: 3,
+  messageCacheMaxSize: 50
+});
 
 // 7d!exec command
 if(config["allow-exec-command"] === true) {
@@ -260,24 +266,24 @@ function updateDiscordStatus(status) {
   if(!config["disable-status-updates"]) {
     if(status === 0 && d7dtdState.connStatus !== 0) {
       client.user.setPresence({ 
-        activity: { name: `Connecting... | Type ${prefix}info` },
+        activities: [{ name: `Connecting... | Type ${prefix}info` }],
         status: "dnd"
       });
     } else if(status === -1 && d7dtdState.connStatus !== -1) {
       client.user.setPresence({ 
-        activity: { name: `Error | Type ${prefix}help` },
+        activities: [{ name: `Error | Type ${prefix}help` }],
         status: "dnd"
       });
     } else if(status === 1 && d7dtdState.connStatus !== 1) {
       if(typeof config.channel === "undefined" || config.channel === "channelid") {
         client.user.setPresence({ 
-          activity: { name: `No channel | Type ${prefix}setchannel` },
+          activities: [{ name: `No channel | Type ${prefix}setchannel` }],
           status: "idle"
         });
       }
       else {
         client.user.setPresence({ 
-          activity: { name: `7DTD | Type ${prefix}help` },
+          activities: [{ name: `7DTD | Type ${prefix}help` }],
           status: "online"
         });
       }
@@ -421,12 +427,10 @@ function parseDiscordCommand(msg, mentioned) {
         cmdString = `\n**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`;
       }
 
-
       var string = `Server connection: ${statusMsg}${cmdString}\n\n*Dishorde v${pjson.version} - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}.*`;
-      msg.channel.send({embed: {
-        description: string
-      }})
-        .catch(() => {
+      msg.channel.send({embeds: [{description: string}] })
+        .catch((err) => {
+          console.log(err);
           // If the embed fails, try sending without it.
           msg.channel.send(string);
         });
@@ -637,10 +641,10 @@ Telnet.on("data", (data) => {
       console.log("The server has shut down. Closing connection...");
       Telnet.destroy();
 
-      channel.send({embed: {
+      channel.send({embeds: [{
         color: 14164000,
         description: "The server has shut down."
-      }})
+      }] })
         .catch(() => {
         // Try re-sending without the embed if an error occurs.
           channel.send("**The server has shut down.**")
@@ -748,7 +752,7 @@ if(!config["skip-discord-auth"]) {
     setTimeout(() => { doLogin(); }, 6000);
   });
 
-  client.on("message", (msg) => {
+  client.on("messageCreate", (msg) => {
     if(msg.author !== client.user) {
       // If the bot is mentioned, pass through as if the user typed 7d!info
       // Also includes overrides for the default prefix.
