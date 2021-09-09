@@ -126,7 +126,7 @@ require("./lib/init.js")(pjson, config, configPrivate);
 ////// # Functions # //////
 function sanitizeMsg(msg) {
   // Replace @everyone and @here
-  msg = msg.replace(/\@everyone|@here|<@.*>/g, "\`\$&\`");
+  msg = msg.replace(/@everyone|@here|<@.*>/g, "`$&`");
 
   return msg;
 }
