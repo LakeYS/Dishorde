@@ -133,6 +133,9 @@ require("./lib/init.js")(pjson, config, configPrivate);
 function sanitizeMsg(msg) {
   // Replace @everyone and @here
   msg = msg.replace(/@everyone|@here|<@.*>/g, "`$&`");
+  // Filter links
+  msg = msg.replace(/https:\/\//g, "https\\://");
+  msg = msg.replace(/http:\/\//g, "http\\://");
 
   return msg;
 }
