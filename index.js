@@ -2,7 +2,6 @@ const minimist = require("minimist");
 const fs = require("fs");
 const pjson = require("./package.json");
 const Discord = require("discord.js");
-const Telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
 const { Client, Intents } = Discord;
 
 var TelnetClient = require("telnet-client");
@@ -54,6 +53,8 @@ else {
 
   config = require(configFile);
 }
+
+var telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
 
 // IP
 // This argument allows you to run the bot on a remote network.
@@ -127,7 +128,7 @@ const configPrivate = {
   socketPort: 7383
 };
 
-require("./lib/init.js")(pjson, config, configPrivate);
+new DishordeInitializer(pjson, config, configPrivate);
 
 ////// # Functions # //////
 function sanitizeMsg(msg) {
@@ -220,7 +221,7 @@ function handleMsgFromGame(line) {
 function handleMsgToGame(line) {
   // TODO: Ensure connection is valid before executing commands
   if(!config["disable-chatmsgs"]) {
-    Telnet.exec("say \"" + line + "\"", (err, response) => {
+    telnet.exec("say \"" + line + "\"", (err, response) => {
       if(err) {
         console.log("Error while attempting to send message: " + err.message);
       }
@@ -403,7 +404,7 @@ function parseDiscordCommand(msg, mentioned) {
 
     console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
     var execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
-    Telnet.exec(execStr);
+    telnet.exec(execStr);
   }
 
   // The following commands only work in the specified channel if one is set.
@@ -444,7 +445,7 @@ function parseDiscordCommand(msg, mentioned) {
     if(!config["disable-commands"]) {
       // 7d!time
       if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
-        Telnet.exec("gettime", (err, response) => {
+        telnet.exec("gettime", (err, response) => {
           if(!err) {
             processTelnetResponse(response, (line) => {
               if(line.startsWith("Day")) {
@@ -467,7 +468,7 @@ function parseDiscordCommand(msg, mentioned) {
 
       // 7d!version
       if(cmd === "VERSION" || cmd === "V") {
-        Telnet.exec("version", (err, response) => {
+        telnet.exec("version", (err, response) => {
           if(!err) {
             processTelnetResponse(response, (line) => {
               if(line.startsWith("Game version:")) {
@@ -489,7 +490,7 @@ function parseDiscordCommand(msg, mentioned) {
 
       // 7d!players
       if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
-        Telnet.exec("lp", (err, response) => {
+        telnet.exec("lp", (err, response) => {
           if(!err) {
             processTelnetResponse(response, (line) => {
               if(line.startsWith("Total of ")) {
@@ -562,10 +563,10 @@ var params = {
 
 // If Discord auth is skipped, we have to connect now rather than waiting for the Discord client.
 if(config["skip-discord-auth"]) {
-  Telnet.connect(params);
+  telnet.connect(params);
 }
 
-Telnet.on("ready", () => {
+telnet.on("ready", () => {
   console.log("Connected to game. (" +  Date() + ")");
 
   if(!config["skip-discord-auth"]) {
@@ -573,12 +574,12 @@ Telnet.on("ready", () => {
   }
 });
 
-Telnet.on("failedlogin", () => {
+telnet.on("failedlogin", () => {
   console.log("Login to game failed! (" +  Date() + ")");
   process.exit();
 });
 
-Telnet.on("close", () => {
+telnet.on("close", () => {
   console.log("Connection to game closed.");
 
   // Empty the cache.
@@ -590,12 +591,12 @@ Telnet.on("close", () => {
   }
 
   if(d7dtdState.doReconnect) {
-    Telnet.end(); // Just in case
-    setTimeout(() => { Telnet.connect(params); }, 5000);
+    telnet.end(); // Just in case
+    setTimeout(() => { telnet.connect(params); }, 5000);
   }
 });
 
-Telnet.on("data", (data) => {
+telnet.on("data", (data) => {
   data = d7dtdState.data + data.toString();
 
   if(config["debug-mode"]) {
@@ -642,7 +643,7 @@ Telnet.on("data", (data) => {
       // If we don't destroy the connection, crashes will happen when someone types a message.
       // This is a workaround until better measures can be put in place for sending data to the game.
       console.log("The server has shut down. Closing connection...");
-      Telnet.destroy();
+      telnet.destroy();
 
       channel.send({embeds: [{
         color: 14164000,
@@ -676,7 +677,7 @@ Telnet.on("data", (data) => {
   }
 });
 
-Telnet.on("error", (error) => {
+telnet.on("error", (error) => {
   var errMsg = error.message || error;
   console.log(`An error occurred while connecting to the game:\n${errMsg}`);
   //d7dtdState.lastTelnetErr = data.message;
@@ -731,7 +732,7 @@ if(!config["skip-discord-auth"]) {
     // Wait until the Discord client is ready before connecting to the game.
     if(d7dtdState.connInitialized !== 1) {
       d7dtdState.connInitialized = 1; // Make sure we only do this once
-      Telnet.connect(params);
+      telnet.connect(params);
     }
   });
 
