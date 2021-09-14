@@ -2,9 +2,10 @@ const minimist = require("minimist");
 const fs = require("fs");
 const pjson = require("./package.json");
 const Discord = require("discord.js");
-const { Client, Intents } = Discord;
-
 var TelnetClient = require("telnet-client");
+const DishordeInitializer = require("./lib/init.js");
+
+const { Client, Intents } = Discord;
 var intents = ["GUILDS", "GUILD_MESSAGES"];
 
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
