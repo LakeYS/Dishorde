@@ -1,9 +1,11 @@
 const minimist = require("minimist");
 const fs = require("fs");
-var TelnetClient = require("telnet-client");
 const pjson = require("./package.json");
 const Discord = require("discord.js");
+const Telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
 const { Client, Intents } = Discord;
+
+var TelnetClient = require("telnet-client");
 var intents = ["GUILDS", "GUILD_MESSAGES"];
 
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
@@ -52,8 +54,6 @@ else {
 
   config = require(configFile);
 }
-
-const Telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
 
 // IP
 // This argument allows you to run the bot on a remote network.
