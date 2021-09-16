@@ -144,8 +144,9 @@ function sanitizeMsg(msg) {
 
 function handleMsgFromGame(line) {
   // Regex for identifying a chat message
-  // Example 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
-  // Example 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
+  // Ex 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
+  // Ex 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
+  // Ex 3: 2021-09-15T20:42:00 1103.462 INF Chat (from '12345678901234567', entity id '171', to 'Global'): 'Lake': the quick brown fox jumps over the lazy dog
   var dataRaw = line.match(/(.+)T(.+) (.+) INF (Chat|GMSG)(.*): '(.*)': (.*)/);
 
   if(dataRaw === null) {
