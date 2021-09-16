@@ -143,53 +143,53 @@ function sanitizeMsg(msg) {
 }
 
 function handleMsgFromGame(line) {
-  var split = line.split(" ");
-  var type = split[3];
+  // Regex for identifying a chat message
+  // Example 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
+  // Example 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
+  var dataRaw = line.match(/(.+)T(.+) (.+) INF (Chat|GMSG)(.*): '(.*)': (.*)/);
 
-  if(typeof type !== "undefined") {
-    type = type.replace(":", "");
+  if(dataRaw === null) {
+    return;
   }
 
-  if((!config["disable-chatmsgs"] && type === "Chat") || (!config["disable-gmsgs"] && type === "GMSG")) {
+  // Evaluate the source info (i.e. " (from '-non-player-', entity id '-1', to 'Global')") separately because it may not exist.
+  var sourceInfoRaw = dataRaw[5].match(/ \(from '(.+)', entity id '(.+)', to '(.+)'\)/);
+
+  var data = {
+    date: dataRaw[1],
+    time: dataRaw[2],
+    type: dataRaw[4],
+    from: sourceInfoRaw[1],
+    to: sourceInfoRaw[3],
+    entityId: sourceInfoRaw[2],
+    username: dataRaw[6],
+    content: dataRaw[7]
+  };
+
+  // TODO: Expressions for GMSGs
+
+  console.log(data);
+
+  if((!config["disable-chatmsgs"] && data.type === "Chat") || (!config["disable-gmsgs"] && data.type === "GMSG")) {
     // Make sure the channel exists.
+    var msg = data.content;
     if(typeof channel !== "undefined") {
-      // Cut off the timestamp and other info
-      var msg = split[4];
-      for(var i = 5; i <= split.length-1; i++) {
-        msg = msg + " " + split[i];
-      }
-
-      // Replace the source information
-      if(type === "Chat") {
-        msg = msg.replace(/ *\([^)]*\): */, "");
-
-        var checkString = "'Global'):";
-
-        if(split[10] !== checkString && split[11] !== checkString) {
+      if(data.type === "Chat") {
+        if(data.to !== "Global") {
           if(config["show-private-chat"]) {
-            msg = `*(Private)* ${msg}`;
+            msg = `*(Private)* ${data.username}: ${data.content}`;
           }
           else {
             return;
           }
         }
-
       }
 
       if(config["log-messages"]) {
-        console.log(msg);
+        console.log(`${data.username}: ${data.content}`);
       }
 
-      // When using a local connection, messages go through as new data rather than a response.
-      // This string check is a workaround for that.
-      if(msg.startsWith("'Server': [")) {
-        return;
-      }
-
-      // Convert it to Discord-friendly text.
-      msg = msg.replace("'","").replace("'","").replace("\n","");
-
-      if(type === "GMSG") {
+      if(data.type === "GMSG") {
         // Remove join and leave messages.
         if(msg.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
           return;
@@ -204,7 +204,7 @@ function handleMsgFromGame(line) {
       if(!config["hide-prefix"])
       {
         // Do nothing if the prefix "/" is in the message.
-        if(msg.includes(": /")) {
+        if(msg.startsWith("/")) {
           return;
         }
       }
@@ -213,7 +213,7 @@ function handleMsgFromGame(line) {
 
       // If we didn't filter the message down to nothing, send it.
       if(msg !== "") {
-        channel.send(msg);
+        channel.send(`${data.username}: ${msg}`);
       }
     }
   }
