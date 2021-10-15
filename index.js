@@ -143,6 +143,11 @@ function sanitizeMsg(msg) {
 }
 
 function handleMsgFromGame(line) {
+  // Nothing to do with empty lines.
+  if(line === "") {
+    return;
+  }
+  
   // Regex for identifying a chat message
   // Ex 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
   // Ex 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
