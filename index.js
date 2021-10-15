@@ -173,7 +173,7 @@ function handleMsgFromGame(line) {
   };
 
   // TODO: Expressions for GMSGs
-  if(config["disable-non-player-msgs"] && data.from === "-non-player-") { 
+  if(config["disable-non-player-chatmsgs"] && data.from === "-non-player-") { 
     return;
   }
 
