@@ -168,6 +168,9 @@ function handleMsgFromGame(line) {
   };
 
   // TODO: Expressions for GMSGs
+  if(config["disable-non-player-msgs"] && data.from === "-non-player-") { 
+    return;
+  }
 
   console.log(data);
 
