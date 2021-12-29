@@ -767,18 +767,20 @@ if(!config["skip-discord-auth"]) {
   });
 
   client.on("messageCreate", (msg) => {
-    if(msg.author !== client.user) {
-      // If the bot is mentioned, pass through as if the user typed 7d!info
-      // Also includes overrides for the default prefix.
-      var mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7d!info" || msg.content === "7d!help";
+    if(msg.author === client.user) {
+      return;
+    }
 
-      if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
-        parseDiscordCommand(msg, mentioned);
-      }
-      else if(msg.channel === channel && msg.channel.type === "text") {
-        msg = "[" + msg.author.username + "] " + msg.cleanContent;
-        handleMsgToGame(msg);
-      }
+    // If the bot is mentioned, pass through as if the user typed 7d!info
+    // Also includes overrides for the default prefix.
+    var mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7d!info" || msg.content === "7d!help";
+
+    if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
+      parseDiscordCommand(msg, mentioned);
+    }
+    else if(msg.channel === channel && msg.channel.type === "GUILD_TEXT") {
+      msg = "[" + msg.author.username + "] " + msg.cleanContent;
+      handleMsgToGame(msg);
     }
   });
 }
