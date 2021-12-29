@@ -152,41 +152,51 @@ function handleMsgFromGame(line) {
   // Ex 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
   // Ex 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
   // Ex 3: 2021-09-15T20:42:00 1103.462 INF Chat (from '12345678901234567', entity id '171', to 'Global'): 'Lake': the quick brown fox jumps over the lazy dog
-  var dataRaw = line.match(/(.+)T(.+) (.+) INF (Chat|GMSG)(.*): '(.*)': (.*)/);
+  var dataRaw = line.match(/(.+)T(.+) (.+) INF (Chat|GMSG)(.*): (.*)/);
+  var content = { name: null, text: null, from: null, to: null, entityId: null };
 
   if(dataRaw === null) {
     return;
   }
 
-  // Evaluate the source info (i.e. " (from '-non-player-', entity id '-1', to 'Global')") separately because it may not exist.
-  var sourceInfoRaw = dataRaw[5].match(/ \(from '(.+)', entity id '(.+)', to '(.+)'\)/);
+  // Evaluate the source info (i.e. " (from '-non-player-', entity id '-1', to 'Global'): 'Server'") separately because it may not exist.
+  // Source info includes the sender name (i.e. 'Server')
+  var sourceInfoRaw = dataRaw[5].match(/\(from '(.+)', entity id '(.+)', to '(.+)'\): '(.+)'/);
+  if(sourceInfoRaw === null) {
+    content.text = dataRaw[6];
+  }
+  else {
+    // We have content info to derive from the source info match
+    content.name = sourceInfoRaw[4];
+    content.text = dataRaw[6];
+
+    content.from = sourceInfoRaw[1];
+    content.to = sourceInfoRaw[3];
+    content.entityId = sourceInfoRaw[2];
+  }
 
   var data = {
     date: dataRaw[1],
     time: dataRaw[2],
     type: dataRaw[4],
-    from: sourceInfoRaw[1],
-    to: sourceInfoRaw[3],
-    entityId: sourceInfoRaw[2],
-    username: dataRaw[6],
-    content: dataRaw[7]
+    content
   };
 
-  // TODO: Expressions for GMSGs
-  if(config["disable-non-player-chatmsgs"] && data.from === "-non-player-") { 
+  if(config["disable-non-player-chatmsgs"] && data.content.from === "-non-player-") { 
     return;
   }
 
-  console.log(data);
-
   if((!config["disable-chatmsgs"] && data.type === "Chat") || (!config["disable-gmsgs"] && data.type === "GMSG")) {
+    var msg;
+    if(data.content.name === null) msg = data.content.text;
+    else msg = `${data.content.name}: ${data.content.text}`;
+
     // Make sure the channel exists.
-    var msg = data.content;
     if(typeof channel !== "undefined") {
       if(data.type === "Chat") {
-        if(data.to !== "Global") {
-          if(config["show-private-chat"]) {
-            msg = `*(Private)* ${data.username}: ${data.content}`;
+        if(data.content.to !== "Global") {
+          if(config["show-private-chat"] && data.content.name !== null) {
+            msg = `*(Private)* ${data.content.name}: ${data.content.text}`;
           }
           else {
             return;
@@ -194,8 +204,8 @@ function handleMsgFromGame(line) {
         }
       }
 
-      if(config["log-messages"]) {
-        console.log(`${data.username}: ${data.content}`);
+      if(config["log-messages"] && data.content.name !== null) {
+        console.log(msg);
       }
 
       if(data.type === "GMSG") {
@@ -218,11 +228,12 @@ function handleMsgFromGame(line) {
         }
       }
 
+      // Sanitize the resulting message, username included.
       msg = sanitizeMsg(msg);
 
       // If we didn't filter the message down to nothing, send it.
       if(msg !== "") {
-        channel.send(`${data.username}: ${msg}`);
+        channel.send(msg);
       }
     }
   }
@@ -238,8 +249,8 @@ function handleMsgToGame(line) {
       else {
         var lines = response.split("\n");
         for(var i = 0; i <= lines.length-1; i++) {
-          var line = lines[i];
-          handleMsgFromGame(line);
+          var lineResponse = lines[i];
+          handleMsgFromGame(lineResponse);
         }
       }
     });
