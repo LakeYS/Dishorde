@@ -220,10 +220,10 @@ function handleMsgFromGame(line) {
         }
       }
 
-      if(!config["hide-prefix"])
+      if(config["hide-prefix"])
       {
         // Do nothing if the prefix "/" is in the message.
-        if(msg.startsWith("/")) {
+        if(data.content.text.startsWith("/")) {
           return;
         }
       }
