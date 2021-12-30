@@ -210,12 +210,12 @@ function handleMsgFromGame(line) {
 
       if(data.type === "GMSG") {
         // Remove join and leave messages.
-        if(msg.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
+        if(data.content.text.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
           return;
         }
 
         // Remove other global messages (player deaths, etc.)
-        if(!msg.endsWith("the game") && config["disable-misc-gmsgs"]) {
+        if(!data.content.text.endsWith("the game") && config["disable-misc-gmsgs"]) {
           return;
         }
       }
