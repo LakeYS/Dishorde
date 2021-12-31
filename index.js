@@ -27,6 +27,8 @@ var d7dtdState = {
   // Connection initialized?
   connInitialized: 0,
 
+  previousLine: null,
+
   // Connection status
   // -1 = Error, 0 = No connection/connecting, 1 = Online
   // -100 = Override or N/A (value is ignored)
@@ -147,6 +149,13 @@ function handleMsgFromGame(line) {
   if(line === "") {
     return;
   }
+
+  if(d7dtdState.previousLine === line) {
+    console.warn(`WARNING: Caught attempting to send a duplicate line from the game. This line will be skipped. Line: ${line}`);
+    return;
+  }
+
+  d7dtdState.previousLine = line;
   
   // Regex for identifying a chat message
   // Ex 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
@@ -240,7 +249,6 @@ function handleMsgFromGame(line) {
 }
 
 function handleMsgToGame(line) {
-  // TODO: Ensure connection is valid before executing commands
   if(!config["disable-chatmsgs"]) {
     telnet.exec("say \"" + line + "\"", (err, response) => {
       if(err) {
