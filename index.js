@@ -618,10 +618,26 @@ telnet.on("close", () => {
 });
 
 telnet.on("data", (data) => {
-  data = d7dtdState.data + data.toString();
-
   if(config["debug-mode"]) {
-    console.log("[DEBUG] Buffer length: " + data.length + "; Buffer dump: " + data);
+    var str = data.toString();
+
+    var lineEnding = "!!!NONE!!!";
+    if(str.endsWith("\r\n")) lineEnding = "CRLF";
+    else if(str.endsWith("\r")) lineEnding = "CR";
+    else if(str.endsWith("\n")) lineEnding = "LF";
+
+    console.log(`[DEBUG] Buffer length: ${data.length}; Line ending: ${lineEnding};`);
+
+    if(lineEnding === "!!!NONE!!!") console.warn("[DEBUG] Buffer is missing a line ending!");
+
+    if(str.startsWith("\r\n") || str.startsWith("\n")) {
+      console.log("[DEBUG] Line starts with a line ending. Possible issues?");
+    }
+
+    if(config["debug-buffer-log"]) {
+      console.log(`[BUFFERDMP1] ${data}`);
+      console.log(`[BUFFERDMP2] ${str}`);
+    }
   }
 
   if(data.endsWith("\n")) {
