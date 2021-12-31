@@ -640,7 +640,9 @@ telnet.on("data", (data) => {
     }
   }
 
-  if(data.endsWith("\n")) {
+  data = d7dtdState.data + data.toString();
+
+  if(data.endsWith("\n") || data.endsWith("\r")) {
     d7dtdState.data = ""; // Clear the existing data cache.
   }
   else {
