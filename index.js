@@ -4,6 +4,7 @@ const pjson = require("./package.json");
 const Discord = require("discord.js");
 var TelnetClient = require("telnet-client");
 const DishordeInitializer = require("./lib/init.js");
+const Logger = require("./lib/log.js");
 
 const { Client, Intents } = Discord;
 var intents = ["GUILDS", "GUILD_MESSAGES"];
@@ -28,6 +29,7 @@ var d7dtdState = {
   connInitialized: 0,
 
   previousLine: null,
+  dataCheck: null,
 
   // Connection status
   // -1 = Error, 0 = No connection/connecting, 1 = Online
@@ -55,6 +57,11 @@ else {
   }
 
   config = require(configFile);
+}
+
+// Logging init
+if(config["log-console"]) {
+  d7dtdState.logger = new Logger();
 }
 
 var telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
@@ -643,8 +650,7 @@ telnet.on("data", (data) => {
     }
 
     if(config["debug-buffer-log"]) {
-      console.log(`[BUFFERDMP1] ${data}`);
-      console.log(`[BUFFERDMP2] ${str}`);
+      console.log(`[BUFFERDMP1] ${str}`);
     }
   }
 
