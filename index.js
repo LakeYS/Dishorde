@@ -141,7 +141,7 @@ const configPrivate = {
 new DishordeInitializer(pjson, config, configPrivate);
 
 ////// # Functions # //////
-function sanitizeMsg(msg) {
+function sanitizeMsgFromGame(msg) {
   // Replace @everyone and @here
   msg = msg.replace(/@everyone|@here|<@.*>/g, "`$&`");
   // Filter links
@@ -245,7 +245,7 @@ function handleMsgFromGame(line) {
       }
 
       // Sanitize the resulting message, username included.
-      msg = sanitizeMsg(msg);
+      msg = sanitizeMsgFromGame(msg);
 
       // If we didn't filter the message down to nothing, send it.
       if(msg !== "") {
