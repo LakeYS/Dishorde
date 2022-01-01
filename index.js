@@ -151,6 +151,11 @@ function sanitizeMsgFromGame(msg) {
   return msg;
 }
 
+function sanitizeMsgToGame(msg) {
+  msg = msg.replace(/\"/g, "");
+  return msg;
+}
+
 function handleMsgFromGame(line) {
   // Nothing to do with empty lines.
   if(line === "") {
@@ -257,7 +262,8 @@ function handleMsgFromGame(line) {
 
 function handleMsgToGame(line) {
   if(!config["disable-chatmsgs"]) {
-    telnet.exec("say \"" + line + "\"", (err, response) => {
+    var msg = sanitizeMsgToGame(line);
+    telnet.exec("say \"" + msg + "\"", (err, response) => {
       if(err) {
         console.log("Error while attempting to send message: " + err.message);
       }
