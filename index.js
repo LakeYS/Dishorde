@@ -822,7 +822,7 @@ if(!config["skip-discord-auth"]) {
       parseDiscordCommand(msg, mentioned);
     }
     else if(msg.channel === channel && msg.channel.type === "GUILD_TEXT") {
-      msg = "[" + msg.author.username + "] " + msg.cleanContent;
+      msg = "[" + msg.member.nickname + "] " + msg.cleanContent;
       handleMsgToGame(msg);
     }
   });
