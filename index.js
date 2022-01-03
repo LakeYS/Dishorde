@@ -653,7 +653,7 @@ telnet.on("data", (data) => {
 
     if(lineEnding === "!!!NONE!!!") console.warn("[DEBUG] Buffer is missing a line ending!");
 
-    if(str.startsWith("\r\n") || str.startsWith("\n")) {
+    if(str.startsWith("\r\n") || str.startsWith("\n") || str.startsWith("\r")) {
       console.log("[DEBUG] Line starts with a line ending. Possible issues?");
     }
 
