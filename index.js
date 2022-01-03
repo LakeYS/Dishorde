@@ -164,6 +164,8 @@ function handleMsgFromGame(line) {
 
   if(d7dtdState.previousLine === line) {
     console.warn(`WARNING: Caught attempting to send a duplicate line from the game. This line will be skipped. Line: ${line}`);
+    d7dtdState.data = ""; // Clear the data cache
+
     return;
   }
 
