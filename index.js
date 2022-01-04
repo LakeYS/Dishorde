@@ -152,7 +152,7 @@ function sanitizeMsgFromGame(msg) {
 }
 
 function sanitizeMsgToGame(msg) {
-  msg = msg.replace(/\"/g, "");
+  msg = msg.replace(/"/g, "");
   return msg;
 }
 
