@@ -12,6 +12,8 @@ var intents = ["GUILDS", "GUILD_MESSAGES"];
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
 console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
 
+const lineSplit = /\n|\r/g;
+
 var channel = void 0;
 
 var d7dtdState = {
@@ -270,7 +272,7 @@ function handleMsgToGame(line) {
         console.log("Error while attempting to send message: " + err.message);
       }
       else {
-        var lines = response.split("\n");
+        var lines = response.split(lineSplit);
         for(var i = 0; i <= lines.length-1; i++) {
           var lineResponse = lines[i];
           handleMsgFromGame(lineResponse);
@@ -363,7 +365,7 @@ function processTelnetResponse(response, callback) {
   // Sometimes the "response" has more than what we're looking for.
   // We have to double-check and make sure the correct line is returned.
   if(typeof response !== "undefined") {
-    var lines = response.split("\n");
+    var lines = response.split(lineSplit);
     d7dtdState.receivedData = 0;
     for(var i = 0; i <= lines.length-1; i++) {
       callback(lines[i]);
@@ -561,14 +563,14 @@ function parseDiscordCommand(msg, mentioned) {
       //      // Sometimes the "response" has more than what we're looking for.
       //      // We have to double-check and make sure the correct line is returned.
       //      if(typeof response !== "undefined") {
-      //        var lines = response.split("\n");
+      //        var lines = response.split(lineSplit);
       //        d7dtdState.receivedData = 0;
 
       //        final = "";
       //        for(var i = 0; i <= lines.length-1; i++) {
       //          var line = lines[i];
       //          if(line.startsWith("GamePref.")) {
-      //            final = final + "\n" + line.replace("GamePref.","");
+      //            final = final + lineSplit + line.replace("GamePref.","");
       //            d7dtdState.receivedData = 1;
       //          }
       //        }
@@ -675,7 +677,7 @@ telnet.on("data", (data) => {
     return;
   }
 
-  var lines = data.split("\n");
+  var lines = data.split(lineSplit);
 
   if(config["log-telnet"]) {
     console.log("[Telnet] " + data);
