@@ -20,6 +20,7 @@
   "disable-status-updates": false,
   "disable-version-check": false,
   "hide-prefix": false,
+  "log-console": false,
   "log-messages": false,
   "log-telnet": false,
   "prefix": "7d!"
