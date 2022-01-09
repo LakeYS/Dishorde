@@ -626,8 +626,6 @@ telnet.on("failedlogin", () => {
 });
 
 telnet.on("close", () => {
-  console.log("Connection to game closed.");
-
   // Empty the cache.
   d7dtdState.data = "";
 
