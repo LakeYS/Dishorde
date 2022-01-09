@@ -15,7 +15,7 @@
   "disable-chatmsgs": false,
   "disable-join-leave-gmsgs": false,
   "disable-misc-gmsgs": false,
-  "disable-non-player-chatmsgs": false,
+  "disable-non-player-chatmsgs": true,
   "show-private-chat": false,
   "disable-status-updates": false,
   "disable-version-check": false,
