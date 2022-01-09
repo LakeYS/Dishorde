@@ -10,6 +10,7 @@
   "ip": "localhost",
 
   "allow-exec-command": false,
+  "allow-links-from-game": false,
   "allow-multiple-instances": false,
   "disable-commands": false,
   "disable-chatmsgs": false,

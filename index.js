@@ -146,9 +146,12 @@ new DishordeInitializer(pjson, config, configPrivate);
 function sanitizeMsgFromGame(msg) {
   // Replace @everyone and @here
   msg = msg.replace(/@everyone|@here|<@.*>/g, "`$&`");
-  // Filter links
-  msg = msg.replace(/https:\/\//g, "https\\://");
-  msg = msg.replace(/http:\/\//g, "http\\://");
+  
+  if(!config["allow-links-from-game"]) {
+    // Filter links
+    msg = msg.replace(/https:\/\//g, "https\\://");
+    msg = msg.replace(/http:\/\//g, "http\\://");
+  }
 
   return msg;
 }
