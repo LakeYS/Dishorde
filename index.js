@@ -463,7 +463,7 @@ function parseDiscordCommand(msg, mentioned) {
       // -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
       var statusMsg;
       switch(d7dtdState.connStatus) {
-      case -1:
+      default:
         statusMsg = ":red_circle: Error";
         break;
       case 0:
