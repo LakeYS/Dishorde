@@ -33,12 +33,16 @@ Commands can be sent via DM or in the specified chat channel.
 # Configuration
 The bot can be configured by editing config.json. Here's a list of the preferences:
 - `allow-exec-command` - Enables a command called `7d!exec`. This allows anybody with the 'manage server' permission to execute commands on the server. The command works in any channel. **WARNING: Enabling this may pose a security risk for your server.**
+- `allow-multiple-instances` - By default, the bot will not start if there is another copy of it already running. Enabling this will allow multiple instances of the bot to run on one system.
+- `allow-links-from-game` - Allows players in-game to post links into Discord. When set to false, links will still show up, but will not be clickable. When enabled, links may include embeds in Discord unless you configure the bot's permissions otherwise.
 - `disable-commands` - Disable Discord commands such as 7d!time. Does not disable 7d!info.
 - `disable-chatmsgs` - Disable chat messages to and from the server. Does not disable other in-game messages such as join/leave and deaths.
 - `disable-join-leave-gmsgs` - Disables player join/leave messages.
 - `disable-misc-gmsgs` - Disables all other global messages (player deaths, etc.)
+- `disable-non-player-chatmsgs` - Disables chat messages sent by non-players. (Including the "say" console command and mods)
 - `disable-status-updates` - Disable the bot's presence and online status display.
 - `hide-prefix` - Hides all chat messages that start with a forward slash. This may be useful if your server uses commands.
+- `log-console` - Enables logging of the bot's console to a file, console.log.
 - `log-messages` - Chat messages will show up in the terminal.
 - `log-telnet` - All output from the connection will show up in the terminal.
 - `prefix` - The prefix for bot commands. ('7d!' by default)
