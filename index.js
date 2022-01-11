@@ -312,10 +312,10 @@ function handlePlayerCount(line, msg) {
 
 ////// # Discord # //////
 
-// updateDiscordStatus
+// updateStatus
 // NOTE: This function will 'cache' the current status to avoid re-sending it.
-// If you want to forcibly re-send the same status, set 'd7dtdState.connStatus' to -100 first.
-function updateDiscordStatus(status) {
+// If you want to forcibly re-send the same status to Discord, set 'd7dtdState.connStatus' to -100 first.
+function updateStatus(status) {
   if(!config["disable-status-updates"]) {
     if(status === 0 && d7dtdState.connStatus !== 0) {
       client.user.setPresence({ 
@@ -342,22 +342,23 @@ function updateDiscordStatus(status) {
       }
     }
 
-    // Update the status so we don't keep sending duplicates to Discord
-    d7dtdState.connStatus = status;
   }
+
+  // Update the status so we don't keep sending duplicates to Discord
+  d7dtdState.connStatus = status;
 }
 
 function refreshDiscordStatus() {
   var status = d7dtdState.connStatus;
   d7dtdState.connStatus = -100;
-  updateDiscordStatus(status);
+  updateStatus(status);
 }
 
 // This function prevent's the bot's staus from showing up as blank.
 function d7dtdHeartbeat() {
   var status = d7dtdState.connStatus;
   d7dtdState.connStatus = -100;
-  updateDiscordStatus(status);
+  updateStatus(status);
 
   d7dtdState.timeout = setTimeout(() => {
     d7dtdHeartbeat();
@@ -619,7 +620,7 @@ telnet.on("ready", () => {
   console.log("Connected to game. (" +  Date() + ")");
 
   if(!config["skip-discord-auth"]) {
-    updateDiscordStatus(1);
+    updateStatus(1);
   }
 });
 
@@ -634,7 +635,7 @@ telnet.on("close", () => {
 
   // If there is no error, update status to 'No connection'
   if(d7dtdState.connStatus !== -1) {
-    updateDiscordStatus(0);
+    updateStatus(0);
   }
 
   if(d7dtdState.doReconnect) {
@@ -746,7 +747,7 @@ telnet.on("error", (error) => {
   console.log(`An error occurred while connecting to the game:\n${errMsg}`);
   //d7dtdState.lastTelnetErr = data.message;
 
-  updateDiscordStatus(-1);
+  updateStatus(-1);
 });
 
 function doLogin() {
