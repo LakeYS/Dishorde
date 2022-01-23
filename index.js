@@ -167,8 +167,10 @@ function handleMsgFromGame(line) {
     return;
   }
 
+  var isLineDuplicate = false
+  // Line check
   if(d7dtdState.previousLine === line) {
-    console.warn(`WARNING: Caught attempting to send a duplicate line from the game. This line will be skipped. Line: ${line}`);
+    if(config["debug-mode"]) console.log(`[DEBUG] Duplicate console line. Line: ${line}`);
     d7dtdState.data = ""; // Clear the data cache
 
     return;
@@ -254,6 +256,13 @@ function handleMsgFromGame(line) {
         if(data.content.text.startsWith("/")) {
           return;
         }
+      }
+
+      // If we're dealing with a duplicated message, we need to run a warning.
+      if(isLineDuplicate) {
+        console.warn(`WARNING: Caught attempting to send a duplicate line from the game. This line will be skipped. Line: ${line}`);
+    
+        return;
       }
 
       // Sanitize the resulting message, username included.
