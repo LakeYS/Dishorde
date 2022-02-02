@@ -397,7 +397,7 @@ function parseDiscordCommand(msg, mentioned) {
   if(cmd.startsWith("SETCHANNEL")) {
     var channelExists = (typeof channel !== "undefined");
 
-    if(!channelExists || msg.channel.type !== "text") {
+    if(!channelExists || msg.channel.type !== "GUILD_TEXT") {
       return;
     }
 
@@ -452,7 +452,7 @@ function parseDiscordCommand(msg, mentioned) {
   // 7d!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
   if(cmd.startsWith("EXEC")) {
-    if(msg.channel.type !== "text" || !config["allow-exec-command"]) {
+    if(msg.channel.type !== "GUILD_TEXT" || !config["allow-exec-command"]) {
       return;
     }
 
@@ -467,7 +467,7 @@ function parseDiscordCommand(msg, mentioned) {
   }
 
   // The following commands only work in the specified channel if one is set.
-  if(msg.channel === channel || msg.channel.type === "dm") {
+  if(msg.channel === channel || msg.channel.type === "DM") {
     // 7d!info
     if(cmd === "INFO" || cmd === "I" || cmd === "HELP" || cmd === "H" || mentioned) {
       // -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
