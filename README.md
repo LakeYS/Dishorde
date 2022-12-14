@@ -51,13 +51,15 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 
 # How to Install - Windows
 ## Creating the bot account
-1. Log in to the [Discord Developer Portal](https://discord.com/developers) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
-2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Now you can set an avatar for your bot if desired.
-3. Once your bot is created, find the switch that is labeled "Public bot". Make sure that this is **OFF**. Click "Save Changes" to confirm.
-4. Under "Token" click the link that says "Click to Reveal Token". This is the password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open.
-5. Paste the URL below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
+1. Log in to the [Discord Developer Portal](https://discord.com/developers) in a browser and click "Create an application". Name the bot anything you'd like. Write down the application ID as you'll need it for later.
+2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Once created, you can set an avatar for your bot if desired.
+3. Under "Privileged Gateway Intents", locate the "Message Content Intent" switch and turn this on. ***Important**! If you do not turn this on, the bot will not be able to see your messages or commands.*
+4. Under "Authorization Flow", locate the "Public Bot" switch and turn this off. ***Important!** If you do not turn this off, anyone can create a link to invite your server's bot to their own server.*
+5. Click "Save Changes" to confirm.
+6. Back towards the top, click the "Reset Token" button and reset the token. When done, the button will be replaced by a long set of letters and numbers. This is your bot's 'token'--like a password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open. ***Note!** Once you close the page, you will not be able to retrieve your bot's token without resetting it.*
+7. Copy the URL below into your browser and replace "APP_ID" with your application ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
-`https://discord.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+`https://discord.com/oauth2/authorize?client_id=APP_ID&scope=bot`
 
 ## Setting up the bot
 1. [Download](https://github.com/LakeYS/Dishorde/releases/download/v2.0.1/Dishorde.zip) this repository and extract it somewhere on your server's system.
@@ -99,13 +101,15 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 6. Type `npm install` to install the required packages for the bot to run.
 
 ## Creating the bot account
-1. Log in to the [Discord Developer Portal](https://discord.com/developers) in a browser and click "Create an application". Name the bot anything you'd like. Write down the client ID as you'll need it for later.
-2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Now you can set an avatar for your bot if desired.
-3. Once your bot is created, find the switch that is labeled "Public bot". Make sure that this is **OFF**. Click "Save Changes" to confirm.
-4. Under "Token" click the link that says "Click to Reveal Token". This is the password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open.
-5. Paste the URL below into your browser and replace "CLIENT_ID" with your client ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
+1. Log in to the [Discord Developer Portal](https://discord.com/developers) in a browser and click "Create an application". Name the bot anything you'd like. Write down the application ID as you'll need it for later.
+2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Once created, you can set an avatar for your bot if desired.
+3. Under "Privileged Gateway Intents", locate the "Message Content Intent" switch and turn this on. ***Important**! If you do not turn this on, the bot will not be able to see your messages or commands.*
+4. Under "Authorization Flow", locate the "Public Bot" switch and turn this off. ***Important!** If you do not turn this off, anyone can create a link to invite your server's bot to their own server.*
+5. Click "Save Changes" to confirm.
+6. Back towards the top, click the "Reset Token" button and reset the token. When done, the button will be replaced by a long set of letters and numbers. This is your bot's 'token'--like a password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open. ***Note!** Once you close the page, you will not be able to retrieve your bot's token without resetting it.*
+7. Copy the URL below into your browser and replace "APP_ID" with your application ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
 
-`https://discord.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+`https://discord.com/oauth2/authorize?client_id=APP_ID&scope=bot`
 
 ## Configuring the bot
 1. On your server's system, navigate to the game's directory and edit your the config xml file.
