@@ -167,7 +167,7 @@ function handleMsgFromGame(line) {
     return;
   }
 
-  var isLineDuplicate = false
+  var isLineDuplicate = false;
   // Line check
   if(d7dtdState.previousLine === line) {
     if(config["debug-mode"]) console.log(`[DEBUG] Duplicate console line. Line: ${line}`);
