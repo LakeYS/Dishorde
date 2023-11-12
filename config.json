@@ -21,6 +21,7 @@
   "disable-status-updates": false,
   "disable-version-check": false,
   "hide-prefix": false,
+  "horde-frequency": "7",
   "log-console": false,
   "log-messages": false,
   "log-telnet": false,

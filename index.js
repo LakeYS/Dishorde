@@ -309,10 +309,30 @@ function handleCmdError(err) {
 }
 
 function handleTime(line, msg) {
-  var day = line.split(",")[0].replace("Day ","");
-  var dayHorde = (parseInt(day / 7) + 1) * 7 - day;
+  let hordeFreq = 7;
+  if(config["horde-frequency"] != null) {
+    hordeFreq = parseInt(config["horde-frequency"]);
+  }
 
-  msg.channel.send(`${line}\n${dayHorde} day${dayHorde===1?"":"s"} to next horde.`);
+  const messageValues = line.split(",");
+  const day = parseInt(messageValues[0].replace("Day ", ""));
+  const hour = parseInt(messageValues[1].split(":")[0]);
+  const daysFromHorde = day % hordeFreq;
+  let hordeMsg = "";
+
+  if (daysFromHorde === 0 && hour < 22) {
+    const hoursToHorde = 22 - hour;
+    const hourStr = hour === 21 ? "less than an hour" : `${hoursToHorde} hour${hoursToHorde === 1 ? "" : "s"}`;
+
+    hordeMsg = `The blood moon horde begins in ${hourStr}.`;
+  } else if (daysFromHorde === 0 && hour >= 22 || daysFromHorde === 1 && hour < 6) {
+    hordeMsg = "The horde is rampaging now!";
+  } else if (daysFromHorde !== 0) {
+    const daysToHorde = parseInt(hordeFreq) - daysFromHorde;
+    hordeMsg = `The blood moon horde begins on Day ${day+daysToHorde} (in ${daysToHorde} day${daysToHorde === 1 ? "" : "s"}).`;
+  }
+
+  msg.channel.send(`${line}\n${hordeMsg}`);
 }
 
 function handlePlayerCount(line, msg) {
