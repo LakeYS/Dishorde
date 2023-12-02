@@ -851,7 +851,8 @@ if(!config["skip-discord-auth"]) {
   });
 
   client.on("messageCreate", (msg) => {
-    if(msg.author === client.user) {
+    // member can be null for messages from webhooks, etc.
+    if(msg.author === client.user || msg.member == null) {
       return;
     }
 
