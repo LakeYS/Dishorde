@@ -320,12 +320,17 @@ function handleTime(line, msg) {
   const daysFromHorde = day % hordeFreq;
   let hordeMsg = "";
 
+  const isFirstWeek = day === 1 || day === 2;
+  const isHordeHour = (daysFromHorde === 0 && hour >= 22) || (daysFromHorde === 1 && hour < 6);
+
+  const isHordeNow = !isFirstWeek && isHordeHour;
+
   if (daysFromHorde === 0 && hour < 22) {
     const hoursToHorde = 22 - hour;
     const hourStr = hour === 21 ? "less than an hour" : `${hoursToHorde} hour${hoursToHorde === 1 ? "" : "s"}`;
 
     hordeMsg = `The blood moon horde begins in ${hourStr}.`;
-  } else if (daysFromHorde === 0 && hour >= 22 || daysFromHorde === 1 && hour < 6) {
+  } else if (isHordeNow) {
     hordeMsg = "The horde is rampaging now!";
   } else if (daysFromHorde !== 0) {
     const daysToHorde = parseInt(hordeFreq) - daysFromHorde;
