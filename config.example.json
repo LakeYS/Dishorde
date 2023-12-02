@@ -7,7 +7,7 @@
   "token": "your_token_here",
   "channel": "channelid",
   "port": "8081",
-  "ip": "localhost",
+  "ip": "127.0.0.1",
 
   "allow-exec-command": false,
   "allow-links-from-game": false,
