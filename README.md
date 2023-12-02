@@ -1,6 +1,6 @@
 # Dishorde - 7 Days to Die Discord Integration
 
-[How to Install](https://github.com/LakeYS/Dishorde#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/s3vCQba) | [Website](http://lakeys.net/dishorde)
+[How to Install](https://github.com/LakeYS/Dishorde#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/ZMpSE2a3rs) | [Website](http://lakeys.net/dishorde)
 ------------ | ------------- | ------------- | -------------
 
 Dishorde is a Discord bridge bot for 7 Days to Die. It integrates a dedicated game server's chat with Discord, granting players access to the server's chat through Discord.
