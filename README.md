@@ -67,7 +67,7 @@ The bot can be configured by editing config.json. Here's a list of the preferenc
 3. Once Node.js is finished installing, run install.bat in the bot's folder. This will automatically install the required modules for the bot.
 4. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
 5. Open serverconfig.xml in a text editor (Right click and select 'Edit' to open it in Nodepad) and find "TelnetEnabled". Set it to true. Make sure TelnetPort is 8081 (or use the "port" argument in config.json). Set a telnet password.
-6. Right click the bot's config.json file and click "Edit".
+6. Rename the config.json.example file to config.json. Right click this file and click "Edit".
 7. Find "changeme" and replace it with your server's Telnet password. Replace "your_token_here" with the Discord token from earlier. If running the bot on a different network from the server, add `--ip=[your server's external ip]` (May require port forwarding if using an external IP. Make sure your Telnet password is secure.)
 
 ## Run the bot!
@@ -94,7 +94,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 
 ## Setting up the bot
 1. Open a terminal on your system.
-2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to an Android or Raspberry Pi device.**
+2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to a Raspberry Pi device.**
 3. Type `curl -L https://github.com/LakeYS/Dishorde/releases/download/v2.2.0/Dishorde.tar.gz > 7dtdbot.tar.gz` to download the bot's files to an archive named `7dtdbot.tar.gz`.
 4. Type `tar -xzf 7dtdbot.tar.gz` to extract the archive. This will create a directory named "7DTD-Discord-master". Navigate to the directory with `cd 7DTD-Discord-master`.
 5. Type `sudo chmod +x run.sh`. This gives you permission to execute run.sh. (If this does not work, try `chmod +x run.sh`)
@@ -114,7 +114,7 @@ If running the bot on the same network as the Raspberry Pi, you will likely need
 ## Configuring the bot
 1. On your server's system, navigate to the game's directory and edit your the config xml file.
 2. Find "TelnetEnabled" and make sure it is set to "true". Set a telnet password and save the file. **Make sure your telnet password is secure , especially if the telnet port is open or the server is running on a VPS.**
-3. Now navigate back to the bot's folder. Edit config.json.
+3. Now navigate back to the bot's folder. Rename config.example.json to config.json and open this file in a text editor.
 4. Find the line containing `"password": "changeme",` and replace "changeme" with your server's telnet password.
 5. If running the bot on a different network from the server, change "localhost" to your server's external IP. (If using an external IP to connect the bot, forwarding the telnet port may be required)
 6. Replace "your_token_here" with the Discord bot token from earlier.  Keep the file open for the next section.
