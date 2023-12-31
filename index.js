@@ -861,6 +861,10 @@ if(!config["skip-discord-auth"]) {
       return;
     }
 
+    if(!config["show-discord-bot-msgs"] && msg.author.bot === true) {
+      return;
+    }
+
     // If the bot is mentioned, pass through as if the user typed 7d!info
     // Also includes overrides for the default prefix.
     var mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7d!info" || msg.content === "7d!help";

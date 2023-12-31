@@ -18,6 +18,7 @@
   "disable-misc-gmsgs": false,
   "disable-non-player-chatmsgs": true,
   "show-private-chat": false,
+  "show-discord-bot-msgs": false,
   "disable-status-updates": false,
   "disable-version-check": false,
   "hide-prefix": false,
