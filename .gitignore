@@ -52,7 +52,7 @@ node_modules
 run_dev*.sh
 run_private*.sh
 run*.bat
-config*.json
+config_*.json
 run*.vbs
 update.sh
 update_private.sh
