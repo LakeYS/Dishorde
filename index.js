@@ -43,6 +43,9 @@ var d7dtdState = {
 // We have to treat the channel ID as a string or the number will parse incorrectly.
 var argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
 
+// cache previous Message to check for double messages
+var previousMsg;
+
 // This is a simple check to see if we're using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
 var config;
@@ -143,6 +146,18 @@ const configPrivate = {
 new DishordeInitializer(pjson, config, configPrivate);
 
 ////// # Functions # //////
+function checkForDoubleMsg(msg) {
+  if(msg == previousMsg) {
+    // Message was the same, so return nothing
+    msg = "";
+  }
+  else {
+    // message differed, so this is the new cached message
+    previousMsg = msg;
+  }
+  return msg;
+}
+
 function sanitizeMsgFromGame(msg) {
   // Replace @everyone and @here
   msg = msg.replace(/@everyone|@here|<@.*>/g, "`$&`");
@@ -152,7 +167,7 @@ function sanitizeMsgFromGame(msg) {
     msg = msg.replace(/https:\/\//g, "https\\://");
     msg = msg.replace(/http:\/\//g, "http\\://");
   }
-
+  msg = checkForDoubleMsg(msg)
   return msg;
 }
 
