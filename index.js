@@ -151,10 +151,9 @@ function checkForDoubleMsg(msg) {
     // Message was the same, so return nothing
     msg = "";
   }
-  else {
-    // message differed, so this is the new cached message
-    previousMsg = msg;
-  }
+  // set new cached message, either because it differed or
+  // to reset the msg so that only double posts are filtered
+  previousMsg = msg;
   return msg;
 }
 
