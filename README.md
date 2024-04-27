@@ -85,13 +85,6 @@ You may want to create a shortcut to run.bat or run_silent.vbs in your Startup f
 
 
 # How to Install - Linux
-## Raspberry Pi/Raspbian OS Setup
-The bot can be run from a Raspberry Pi device by installing NodeJS. You may need access to a desktop computer in order to create the bot account.
-
-First, follow the [NodeJS install instructions found here](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions) under "Debian and Ubuntu based Linux distributions".
-
-If running the bot on the same network as the Raspberry Pi, you will likely need to enter the computer's internal IP. Open a commant prompt on the system that the server is running on and type `ipconfig`. Look for the field labeled 'IPv4 address' and copy the IP next to it (the IP should start with `196.168`). Then, copy this IP into the config.json under 'ip'. If this does not work, consider forwarding your telnet port (make sure the password is secure) and using the network's external IP.
-
 ## Setting up the bot
 1. Open a terminal on your system.
 2. Install Node.js and NPM. Install build tools if instructed. [[How to install via package manager]](https://nodejs.org/en/download/package-manager/). **Skip this step if installing to a Raspberry Pi device.**
