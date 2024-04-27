@@ -45,6 +45,7 @@ var argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
 
 // cache previous Message to check for double messages
 var previousMsg;
+var reg = /\[.*\]\(.*\)\[-\]\[[a-fA-F\d]{3,6}\]([^[]+)\[-](: .+)/;
 
 // This is a simple check to see if we're using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
@@ -146,7 +147,24 @@ const configPrivate = {
 new DishordeInitializer(pjson, config, configPrivate);
 
 ////// # Functions # //////
+function ServerToolsRegex(msg) {
+  // Check for ServerTools color code prefix and remove it to
+  // align with normal messages
+  try {
+    let newMsg = msg.match(reg);
+    msg = newMsg[1] + newMsg[2];
+    console.log(`regex matched, ${newMsg}`);
+  }
+  catch {
+    // regex did not match
+    console.log(`regex did not match`);
+  }
+  return msg;
+}
+
 function checkForDoubleMsg(msg) {
+  // Check for ServerTools
+  msg = ServerToolsRegex(msg);
   if(msg == previousMsg) {
     // Message was the same, so return nothing
     msg = "";
@@ -166,7 +184,9 @@ function sanitizeMsgFromGame(msg) {
     msg = msg.replace(/https:\/\//g, "https\\://");
     msg = msg.replace(/http:\/\//g, "http\\://");
   }
-  msg = checkForDoubleMsg(msg)
+  if(config["server-is-modded"]) {
+    msg = checkForDoubleMsg(msg);
+  }
   return msg;
 }
 
