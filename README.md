@@ -1,3 +1,5 @@
+# Note - Not yet compatible with 7 Days to Die 1.0. Check back soon!
+
 # Dishorde - 7 Days to Die Discord Integration
 
 [How to Install](https://github.com/LakeYS/Dishorde#how-to-install---windows) | [Support it on Patreon](https://www.patreon.com/LakeYS) | [Join the Discord](https://discord.gg/ZMpSE2a3rs) | [Website](http://lakeys.net/dishorde)
