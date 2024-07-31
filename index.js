@@ -161,48 +161,49 @@ function sanitizeMsgToGame(msg) {
   return msg;
 }
 
+// Mapping von Entity IDs zu Spielernamen
+var entityIdToPlayerName = {};
+
+// Funktion zum Abrufen einer Nachrichtenvorlage aus der Konfigurationsdatei
+function getFormattedMessage(eventType, playerName) {
+  var template = config.messages[eventType];
+  if (!template) return "";
+
+  // Ersetze den Platzhalter {playername} durch den tatsächlichen Spielernamen
+  return template.replace("{playername}", playerName);
+}
+
+// Funktion zum Abrufen des Spielernamens basierend auf der Entity ID
+function getPlayerNameByEntityId(entityId) {
+  return entityIdToPlayerName[entityId] || "Unknown";
+}
+
+// Funktion zur Verarbeitung von Nachrichten aus dem Spiel
 function handleMsgFromGame(line) {
-  // Nothing to do with empty lines.
-  if(line === "") {
-    return;
-  }
+  if (line === "") return;
 
   var isLineDuplicate = false;
-  // Line check
-  if(d7dtdState.previousLine === line) {
-    if(config["debug-mode"]) console.log(`[DEBUG] Duplicate console line. Line: ${line}`);
-    d7dtdState.data = ""; // Clear the data cache
-
+  if (d7dtdState.previousLine === line) {
+    if (config["debug-mode"]) console.log(`[DEBUG] Duplicate console line. Line: ${line}`);
+    d7dtdState.data = "";
     return;
   }
 
   d7dtdState.previousLine = line;
-  
-  // Regex for identifying a chat message
-  // Ex 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
-  // Ex 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
-  // Ex 3: 2021-09-15T20:42:00 1103.462 INF Chat (from '12345678901234567', entity id '171', to 'Global'): 'Lake': the quick brown fox jumps over the lazy dog
+
   var dataRaw = line.match(/(.+)T(.+) (.+) INF (Chat|GMSG)(.*): (.*)/);
-  var content = { name: null, text: null, from: null, to: null, entityId: null };
+  if (dataRaw === null) return;
 
-  if(dataRaw === null) {
-    return;
-  }
+  var content = { name: null, text: dataRaw[6], from: null, to: null, entityId: null };
 
-  // Evaluate the source info (i.e. " (from '-non-player-', entity id '-1', to 'Global'): 'Server'") separately because it may not exist.
-  // Source info includes the sender name (i.e. 'Server')
-  var sourceInfoRaw = dataRaw[5].match(/\(from '(.+)', entity id '(.+)', to '(.+)'\): '(.+)'/);
-  if(sourceInfoRaw === null) {
-    content.text = dataRaw[6];
-  }
-  else {
-    // We have content info to derive from the source info match
-    content.name = sourceInfoRaw[4];
-    content.text = dataRaw[6];
-
-    content.from = sourceInfoRaw[1];
-    content.to = sourceInfoRaw[3];
-    content.entityId = sourceInfoRaw[2];
+  if (dataRaw[4] === "Chat") {
+    var sourceInfoRaw = dataRaw[5].match(/\(from '(.+)', entity id '(.+)', to '(.+)'\)/);
+    if (sourceInfoRaw) {
+      content.entityId = sourceInfoRaw[2];
+      content.name = playerIdNameMap[content.entityId] || "Unknown";
+      content.from = sourceInfoRaw[1];
+      content.to = sourceInfoRaw[3];
+    }
   }
 
   var data = {
@@ -212,68 +213,74 @@ function handleMsgFromGame(line) {
     content
   };
 
-  if(config["disable-non-player-chatmsgs"] && data.content.from === "-non-player-") { 
-    return;
-  }
+  if (config["disable-non-player-chatmsgs"] && data.content.from === "-non-player-") return;
 
-  if((!config["disable-chatmsgs"] && data.type === "Chat") || (!config["disable-gmsgs"] && data.type === "GMSG")) {
+  if ((data.type === "Chat" && !config["disable-chatmsgs"]) || (data.type === "GMSG" && !config["disable-gmsgs"])) {
     var msg;
-    if(data.content.name === null) msg = data.content.text;
-    else msg = `${data.content.name}: ${data.content.text}`;
 
-    // Make sure the channel exists.
-    if(typeof channel !== "undefined") {
-      if(data.type === "Chat") {
-        if(data.content.to !== "Global") {
-          if(config["show-private-chat"] && data.content.name !== null) {
-            msg = `*(Private)* ${data.content.name}: ${data.content.text}`;
-          }
-          else {
-            return;
-          }
+    if (data.type === "GMSG") {
+      let playernameMatch;
+      if (data.content.text.includes("joined the game")) {
+        playernameMatch = data.content.text.match(/Player '(.+)' joined the game/);
+        if (playernameMatch) {
+          msg = (config["messages"]["join"] || "{playername} joined the game")
+            .replace("{playername}", playernameMatch[1]);
+        }
+        updateEntityIdMapping();
+      } else if (data.content.text.includes("left the game")) {
+        playernameMatch = data.content.text.match(/Player '(.+)' left the game/);
+        if (playernameMatch) {
+          msg = (config["messages"]["left"] || "{playername} left the game")
+            .replace("{playername}", playernameMatch[1]);
+        }
+      } else if (data.content.text.includes("died")) {
+        playernameMatch = data.content.text.match(/Player '(.+)' died/);
+        if (playernameMatch) {
+          msg = (config["messages"]["died"] || "{playername} died")
+            .replace("{playername}", playernameMatch[1]);
         }
       }
+    } else if (data.type === "Chat") {
+      msg = `${content.name}: ${data.content.text}`;
+    }
 
-      if(config["log-messages"] && data.content.name !== null) {
-        console.log(msg);
-      }
-
-      if(data.type === "GMSG") {
-        // Remove join and leave messages.
-        if(data.content.text.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
-          return;
-        }
-
-        // Remove other global messages (player deaths, etc.)
-        if(!data.content.text.endsWith("the game") && config["disable-misc-gmsgs"]) {
-          return;
-        }
-      }
-
-      if(config["hide-prefix"])
-      {
-        // Do nothing if the prefix "/" is in the message.
-        if(data.content.text.startsWith("/")) {
-          return;
-        }
-      }
-
-      // If we're dealing with a duplicated message, we need to run a warning.
-      if(isLineDuplicate) {
-        console.warn(`WARNING: Caught attempting to send a duplicate line from the game. This line will be skipped. Line: ${line}`);
-    
-        return;
-      }
-
-      // Sanitize the resulting message, username included.
-      msg = sanitizeMsgFromGame(msg);
-
-      // If we didn't filter the message down to nothing, send it.
-      if(msg !== "") {
-        channel.send(msg);
-      }
+    if (msg && typeof channel !== "undefined") {
+      channel.send(msg).catch(err => console.error(`Failed to send message to Discord: ${err}`));
     }
   }
+}
+
+function updateEntityIdMapping() {
+  telnet.exec("lpi", (err, response) => {
+    if (err) {
+      console.error(`Error fetching player list: ${err.message}`);
+      return;
+    }
+
+    if (!response) {
+      console.log("Received empty response for player list.");
+      return;
+    }
+
+    var lines = response.split(lineSplit);
+    // console.log("Telnet response lines:", lines);
+
+    playerIdNameMap = {};
+    for (var i = 0; i < lines.length; i++) {
+      var match = lines[i].match(/id=(\d+), (.+)/);
+      if (match) {
+        playerIdNameMap[match[1]] = match[2];
+        console.log(`Mapped entity id ${match[1]} to player name ${match[2]}`);
+      }
+    }
+
+    if (Object.keys(playerIdNameMap).length === 0) {
+      console.log("No player IDs were mapped. Possible empty or malformed response.");
+    } else {
+		// Debug
+		// console.log("Updated entity ID mapping: ", playerIdNameMap);
+    }
+  });
 }
 
 function handleMsgToGame(line) {
