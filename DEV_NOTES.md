@@ -1,7 +1,7 @@
 # Times for reference
 In the game's console, use `settime` and `gettime` to test different times for 7d!time.
 
-At the time of writing, the horde starts at 22:00 on Day 7 and ends at 06:00 on Day 8.
+At the time of writing, the horde starts at 22:00 on Day 7 and ends at 04:00 on Day 8.
 
 ## Useful timestamps for testing
 * Day 5, 04:00 - 100000
