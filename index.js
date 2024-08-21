@@ -321,7 +321,7 @@ function handleTime(line, msg) {
   let hordeMsg = "";
 
   const isFirstWeek = day === 1 || day === 2;
-  const isHordeHour = (daysFromHorde === 0 && hour >= 22) || (daysFromHorde === 1 && hour < 6);
+  const isHordeHour = (daysFromHorde === 0 && hour >= 22) || (daysFromHorde === 1 && hour < 4);
 
   const isHordeNow = !isFirstWeek && isHordeHour;
 
