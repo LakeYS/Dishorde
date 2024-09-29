@@ -12,6 +12,46 @@ var intents = ["GUILDS", "GUILD_MESSAGES"];
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
 console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
 
+/**
+ * Maps entity IDs to player names.
+ * @type {Record<string, string>}
+ */
+const entityIdMap = {};
+
+/**
+ * Regex to match chat messages.
+ * 
+ * - Group 1 = timestamp
+ * - Group 2 = type (Chat or GMSG)
+ * - Group 4 = 'from' (can be blank - Steam ID, etc.)
+ * - Group 5 = entity ID
+ * - Group 6 = 'to'
+ * - Group 7 = message
+ */
+const regexChat = /(.+) INF (Chat|GMSG)( \(from '(.+|)', entity id '(.+)', to '(.+)'\)|): (.+)/;
+
+/**
+ * Regex for indexing a player's name by entity ID upon join.
+ * - Group 1 = timestamp
+ * - Group 5 = entity id
+ * - Group 7 = plaintext name
+ */
+const regexJoin = /(.+) (.+) INF PlayerSpawnedInWorld \(reason: (.+), position: (.+)\)\: EntityID=(.+), PltfmId=(.+), PlayerName='(.+)',(.+)/;
+
+/**
+ * Regex for indexing players' names by entity ID at any point (e.g. startup).
+ * Applies to the 'lpi' command.
+ * - Group 1 = sequential number
+ * - Group 2 = entity id
+ * - Group 3 = plaintext name
+ */
+const regexLpi = /(.+). id=(.+), (.+)/;
+
+/**
+ * Regex for matching the final message output of 'lpi'.
+ */
+const regexLpiTotal = /Total of (.+) in the game/;
+
 const lineSplit = /\n|\r/g;
 
 var channel = void 0;
@@ -23,6 +63,7 @@ var d7dtdState = {
   waitingForVersion: 0,
   waitingForPlayers: 0,
   //waitingForPref: 0,
+  waitingForInitialLpi: 1,
   receivedData: 0,
 
   skipVersionCheck: 0,
@@ -57,7 +98,6 @@ else {
   if(typeof argv.configFile !== "undefined") {
     configFile = argv.configFile;
   }
-
   config = require(configFile);
 }
 
@@ -161,6 +201,34 @@ function sanitizeMsgToGame(msg) {
   return msg;
 }
 
+/**
+ * Handle a player join/leave event and cache player names.
+ * @param {string[]} msg The regex capture from {@link regexJoin}
+ */
+function handlePlayerJoin(msg) {
+  const entityId = msg[5];
+  const name = msg[7];
+
+  if(entityIdMap[entityId] == null) {
+    // New player joining - add to the ID map
+    entityIdMap[entityId] = name;
+  }
+}
+
+/**
+ * Handle player data from the 'lpi' command.
+ * @param {string[]} msg 
+ */
+function handlePlayerListItem(msg) {
+  const entityId = msg[2];
+  const name = msg[3];
+
+  if(entityIdMap[entityId] == null) {
+    // New player joining - add to the ID map
+    entityIdMap[entityId] = name;
+  }
+}
+
 function handleMsgFromGame(line) {
   // Nothing to do with empty lines.
   if(line === "") {
@@ -177,38 +245,59 @@ function handleMsgFromGame(line) {
   }
 
   d7dtdState.previousLine = line;
-  
-  // Regex for identifying a chat message
-  // Ex 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
-  // Ex 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
-  // Ex 3: 2021-09-15T20:42:00 1103.462 INF Chat (from '12345678901234567', entity id '171', to 'Global'): 'Lake': the quick brown fox jumps over the lazy dog
-  var dataRaw = line.match(/(.+)T(.+) (.+) INF (Chat|GMSG)(.*): (.*)/);
+
+  var dataRaw = line.match(regexChat);
   var content = { name: null, text: null, from: null, to: null, entityId: null };
 
   if(dataRaw === null) {
+    var dataJoin = line.match(regexJoin);
+    if(dataJoin != null) {
+      handlePlayerJoin(dataJoin);
+      return;
+    } 
+
+    var dataLpi = line.match(regexLpi);
+    if(dataLpi != null) {
+      handlePlayerListItem(dataLpi);
+      return;
+    }
+
+    var dataLpiDone = line.match(regexLpiTotal)
+    if(dataLpiDone != null && d7dtdState.waitingForInitialLpi) {
+      d7dtdState.waitingForInitialLpi = 0;
+      return;
+    }
+
+    // Doesn't match anything - return.
     return;
   }
 
-  // Evaluate the source info (i.e. " (from '-non-player-', entity id '-1', to 'Global'): 'Server'") separately because it may not exist.
-  // Source info includes the sender name (i.e. 'Server')
-  var sourceInfoRaw = dataRaw[5].match(/\(from '(.+)', entity id '(.+)', to '(.+)'\): '(.+)'/);
-  if(sourceInfoRaw === null) {
-    content.text = dataRaw[6];
+  if(dataRaw[5] === 'GMSG') {
+    content.text = dataRaw[7];
   }
-  else {
-    // We have content info to derive from the source info match
-    content.name = sourceInfoRaw[4];
-    content.text = dataRaw[6];
+  content.text = dataRaw[7];
 
-    content.from = sourceInfoRaw[1];
-    content.to = sourceInfoRaw[3];
-    content.entityId = sourceInfoRaw[2];
+  // We have content info to derive from the source info match
+  
+  content.to = dataRaw[6];
+  content.entityId = dataRaw[5];
+
+  if(content.entityId === '-1') {
+    content.name = 'Server'
+  } else {
+    // Retrieve the player's name.
+    if(entityIdMap[content.entityId] == null) {
+      // Something went wrong.
+      console.warn(`Got a message from an unknown player? Entity ID: ${content.entityId}`);
+      content.name = '*(Unknown)*';
+    } else {
+      content.name = entityIdMap[content.entityId];
+    }
   }
-
+  
   var data = {
-    date: dataRaw[1],
-    time: dataRaw[2],
-    type: dataRaw[4],
+    datetime: dataRaw[1],
+    type: dataRaw[2],
     content
   };
 
@@ -218,14 +307,14 @@ function handleMsgFromGame(line) {
 
   if((!config["disable-chatmsgs"] && data.type === "Chat") || (!config["disable-gmsgs"] && data.type === "GMSG")) {
     var msg;
-    if(data.content.name === null) msg = data.content.text;
+    if(data.type === 'GMSG') msg = data.content.text;
     else msg = `${data.content.name}: ${data.content.text}`;
 
     // Make sure the channel exists.
     if(typeof channel !== "undefined") {
       if(data.type === "Chat") {
         if(data.content.to !== "Global") {
-          if(config["show-private-chat"] && data.content.name !== null) {
+          if(config["show-private-chat"] && data.content.name != null) {
             msg = `*(Private)* ${data.content.name}: ${data.content.text}`;
           }
           else {
@@ -234,18 +323,16 @@ function handleMsgFromGame(line) {
         }
       }
 
-      if(config["log-messages"] && data.content.name !== null) {
+      if(config["log-messages"] && data.content.name != null) {
         console.log(msg);
       }
 
       if(data.type === "GMSG") {
         // Remove join and leave messages.
-        if(data.content.text.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
-          return;
-        }
-
-        // Remove other global messages (player deaths, etc.)
-        if(!data.content.text.endsWith("the game") && config["disable-misc-gmsgs"]) {
+        if(data.content.text.endsWith("the game")) {
+          if(config["disable-join-leave-gmsgs"]) return;
+        } else if(config["disable-misc-gmsgs"]) {
+          // Remove other global messages (player deaths, etc.)
           return;
         }
       }
@@ -656,6 +743,10 @@ telnet.on("ready", () => {
   if(!config["skip-discord-auth"]) {
     updateStatus(1);
   }
+
+  // Run lpi on startup to acquire names of any players that are already on the server.
+  // See: d7dtdState.waitingForInitialLpi
+  telnet.exec('lpi');
 });
 
 telnet.on("failedlogin", () => {
