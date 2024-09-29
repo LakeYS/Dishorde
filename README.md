@@ -1,4 +1,4 @@
-# Note - Not yet compatible with 7 Days to Die 1.0. Check back soon!
+# Note - Not yet compatible with 7 Days to Die 1.0. Check back soon™!
 
 # Dishorde - 7 Days to Die Discord Integration
 
