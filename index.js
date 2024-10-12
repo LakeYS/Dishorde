@@ -235,10 +235,12 @@ function handleMsgFromGame(line) {
     return;
   }
 
+  // TODO This might be redundant now. Remove if we don't see any instances of it in the wild.
   let isLineDuplicate = false;
   // Line check
   if(d7dtdState.previousLine === line) {
     if(config["debug-mode"]) console.log(`[DEBUG] Duplicate console line. Line: ${line}`);
+    isLineDuplicate = true;
     d7dtdState.data = ""; // Clear the data cache
 
     return;
