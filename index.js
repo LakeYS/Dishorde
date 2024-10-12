@@ -283,7 +283,7 @@ function handleMsgFromGame(line) {
     content.name = 'Server'
   } else {
     // Retrieve the player's name.
-    if(entityIdMap[content.entityId] == null) {
+    if(entityIdMap[content.entityId] == null && dataRaw[2] !== 'GMSG') {
       // Something went wrong.
       console.warn(`Got a message from an unknown player? Entity ID: ${content.entityId}`);
       content.name = '*(Unknown)*';
