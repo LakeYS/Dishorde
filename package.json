@@ -13,6 +13,6 @@
     "discord.js": "^13.17.1",
     "minimist": "^1.2.5",
     "semver-compare": "^1.0.0",
-    "telnet-client": "^0.15.8"
+    "telnet-client": "^2.2.1"
   }
 }

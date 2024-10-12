@@ -2,7 +2,7 @@ const minimist = require("minimist");
 const fs = require("fs");
 const pjson = require("./package.json");
 const Discord = require("discord.js");
-const TelnetClient = require("telnet-client");
+const { Telnet } = require("telnet-client");
 const DishordeInitializer = require("./lib/init.js");
 const Logger = require("./lib/log.js");
 
@@ -106,7 +106,7 @@ if(config["log-console"]) {
   d7dtdState.logger = new Logger();
 }
 
-const telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
+const telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new Telnet();
 
 // IP
 // This argument allows you to run the bot on a remote network.
