@@ -272,9 +272,6 @@ function handleMsgFromGame(line) {
     return;
   }
 
-  if(dataRaw[5] === 'GMSG') {
-    content.text = dataRaw[7];
-  }
   content.text = dataRaw[7];
 
   // We have content info to derive from the source info match
