@@ -491,7 +491,7 @@ function processTelnetResponse(response, callback) {
   if(typeof response !== "undefined") {
     const lines = response.split(lineSplit);
     d7dtdState.receivedData = 0;
-    for(const i = 0; i <= lines.length-1; i++) {
+    for(let i = 0; i <= lines.length-1; i++) {
       callback(lines[i]);
     }
   }
