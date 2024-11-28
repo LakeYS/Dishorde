@@ -119,3 +119,39 @@ Once you complete all of this, you will be able to run the bot by executing run.
 `Connected to game. Connected to 1 Discord Servers.`
 
 To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/Dishorde/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
+
+# Run the bot in docker
+If you choose to run the bot in docker you can
+
+As a docker-compose
+
+```
+services:
+  dishorde:
+    image: ghcr.io/LakeYS/dishorde:latest
+    container_name: dishorde
+    environment:
+      SD_IP: 7days_ip_address
+      SD_PASSWORD: your_7days_password
+      SD_TOKEN: Discord_token
+      SD_CHANNEL: discord_channel
+      SD_PORT: 8081
+    networks:
+      - 7days
+    restart: unless-stopped
+
+networks:
+  7days: {}
+```
+
+As a standlaone docker image deployment
+
+```
+docker run -d \
+ -e SD_IP=7days_ip_address \
+ -e SD_PASSWORD=your_7days_password \
+ -e SD_TOKEN=Discord_token \
+ -e SD_CHANNEL=discord_channel \
+ -e SD_PORT=8081 \
+ ghcr.io/LakeYS/dishorde:latest
+```
