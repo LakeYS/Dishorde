@@ -772,7 +772,7 @@ telnet.on("data", (data) => {
   if(config["debug-mode"]) {
     const str = data.toString();
 
-    const lineEnding = "!!!NONE!!!";
+    let lineEnding = "!!!NONE!!!";
     if(str.endsWith("\r\n")) lineEnding = "CRLF";
     else if(str.endsWith("\r")) lineEnding = "CR";
     else if(str.endsWith("\n")) lineEnding = "LF";
