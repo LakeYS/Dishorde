@@ -10,7 +10,7 @@
   "author": "Lake Y",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^13.17.1",
+    "discord.js": "^14.17.2",
     "minimist": "^1.2.5",
     "semver-compare": "^1.0.0",
     "telnet-client": "^2.2.1"

@@ -6,8 +6,8 @@ const { Telnet } = require("telnet-client");
 const DishordeInitializer = require("./lib/init.js");
 const Logger = require("./lib/log.js");
 
-const { Client, Intents } = Discord;
-const intents = ["GUILDS", "GUILD_MESSAGES"];
+const { ChannelType, Client, GatewayIntentBits, PermissionsBitField } = Discord;
+const intents = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent];
 
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
 console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
@@ -163,7 +163,7 @@ else {
 
 // Load the Discord client
 const client = new Client({
-  intents: new Intents(intents),
+  intents,
   retryLimit: 3,
   messageCacheMaxSize: 50
 });
@@ -497,6 +497,11 @@ function processTelnetResponse(response, callback) {
   }
 }
 
+/**
+ * Parse and execute a command from a message if one exists.
+ * @param {Discord.OmitPartialGroupDMChannel<Discord.Message<boolean>>} msg 
+ * @returns 
+ */
 function parseDiscordCommand(msg, mentioned) {
   const cmd = msg.toString().toUpperCase().replace(prefix, "");
 
@@ -506,13 +511,13 @@ function parseDiscordCommand(msg, mentioned) {
 
   // 7d!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
-    const channelExists = (typeof channel !== "undefined");
+    const isConflictingGuild = channel != null && msg.guild.id !== channel.guild.id;
 
-    if(!channelExists || msg.channel.type !== "GUILD_TEXT") {
+    if(msg.channel.type !== ChannelType.GuildText || isConflictingGuild) {
       return;
     }
 
-    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+    if(!msg.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
       msg.author.send("You do not have permission to do this. (setchannel)");
       return;
     }
@@ -563,11 +568,11 @@ function parseDiscordCommand(msg, mentioned) {
   // 7d!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
   if(cmd.startsWith("EXEC")) {
-    if(msg.channel.type !== "GUILD_TEXT" || !config["allow-exec-command"]) {
+    if(msg.channel.type !== ChannelType.GuildText || !config["allow-exec-command"]) {
       return;
     }
 
-    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+    if(!msg.member.permissions.has(PermissionsBitField.Flags.ManageGuild) || msg.guild.id !== channel.guild.id) {
       msg.author.send("You do not have permission to do this. (exec)");
       return;
     }
@@ -578,7 +583,7 @@ function parseDiscordCommand(msg, mentioned) {
   }
 
   // The following commands only work in the specified channel if one is set.
-  if(msg.channel === channel || msg.channel.type === "DM") {
+  if(msg.channel === channel || msg.channel.type === ChannelType.DM) {
     // 7d!info
     if(cmd === "INFO" || cmd === "I" || cmd === "HELP" || cmd === "H" || mentioned) {
       // -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
@@ -962,7 +967,7 @@ if(!config["skip-discord-auth"]) {
     if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
       parseDiscordCommand(msg, mentioned);
     }
-    else if(msg.channel === channel && msg.channel.type === "GUILD_TEXT") {
+    else if(msg.channel === channel && msg.channel.type === ChannelType.GuildText) {
       msg = "[" + msg.member.displayName + "] " + msg.cleanContent;
       handleMsgToGame(msg);
     }
