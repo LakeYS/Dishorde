@@ -13,12 +13,6 @@ console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
 console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
 
 /**
- * Maps entity IDs to player names.
- * @type {Record<string, string>}
- */
-const entityIdMap = {};
-
-/**
  * Regex to match chat messages.
  * 
  * - Group 1 = timestamp
@@ -29,28 +23,6 @@ const entityIdMap = {};
  * - Group 7 = message
  */
 const regexChat = /(.+) INF (Chat|GMSG)( \(from '(.+|)', entity id '(.+)', to '(.+)'\)|): (.+)/;
-
-/**
- * Regex for indexing a player's name by entity ID upon join.
- * - Group 1 = timestamp
- * - Group 5 = entity id
- * - Group 7 = plaintext name
- */
-const regexJoin = /(.+) (.+) INF PlayerSpawnedInWorld \(reason: (.+), position: (.+)\)\: EntityID=(.+), PltfmId=(.+), PlayerName='(.+)',(.+)/;
-
-/**
- * Regex for indexing players' names by entity ID at any point (e.g. startup).
- * Applies to the 'lpi' command.
- * - Group 1 = sequential number
- * - Group 2 = entity id
- * - Group 3 = plaintext name
- */
-const regexLpi = /(.+). id=(.+), (.+)/;
-
-/**
- * Regex for matching the final message output of 'lpi'.
- */
-const regexLpiTotal = /Total of (.+) in the game/;
 
 const lineSplit = /\n|\r/g;
 
@@ -63,7 +35,6 @@ let d7dtdState = {
   waitingForVersion: 0,
   waitingForPlayers: 0,
   //waitingForPref: 0,
-  waitingForInitialLpi: 1,
   receivedData: 0,
 
   skipVersionCheck: 0,
@@ -201,34 +172,6 @@ function sanitizeMsgToGame(msg) {
   return msg;
 }
 
-/**
- * Handle a player join/leave event and cache player names.
- * @param {string[]} msg The regex capture from {@link regexJoin}
- */
-function handlePlayerJoin(msg) {
-  const entityId = msg[5];
-  const name = msg[7];
-
-  if(entityIdMap[entityId] == null) {
-    // New player joining - add to the ID map
-    entityIdMap[entityId] = name;
-  }
-}
-
-/**
- * Handle player data from the 'lpi' command.
- * @param {string[]} msg 
- */
-function handlePlayerListItem(msg) {
-  const entityId = msg[2];
-  const name = msg[3];
-
-  if(entityIdMap[entityId] == null) {
-    // New player joining - add to the ID map
-    entityIdMap[entityId] = name;
-  }
-}
-
 function handleMsgFromGame(line) {
   // Nothing to do with empty lines.
   if(line === "") {
@@ -249,27 +192,9 @@ function handleMsgFromGame(line) {
   d7dtdState.previousLine = line;
 
   const dataRaw = line.match(regexChat);
-  const content = { name: null, text: null, from: null, to: null, entityId: null };
+  const content = { text: null, from: null, to: null, entityId: null };
 
   if(dataRaw === null) {
-    const dataJoin = line.match(regexJoin);
-    if(dataJoin != null) {
-      handlePlayerJoin(dataJoin);
-      return;
-    } 
-
-    const dataLpi = line.match(regexLpi);
-    if(dataLpi != null) {
-      handlePlayerListItem(dataLpi);
-      return;
-    }
-
-    const dataLpiDone = line.match(regexLpiTotal)
-    if(dataLpiDone != null && d7dtdState.waitingForInitialLpi) {
-      d7dtdState.waitingForInitialLpi = 0;
-      return;
-    }
-
     // Doesn't match anything - return.
     return;
   }
@@ -281,19 +206,6 @@ function handleMsgFromGame(line) {
   content.to = dataRaw[6];
   content.entityId = dataRaw[5];
 
-  if(content.entityId === '-1') {
-    content.name = 'Server'
-  } else {
-    // Retrieve the player's name.
-    if(entityIdMap[content.entityId] == null && dataRaw[2] !== 'GMSG') {
-      // Something went wrong.
-      console.warn(`Got a message from an unknown player? Entity ID: ${content.entityId}`);
-      content.name = '*(Unknown)*';
-    } else {
-      content.name = entityIdMap[content.entityId];
-    }
-  }
-  
   const data = {
     datetime: dataRaw[1],
     type: dataRaw[2],
@@ -307,7 +219,7 @@ function handleMsgFromGame(line) {
   if((!config["disable-chatmsgs"] && data.type === "Chat") || (!config["disable-gmsgs"] && data.type === "GMSG")) {
     let msg;
     if(data.type === 'GMSG') msg = data.content.text;
-    else msg = `${data.content.name}: ${data.content.text}`;
+    else msg = data.content.text;
 
     // Make sure the channel exists.
     if(typeof channel !== "undefined") {
