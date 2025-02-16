@@ -26,5 +26,10 @@
   "log-console": false,
   "log-messages": false,
   "log-telnet": false,
-  "prefix": "7d!"
+  "prefix": "7d!",
+  "messages": {
+	  "join": "{playername} joined the game",
+	  "left": "{playername} left the game",
+	  "died": "{playername} died"
+  }
 }
