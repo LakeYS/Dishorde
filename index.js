@@ -1,22 +1,37 @@
-const minimist = require("minimist");
-const fs = require("fs");
-const pjson = require("./package.json");
-const Discord = require("discord.js");
-var TelnetClient = require("telnet-client");
-const DishordeInitializer = require("./lib/init.js");
-const Logger = require("./lib/log.js");
+import minimist from "minimist";
+import {writeFile} from "fs";
+import {readFile} from "fs/promises";
+import {ChannelType, Client, GatewayIntentBits, PermissionsBitField} from "discord.js"
+import SevenDaysClient from "./lib/sevenDaysClient.js";
+import DishordeInitializer from "./lib/init.js";
+import Logger from "./lib/log.js";
 
-const { Client, Intents } = Discord;
-var intents = ["GUILDS", "GUILD_MESSAGES"];
+import DemoClient from "./lib/demoServer.js";
+
+const intents = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent];
+
+const pjson = JSON.parse(
+  await readFile('./package.json')
+);
 
 console.log("\x1b[7m# Dishorde v" + pjson.version + " #\x1b[0m");
 console.log("NOTICE: Remote connections to 7 Days to Die servers are not encrypted. To keep your server secure, do not run this application on a public network, such as a public wi-fi hotspot. Be sure to use a unique telnet password.\n");
 
-const lineSplit = /\n|\r/g;
+/**
+ * Regex to match chat messages.
+ * 
+ * - Group 1 = timestamp
+ * - Group 2 = type (Chat or GMSG)
+ * - Group 4 = 'from' (can be blank - Steam ID, etc.)
+ * - Group 5 = entity ID
+ * - Group 6 = 'to'
+ * - Group 7 = message
+ */
+const regexChat = /(.+) INF (Chat|GMSG)( \(from '(.+|)', entity id '(.+)', to '(.+)'\)|): (.+)/;
 
-var channel = void 0;
+let channel = void 0;
 
-var d7dtdState = {
+let d7dtdState = {
   doReconnect: 1,
 
   waitingForTime: 0,
@@ -41,12 +56,12 @@ var d7dtdState = {
 
 ////// # Arguments # //////
 // We have to treat the channel ID as a string or the number will parse incorrectly.
-var argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
+const argv = minimist(process.argv.slice(2), {string: ["channel","port"]});
 
 // This is a simple check to see if we're using arguments or the config file.
 // If the user is using arguments, config.json is ignored.
-var config;
-var configFile;
+let config;
+let configFile;
 if(Object.keys(argv).length > 2) {
   config = argv;
   console.log("********\nWARNING: Configuring the bot with arguments is no-longer supported and may not work correctly. Please consider using config.json instead.\nThe arguments must be removed from run.bat/run.sh in order for the config file to take effect.\n********");
@@ -58,7 +73,9 @@ else {
     configFile = argv.configFile;
   }
 
-  config = require(configFile);
+  config = JSON.parse(
+    await readFile(configFile)
+  );
 }
 
 // Logging init
@@ -66,11 +83,11 @@ if(config["log-console"]) {
   d7dtdState.logger = new Logger();
 }
 
-var telnet = config["demo-mode"]?require("./lib/demoServer.js").client:new TelnetClient();
+const telnet = config["demo-mode"]?new DemoClient():new SevenDaysClient();
 
 // IP
 // This argument allows you to run the bot on a remote network.
-var ip;
+let ip;
 if(typeof config.ip === "undefined") {
   ip = "localhost";
 }
@@ -79,7 +96,7 @@ else {
 }
 
 // Port
-var port;
+let port;
 if(typeof config.port === "undefined") {
   port = 8081; // If no port, default to 8081
 }
@@ -92,17 +109,17 @@ if(typeof config.password === "undefined") {
   console.error("\x1b[31mERROR: No telnet password specified!\x1b[0m");
   process.exit();
 }
-var pass = config.password;
+const pass = config.password;
 
 // Discord token
 if(typeof config.token === "undefined") {
   console.error("\x1b[31mERROR: No Discord token specified!\x1b[0m");
   process.exit();
 }
-var token = config.token;
+const token = config.token;
 
 // Discord channel
-var skipChannelCheck;
+let skipChannelCheck;
 if(typeof config.channel === "undefined" || config.channel === "channelid") {
   console.warn("\x1b[33mWARNING: No Discord channel specified! You will need to set one with 'setchannel #channelname'\x1b[0m");
   skipChannelCheck = 1;
@@ -110,10 +127,10 @@ if(typeof config.channel === "undefined" || config.channel === "channelid") {
 else {
   skipChannelCheck = 0;
 }
-var channelid = config.channel.toString();
+let channelid = config.channel.toString();
 
 // Prefix
-var prefix;
+let prefix;
 if(typeof config.prefix !== "string") {
   prefix = "7d!";
 }
@@ -123,7 +140,7 @@ else {
 
 // Load the Discord client
 const client = new Client({
-  intents: new Intents(intents),
+  intents,
   retryLimit: 3,
   messageCacheMaxSize: 50
 });
@@ -167,48 +184,27 @@ function handleMsgFromGame(line) {
     return;
   }
 
-  var isLineDuplicate = false;
-  // Line check
-  if(d7dtdState.previousLine === line) {
-    if(config["debug-mode"]) console.log(`[DEBUG] Duplicate console line. Line: ${line}`);
-    d7dtdState.data = ""; // Clear the data cache
-
-    return;
-  }
-
   d7dtdState.previousLine = line;
-  
-  // Regex for identifying a chat message
-  // Ex 1: 2021-09-14T18:14:40 433.266 INF Chat (from '-non-player-', entity id '-1', to 'Global'): 'Server': test
-  // Ex 2: 2021-09-14T18:49:39 2532.719 INF GMSG: Player 'Lake' left the game
-  // Ex 3: 2021-09-15T20:42:00 1103.462 INF Chat (from '12345678901234567', entity id '171', to 'Global'): 'Lake': the quick brown fox jumps over the lazy dog
-  var dataRaw = line.match(/(.+)T(.+) (.+) INF (Chat|GMSG)(.*): (.*)/);
-  var content = { name: null, text: null, from: null, to: null, entityId: null };
+
+  const dataRaw = line.match(regexChat);
+  const content = { text: null, from: null, to: null, entityId: null };
 
   if(dataRaw === null) {
+    // Doesn't match anything - return.
     return;
   }
 
-  // Evaluate the source info (i.e. " (from '-non-player-', entity id '-1', to 'Global'): 'Server'") separately because it may not exist.
-  // Source info includes the sender name (i.e. 'Server')
-  var sourceInfoRaw = dataRaw[5].match(/\(from '(.+)', entity id '(.+)', to '(.+)'\): '(.+)'/);
-  if(sourceInfoRaw === null) {
-    content.text = dataRaw[6];
-  }
-  else {
-    // We have content info to derive from the source info match
-    content.name = sourceInfoRaw[4];
-    content.text = dataRaw[6];
+  content.text = dataRaw[7];
 
-    content.from = sourceInfoRaw[1];
-    content.to = sourceInfoRaw[3];
-    content.entityId = sourceInfoRaw[2];
-  }
+  // We have content info to derive from the source info match
+  
+  content.from = dataRaw[4];
+  content.to = dataRaw[6];
+  content.entityId = dataRaw[5];
 
-  var data = {
-    date: dataRaw[1],
-    time: dataRaw[2],
-    type: dataRaw[4],
+  const data = {
+    datetime: dataRaw[1],
+    type: dataRaw[2],
     content
   };
 
@@ -217,15 +213,15 @@ function handleMsgFromGame(line) {
   }
 
   if((!config["disable-chatmsgs"] && data.type === "Chat") || (!config["disable-gmsgs"] && data.type === "GMSG")) {
-    var msg;
-    if(data.content.name === null) msg = data.content.text;
-    else msg = `${data.content.name}: ${data.content.text}`;
+    let msg;
+    if(data.type === 'GMSG') msg = data.content.text;
+    else msg = data.content.text;
 
     // Make sure the channel exists.
     if(typeof channel !== "undefined") {
       if(data.type === "Chat") {
         if(data.content.to !== "Global") {
-          if(config["show-private-chat"] && data.content.name !== null) {
+          if(config["show-private-chat"] && data.content.name != null) {
             msg = `*(Private)* ${data.content.name}: ${data.content.text}`;
           }
           else {
@@ -234,18 +230,16 @@ function handleMsgFromGame(line) {
         }
       }
 
-      if(config["log-messages"] && data.content.name !== null) {
+      if(config["log-messages"] && data.content.name != null) {
         console.log(msg);
       }
 
       if(data.type === "GMSG") {
         // Remove join and leave messages.
-        if(data.content.text.endsWith("the game") && config["disable-join-leave-gmsgs"]) {
-          return;
-        }
-
-        // Remove other global messages (player deaths, etc.)
-        if(!data.content.text.endsWith("the game") && config["disable-misc-gmsgs"]) {
+        if(data.content.text.endsWith("the game")) {
+          if(config["disable-join-leave-gmsgs"]) return;
+        } else if(config["disable-misc-gmsgs"]) {
+          // Remove other global messages (player deaths, etc.)
           return;
         }
       }
@@ -256,13 +250,6 @@ function handleMsgFromGame(line) {
         if(data.content.text.startsWith("/")) {
           return;
         }
-      }
-
-      // If we're dealing with a duplicated message, we need to run a warning.
-      if(isLineDuplicate) {
-        console.warn(`WARNING: Caught attempting to send a duplicate line from the game. This line will be skipped. Line: ${line}`);
-    
-        return;
       }
 
       // Sanitize the resulting message, username included.
@@ -278,17 +265,10 @@ function handleMsgFromGame(line) {
 
 function handleMsgToGame(line) {
   if(!config["disable-chatmsgs"]) {
-    var msg = sanitizeMsgToGame(line);
-    telnet.exec("say \"" + msg + "\"", (err, response) => {
+    const msg = sanitizeMsgToGame(line);
+    telnet.exec("say \"" + msg + "\"", (err) => {
       if(err) {
         console.log("Error while attempting to send message: " + err.message);
-      }
-      else {
-        var lines = response.split(lineSplit);
-        for(var i = 0; i <= lines.length-1; i++) {
-          var lineResponse = lines[i];
-          handleMsgFromGame(lineResponse);
-        }
       }
     });
   }
@@ -383,14 +363,14 @@ function updateStatus(status) {
 }
 
 function refreshDiscordStatus() {
-  var status = d7dtdState.connStatus;
+  const status = d7dtdState.connStatus;
   d7dtdState.connStatus = -100;
   updateStatus(status);
 }
 
 // This function prevent's the bot's staus from showing up as blank.
 function d7dtdHeartbeat() {
-  var status = d7dtdState.connStatus;
+  const status = d7dtdState.connStatus;
   d7dtdState.connStatus = -100;
   updateStatus(status);
 
@@ -399,20 +379,13 @@ function d7dtdHeartbeat() {
   }, 3.6e+6); // Heartbeat every hour
 }
 
-function processTelnetResponse(response, callback) {
-  // Sometimes the "response" has more than what we're looking for.
-  // We have to double-check and make sure the correct line is returned.
-  if(typeof response !== "undefined") {
-    var lines = response.split(lineSplit);
-    d7dtdState.receivedData = 0;
-    for(var i = 0; i <= lines.length-1; i++) {
-      callback(lines[i]);
-    }
-  }
-}
-
+/**
+ * Parse and execute a command from a message if one exists.
+ * @param {Discord.OmitPartialGroupDMChannel<Discord.Message<boolean>>} msg 
+ * @returns 
+ */
 function parseDiscordCommand(msg, mentioned) {
-  var cmd = msg.toString().toUpperCase().replace(prefix, "");
+  const cmd = msg.toString().toUpperCase().replace(prefix, "");
 
   if(msg.author.bot === true) {
     return;
@@ -420,23 +393,23 @@ function parseDiscordCommand(msg, mentioned) {
 
   // 7d!setchannel
   if(cmd.startsWith("SETCHANNEL")) {
-    var channelExists = (typeof channel !== "undefined");
+    const isConflictingGuild = channel != null && msg.guild.id !== channel.guild.id;
 
-    if(!channelExists || msg.channel.type !== "GUILD_TEXT") {
+    if(msg.channel.type !== ChannelType.GuildText || isConflictingGuild) {
       return;
     }
 
-    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+    if(!msg.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
       msg.author.send("You do not have permission to do this. (setchannel)");
       return;
     }
 
     console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-    var str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
-    var id = str.replace("<#","").replace(">","");
+    const str = msg.toString().toUpperCase().replace(prefix + "SETCHANNEL ", "");
+    const id = str.replace("<#","").replace(">","");
 
     // If blank str, use active channel.
-    var channelobj;
+    let channelobj;
     if(id === prefix + "SETCHANNEL") {
       channelobj = msg.channel;
     }
@@ -459,7 +432,7 @@ function parseDiscordCommand(msg, mentioned) {
 
     config.channel = channelid;
 
-    fs.writeFile(configFile, JSON.stringify(config, null, "\t"), "utf8", (err) => {
+    writeFile(configFile, JSON.stringify(config, null, "\t"), "utf8", (err) => {
       if(err) {
         console.error("Failed to write to the config file with the following err:\n" + err + "\nMake sure your config file is not read-only or missing.");
         msg.channel.send(":warning: Channel set successfully to <#" + channelobj.id + "> (" + channelobj.id + "), however the configuration has failed to save. The configured channel will not save when the bot restarts. See the bot's console for more info.");
@@ -477,26 +450,26 @@ function parseDiscordCommand(msg, mentioned) {
   // 7d!exec
   // This command must be explicitly enabled due to the security risks of allowing it.
   if(cmd.startsWith("EXEC")) {
-    if(msg.channel.type !== "GUILD_TEXT" || !config["allow-exec-command"]) {
+    if(msg.channel.type !== ChannelType.GuildText || !config["allow-exec-command"]) {
       return;
     }
 
-    if(!msg.member.permissions.has("MANAGE_GUILD") || msg.guild !== channel.guild) {
+    if(!msg.member.permissions.has(PermissionsBitField.Flags.ManageGuild) || msg.guild.id !== channel.guild.id) {
       msg.author.send("You do not have permission to do this. (exec)");
       return;
     }
 
     console.log("User " + msg.author.tag + " (" + msg.author.id + ") executed command: " + cmd);
-    var execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
+    const execStr = msg.toString().replace(new RegExp(prefix + "EXEC", "ig"), "");
     telnet.exec(execStr);
   }
 
   // The following commands only work in the specified channel if one is set.
-  if(msg.channel === channel || msg.channel.type === "DM") {
+  if(msg.channel === channel || msg.channel.type === ChannelType.DM) {
     // 7d!info
     if(cmd === "INFO" || cmd === "I" || cmd === "HELP" || cmd === "H" || mentioned) {
       // -1 = Error, 0 = No connection/connecting, 1 = Online, -100 = Override or N/A (value is ignored)
-      var statusMsg;
+      let statusMsg;
       switch(d7dtdState.connStatus) {
       default:
         statusMsg = ":red_circle: Error";
@@ -509,13 +482,13 @@ function parseDiscordCommand(msg, mentioned) {
         break;
       }
 
-      var cmdString = "";
+      let cmdString = "";
       if(!config["disable-commands"]) {
-        var pre = prefix.toLowerCase();
+        const pre = prefix.toLowerCase();
         cmdString = `\n**Commands:** ${pre}info, ${pre}time, ${pre}version, ${pre}players`;
       }
 
-      var string = `Server connection: ${statusMsg}${cmdString}\n\n*Dishorde v${pjson.version} - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}.*`;
+      const string = `Server connection: ${statusMsg}${cmdString}\n\n*Dishorde v${pjson.version} - Powered by discord.js ${pjson.dependencies["discord.js"].replace("^","")}.*`;
       msg.channel.send({embeds: [{description: string}] })
         .catch((err) => {
           console.log(err);
@@ -529,68 +502,40 @@ function parseDiscordCommand(msg, mentioned) {
     if(!config["disable-commands"]) {
       // 7d!time
       if(cmd === "TIME" || cmd === "T" || cmd === "DAY") {
-        telnet.exec("gettime", (err, response) => {
-          if(!err) {
-            processTelnetResponse(response, (line) => {
-              if(line.startsWith("Day")) {
-                d7dtdState.receivedData = 1;
-                handleTime(line, msg);
-              }
-            });
-
-            // Sometimes, the response doesn't have the data we're looking for...
-            if(!d7dtdState.receivedData) {
-              d7dtdState.waitingForTime = 1;
-              d7dtdState.waitingForTimeMsg = msg;
-            }
-          }
-          else {
+        telnet.exec("gettime", (err) => {
+          if(err) {
             handleCmdError(err);
+            return;
           }
+
+          d7dtdState.waitingForTime = 1;
+          d7dtdState.waitingForTimeMsg = msg;
         });
       }
 
       // 7d!version
       if(cmd === "VERSION" || cmd === "V") {
-        telnet.exec("version", (err, response) => {
-          if(!err) {
-            processTelnetResponse(response, (line) => {
-              if(line.startsWith("Game version:")) {
-                msg.channel.send(line);
-                d7dtdState.receivedData = 1;
-              }
-            });
-
-            if(!d7dtdState.receivedData) {
-              d7dtdState.waitingForVersion = 1;
-              d7dtdState.waitingForVersionMsg = msg;
-            }
-          }
-          else {
+        telnet.exec("version", (err) => {
+          if(err) {
             handleCmdError(err);
+            return;
           }
+
+          d7dtdState.waitingForVersion = 1;
+          d7dtdState.waitingForVersionMsg = msg;
         });
       }
 
       // 7d!players
       if(cmd === "PLAYERS" || cmd === "P" || cmd === "PL" || cmd === "LP") {
-        telnet.exec("lp", (err, response) => {
-          if(!err) {
-            processTelnetResponse(response, (line) => {
-              if(line.startsWith("Total of ")) {
-                d7dtdState.receivedData = 1;
-                handlePlayerCount(line, msg);
-              }
-            });
-
-            if(!d7dtdState.receivedData) {
-              d7dtdState.waitingForPlayers = 1;
-              d7dtdState.waitingForPlayersMsg = msg;
-            }
-          }
-          else {
+        telnet.exec("lp", (err) => {
+          if(err) {
             handleCmdError(err);
+            return;
           }
+
+          d7dtdState.waitingForPlayers = 1;
+          d7dtdState.waitingForPlayersMsg = msg;
         });
       }
 
@@ -632,17 +577,11 @@ function parseDiscordCommand(msg, mentioned) {
 }
 
 ////// # Telnet # //////
-var params = {
+const params = {
   host: ip,
   port,
-  timeout: 15000,
   username: "",
   password: pass,
-
-  passwordPrompt: /Please enter password:/i,
-  shellPrompt: /\r\n$/,
-
-  debug: false,
 };
 
 // If Discord auth is skipped, we have to connect now rather than waiting for the Discord client.
@@ -664,9 +603,6 @@ telnet.on("failedlogin", () => {
 });
 
 telnet.on("close", () => {
-  // Empty the cache.
-  d7dtdState.data = "";
-
   // If there is no error, update status to 'No connection'
   if(d7dtdState.connStatus !== -1) {
     updateStatus(0);
@@ -679,105 +615,51 @@ telnet.on("close", () => {
 });
 
 telnet.on("data", (data) => {
-  if(config["debug-mode"]) {
-    var str = data.toString();
-
-    var lineEnding = "!!!NONE!!!";
-    if(str.endsWith("\r\n")) lineEnding = "CRLF";
-    else if(str.endsWith("\r")) lineEnding = "CR";
-    else if(str.endsWith("\n")) lineEnding = "LF";
-
-    console.log(`[DEBUG] Buffer length: ${data.length}; Line ending: ${lineEnding};`);
-
-    if(lineEnding === "!!!NONE!!!") console.warn("[DEBUG] Buffer is missing a line ending!");
-
-    if(str.startsWith("\r\n") || str.startsWith("\n") || str.startsWith("\r")) {
-      console.log("[DEBUG] Line starts with a line ending. Possible issues?");
-    }
-
-    if(config["debug-buffer-log"]) {
-      console.log(`[BUFFERDMP1] ${str}`);
-    }
-  }
-
-  data = d7dtdState.data + data.toString();
-
-  if(data.endsWith("\n") || data.endsWith("\r")) {
-    d7dtdState.data = ""; // Clear the existing data cache.
-  }
-  else {
-    // Fill the cache to be completed on the next "data" call.
-    d7dtdState.data = d7dtdState.data + data;
-
-    // Await further information.
-    return;
-  }
-
-  var lines = data.split(lineSplit);
-
   if(config["log-telnet"]) {
     console.log("[Telnet] " + data);
   }
 
-  // Error catchers for password re-prompts
-  if(data === "Please enter password:\r\n\u0000\u0000") {
-    console.log("ERROR: Received password prompt!");
-    process.exit();
+  const split = data.split(" ");
+
+  if(split[2] === "INF" && split[3] === "[NET]" && split[4] === "ServerShutdown\r") {
+    // If we don't destroy the connection, crashes will happen when someone types a message.
+    // This is a workaround until better measures can be put in place for sending data to the game.
+    console.log("The server has shut down. Closing connection...");
+    telnet.destroy();
+
+    channel.send({embeds: [{
+      color: 14164000,
+      description: "The server has shut down."
+    }] })
+      .catch(() => {
+      // Try re-sending without the embed if an error occurs.
+        channel.send("**The server has shut down.**")
+          .catch((err) => {
+            console.log("Failed to send message with error: " + err.message);
+          });
+      });
   }
 
-  if(data === "Password incorrect, please enter password:\r\n") {
-    console.log("ERROR: Received password prompt! (Telnet password is incorrect)");
-    process.exit();
+  // This is a workaround for responses not working properly, particularly on local connections.
+  if(d7dtdState.waitingForTime && data.startsWith("Day")) {
+    handleTime(data, d7dtdState.waitingForTimeMsg);
   }
-
-  for(var i = 0; i <= lines.length-1; i++) {
-    var line = lines[i];
-
-    // escapeRegExp
-    lines[i] = lines[i].replace(/[.*+?^${}()|[\]\\]/g, " ");
-
-    var split = line.split(" ");
-
-    if(split[2] === "INF" && split[3] === "[NET]" && split[4] === "ServerShutdown\r") {
-      // If we don't destroy the connection, crashes will happen when someone types a message.
-      // This is a workaround until better measures can be put in place for sending data to the game.
-      console.log("The server has shut down. Closing connection...");
-      telnet.destroy();
-
-      channel.send({embeds: [{
-        color: 14164000,
-        description: "The server has shut down."
-      }] })
-        .catch(() => {
-        // Try re-sending without the embed if an error occurs.
-          channel.send("**The server has shut down.**")
-            .catch((err) => {
-              console.log("Failed to send message with error: " + err.message);
-            });
-        });
-    }
-
-    // This is a workaround for responses not working properly, particularly on local connections.
-    if(d7dtdState.waitingForTime && line.startsWith("Day")) {
-      handleTime(line, d7dtdState.waitingForTimeMsg);
-    }
-    else if(d7dtdState.waitingForVersion && line.startsWith("Game version:")) {
-      d7dtdState.waitingForVersionMsg.channel.send(line);
-    }
-    else if(d7dtdState.waitingForPlayers && line.startsWith("Total of ")) {
-      d7dtdState.waitingForPlayersMsg.channel.send(line);
-    }
-    //else if(d7dtdState.waitingForPref && line.startsWith("GamePref.")) {
-    //  d7dtdState.waitingForPrefMsg.channel.send(line);
-    //}
-    else {
-      handleMsgFromGame(line);
-    }
+  else if(d7dtdState.waitingForVersion && data.startsWith("Game version:")) {
+    d7dtdState.waitingForVersionMsg.channel.send(data);
+  }
+  else if(d7dtdState.waitingForPlayers && data.startsWith("Total of ")) {
+    d7dtdState.waitingForPlayersMsg.channel.send(data);
+  }
+  //else if(d7dtdState.waitingForPref && data.startsWith("GamePref.")) {
+  //  d7dtdState.waitingForPrefMsg.channel.send(data);
+  //}
+  else {
+    handleMsgFromGame(data);
   }
 });
 
 telnet.on("error", (error) => {
-  var errMsg = error.message || error;
+  const errMsg = error.message || error;
   console.log(`An error occurred while connecting to the game:\n${errMsg}`);
   //d7dtdState.lastTelnetErr = data.message;
 
@@ -792,7 +674,7 @@ function doLogin() {
     });
 }
 
-var firstLogin;
+let firstLogin;
 if(!config["skip-discord-auth"]) {
   doLogin();
 
@@ -867,12 +749,12 @@ if(!config["skip-discord-auth"]) {
 
     // If the bot is mentioned, pass through as if the user typed 7d!info
     // Also includes overrides for the default prefix.
-    var mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7d!info" || msg.content === "7d!help";
+    const mentioned = msg.content.includes("<@" + client.user.id + ">") || msg.content === "7d!info" || msg.content === "7d!help";
 
     if(msg.content.toUpperCase().startsWith(prefix) || mentioned) {
       parseDiscordCommand(msg, mentioned);
     }
-    else if(msg.channel === channel && msg.channel.type === "GUILD_TEXT") {
+    else if(msg.channel === channel && msg.channel.type === ChannelType.GuildText) {
       msg = "[" + msg.member.displayName + "] " + msg.cleanContent;
       handleMsgToGame(msg);
     }
