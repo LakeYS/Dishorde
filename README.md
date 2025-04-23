@@ -117,3 +117,38 @@ Once you complete all of this, you will be able to run the bot by executing run.
 `Connected to game. Connected to 1 Discord Servers.`
 
 To set the channel for your server's chat, open Discord and type `7d!setchannel #yourchannel` in your server. If the setchannel command doesn't work, try [setting it manually](https://github.com/LakeYS/Dishorde/wiki/Setting-up-the-channel-manually). Once complete, the bot should be all set!
+
+
+# How to Install - Docker
+
+## Creating the bot account
+1. Log in to the [Discord Developer Portal](https://discord.com/developers) in a browser and click "Create an application". Name the bot anything you'd like. Write down the application ID as you'll need it for later.
+2. On the left hand side, click "Bot". Now click the "Add Bot" button to create your bot. Once created, you can set an avatar for your bot if desired.
+3. Under "Privileged Gateway Intents", locate the "Message Content Intent" switch and turn this on. ***Important**! If you do not turn this on, the bot will not be able to see your messages or commands.*
+4. Under "Authorization Flow", locate the "Public Bot" switch and turn this off. ***Important!** If you do not turn this off, anyone can create a link to invite your server's bot to their own server.*
+5. Click "Save Changes" to confirm.
+6. Back towards the top, click the "Reset Token" button and reset the token. When done, the button will be replaced by a long set of letters and numbers. This is your bot's 'token'--like a password for your bot's account. You'll need both this and the Client ID number later. Copy them both somewhere safe or keep the tab open. ***Note!** Once you close the page, you will not be able to retrieve your bot's token without resetting it.*
+7. Copy the URL below into your browser and replace "APP_ID" with your application ID number. Hit enter and select the desired Discord server. Once this is done, the bot will show up in your server!
+
+`https://discord.com/oauth2/authorize?client_id=APP_ID&scope=bot`
+
+## Setting up the bot
+1. Install Docker.
+2. Now you'll need to edit your server's config xml file. If you're using the Steam dedicated server, it should be located in `C:\Program Files (x86)\Steam\steamapps\common\7 Days to Die Dedicated Server`.
+3. Open serverconfig.xml in a text editor (Right click and select 'Edit' to open it in Nodepad) and find "TelnetEnabled". Set it to true. Make sure TelnetPort is 8081 (or use the "port" argument in config.json). Set a telnet password.
+4. Download the [config.json.example](https://github.com/LakeYS/Dishorde/blob/master/config.example.json) file to config.json. Right click this file and click "Edit".
+5. Find "changeme" and replace it with your server's Telnet password. Replace "your_token_here" with the Discord token from earlier. If running the bot on a different network from the server, add `--ip=[your server's external ip]` (May require port forwarding if using an external IP. Make sure your Telnet password is secure.)
+6. Create a `docker-compose.yaml` file in the same directory as your `config.json` with the following contents:
+
+```yaml
+services:
+  dishorde:
+    image: ghcr.io/lakeys/dishorde:2
+    # If you're running 7 days to die in another container you may want to setup a private network
+    # https://docs.docker.com/reference/compose-file/services/#networks
+    network_mode: "host"
+    volumes:
+      - ./config.json:/app/config.json
+```
+
+7. Run `docker compose up` to start the bot, or alternatively `docker compose up -d` to start the bot in the background.
